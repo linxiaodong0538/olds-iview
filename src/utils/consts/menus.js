@@ -53,17 +53,32 @@ export default [
     title: '企业 App',
     children: [
       {
-        icon: 'ios-home',
-        name: 'company-app/storehouse',
-        title: '仓库',
+        icon: 'ios-briefcase',
+        name: 'company-app/medicines',
+        title: '医疗仓库',
         children: [
           {
-            title: '医疗',
-            route: '/website/news/articles/categories'
+            title: '分类列表',
+            route: '/company-app/medicines/products/categories'
           },
           {
-            title: '食堂',
-            route: '/website/news/articles/index'
+            title: '产品列表',
+            route: '/company-app/medicines/products/index'
+          }
+        ]
+      },
+      {
+        icon: 'android-restaurant',
+        name: 'company-app/foods',
+        title: '食堂仓库',
+        children: [
+          {
+            title: '分类列表',
+            route: '/company-app/foods/products/categories'
+          },
+          {
+            title: '产品列表',
+            route: '/company-app/foods/products/index'
           }
         ]
       },

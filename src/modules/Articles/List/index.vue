@@ -122,11 +122,6 @@
         current: 1,
         columns: [
           {
-            title: 'ID',
-            key: 'id',
-            width: 80
-          },
-          {
             title: '标题',
             key: 'title'
           },
