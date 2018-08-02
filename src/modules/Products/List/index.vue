@@ -3,14 +3,14 @@
     <Breadcrumb>
       <Breadcrumb-item href="/">首页</Breadcrumb-item>
       <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
-      <Breadcrumb-item>文章列表</Breadcrumb-item>
+      <Breadcrumb-item>产品列表</Breadcrumb-item>
     </Breadcrumb>
     <List :current="current" :columns="columns" :data="articles.articles.items" :total="articles.articles.total"
           @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
           <Button class="margin-right-sm" type="primary"
-                  @click="$router.push(`/${prefix}/${alias}/articles/index/form`)">新增
+                  @click="$router.push(`/${prefix}/${alias}/products/index/form`)">新增
           </Button>
         </ListOperations>
         <ListSearch>

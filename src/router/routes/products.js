@@ -1,14 +1,14 @@
 export default {
   path: ':prefix/:alias/products',
-  component: resolve => require(['@/modules/Articles'], resolve),
+  component: resolve => require(['@/modules/Products'], resolve),
   children: [
     {
       path: 'index',
-      component: resolve => require(['@/modules/Articles/List'], resolve)
+      component: resolve => require(['@/modules/Products/List'], resolve)
     },
     {
       path: 'index/form/:id?',
-      component: resolve => require(['@/modules/Articles/Form'], resolve)
+      component: resolve => require(['@/modules/Products/Form'], resolve)
     },
     {
       path: 'categories',
