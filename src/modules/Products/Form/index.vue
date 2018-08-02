@@ -18,19 +18,21 @@
             </Option>
           </Select>
         </Form-item>
-        <Form-item label="图片 1" prop="picture">
-          <Uploader key="0" v-if="id && !formValidate.picture1" ref="uploader1" @change="handleUploader1Change"></Uploader>
+        <Form-item label="图片 1" prop="picture1">
+          <Uploader key="0" v-if="id && !formValidate.picture1" ref="uploader1"
+                    @change="handleUploader1Change"></Uploader>
           <Uploader key="1" v-if="id && formValidate.picture1" ref="uploader1" v-model="formValidate.picture1"
                     @change="handleUploader1Change"></Uploader>
           <Uploader key="2" v-if="!id" ref="uploader1" @change="handleUploader1Change"></Uploader>
           <Input v-model="formValidate.picture1" style="display: none;"></Input>
           （尺寸：1150x647）
         </Form-item>
-        <Form-item label="图片 2" prop="picture">
-          <Uploader key="0" v-if="id && !formValidate.picture2" ref="uploader2" @change="handleUploader2Change"></Uploader>
-          <Uploader key="1" v-if="id && formValidate.picture2" ref="uploader2" v-model="formValidate.picture2"
+        <Form-item label="图片 2" prop="picture2">
+          <Uploader key="3" v-if="id && !formValidate.picture2" ref="uploader2"
                     @change="handleUploader2Change"></Uploader>
-          <Uploader key="2" v-if="!id" ref="uploader2" @change="handleUploader2Change"></Uploader>
+          <Uploader key="4" v-if="id && formValidate.picture2" ref="uploader2" v-model="formValidate.picture2"
+                    @change="handleUploader2Change"></Uploader>
+          <Uploader key="5" v-if="!id" ref="uploader2" @change="handleUploader2Change"></Uploader>
           <Input v-model="formValidate.picture2" style="display: none;"></Input>
           （尺寸：1150x647）
         </Form-item>
@@ -38,15 +40,15 @@
           <InputNumber :min="1" :max="100000" v-model="formValidate.price"></InputNumber>
           元
         </Form-item>
-        <Form-item label="库存" prop="price">
-          <InputNumber :min="1" :max="100000" v-model="formValidate.price"></InputNumber>
+        <Form-item label="库存" prop="stock">
+          <InputNumber :min="1" :max="100000" v-model="formValidate.stock"></InputNumber>
           件
         </Form-item>
         <Form-item label="采购地点" prop="purchase_address">
-          <Input v-model="formValidate.purchase_address" placeholder="请输入标题"></Input>
+          <Input v-model="formValidate.purchase_address" placeholder="请输入采购地点"></Input>
         </Form-item>
         <Form-item label="商家电话" prop="seller_telephone">
-          <Input v-model="formValidate.seller_telephone" placeholder="请输入标题"></Input>
+          <Input v-model="formValidate.seller_telephone" placeholder="请输入商家电话"></Input>
         </Form-item>
         <Form-item label="详情" prop="content">
           <Editor ref="editor" v-model="formValidate.content" @change="handleEditorChange"></Editor>
@@ -88,8 +90,14 @@
         id: '',
         formValidate: {
           title: '',
-          content: '',
           category_id: '',
+          picture1: '',
+          picture2: '',
+          price: '',
+          stock: '',
+          purchase_address: '',
+          seller_telephone: '',
+          content: '',
           picture: ''
         },
         ruleValidate: {
@@ -109,20 +117,20 @@
               message: '请选择分类'
             }
           ],
-          picture: [
+          picture1: [
             {
               required: true,
-              message: '请上传封面'
+              message: '请上传图片 1'
             }
           ],
           content: [
             {
               required: true,
-              message: '内容不能为空'
+              message: '详情不能为空'
             },
             {
               max: 10000,
-              message: '内容长度过长'
+              message: '详情长度过长'
             }
           ]
         }

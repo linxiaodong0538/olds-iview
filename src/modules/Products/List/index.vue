@@ -142,6 +142,14 @@
             }
           },
           {
+            title: '价格',
+            key: 'price',
+            width: 180,
+            render (h, params) {
+              return h('span', null, `${params.row.price} 元`)
+            }
+          },
+          {
             title: '发布时间',
             key: 'created_at',
             width: 180,

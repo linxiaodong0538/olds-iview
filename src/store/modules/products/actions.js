@@ -1,13 +1,13 @@
 import types from './types'
-import Model from '../../../models/categories'
+import Model from '../../../models/products'
 
 export default {
   /**
    * 获取列表
    */
-  getCategories ({ commit }, { query }) {
+  getProducts ({ commit }, { query }) {
     return new Model().GET({ query }).then((res) => {
-      commit(types.GET_CATEGORIES, {
+      commit(types.GET_PRODUCTS, {
         data: res.data
       })
     })
@@ -16,9 +16,9 @@ export default {
   /**
    * 获取详情
    */
-  getCategory ({ commit }, { id }) {
+  getProduct ({ commit }, { id }) {
     return new Model().GET({ id }).then((res) => {
-      commit(types.GET_CATEGORY, {
+      commit(types.GET_PRODUCT, {
         data: res.data
       })
     })
@@ -27,21 +27,21 @@ export default {
   /**
    * 新增
    */
-  postCategory ({ commit }, { body }) {
+  postProduct ({ commit }, { body }) {
     return new Model().POST({ body })
   },
 
   /**
    * 编辑
    */
-  putCategory ({ commit }, { id, body }) {
+  putProduct ({ commit }, { id, body }) {
     return new Model().PUT({ id, body })
   },
 
   /**
    * 删除
    */
-  deleteCategory ({ commit }, { id }) {
+  deleteProduct ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }
