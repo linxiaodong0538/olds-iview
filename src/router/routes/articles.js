@@ -1,5 +1,5 @@
 export default {
-  path: ':alias/articles',
+  path: ':prefix/:alias/articles',
   component: resolve => require(['@/modules/Articles'], resolve),
   children: [
     {

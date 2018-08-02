@@ -9,7 +9,8 @@
           @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary" @click="$router.push(`/${alias}/articles/index/form`)">新增
+          <Button class="margin-right-sm" type="primary"
+                  @click="$router.push(`/${prefix}/${alias}/articles/index/form`)">新增
           </Button>
         </ListOperations>
         <ListSearch>
@@ -60,6 +61,7 @@
     async beforeRouteUpdate (to, from, next) {
       this.categories.categories = {}
       this.articles.articles = {}
+      this.prefix = to.params.prefix
       this.alias = to.params.alias
       await this.getCategoryItems()
       this.getItems()
@@ -68,6 +70,7 @@
     async created () {
       this.categories.categories = {}
       this.articles.articles = {}
+      this.prefix = this.$route.params.prefix
       this.alias = this.$route.params.alias
       await this.getCategoryItems()
       this.getItems()
@@ -81,6 +84,7 @@
     data () {
       return {
         consts,
+        prefix: '',
         alias: '',
         attr: {
           search: {
@@ -165,7 +169,7 @@
                   },
                   on: {
                     click: () => {
-                      this.$router.push(`/${this.alias}/articles/index/form/${params.row.id}`)
+                      this.$router.push(`/${this.prefix}/${this.alias}/articles/index/form/${params.row.id}`)
                     }
                   }
                 }, '编辑'),

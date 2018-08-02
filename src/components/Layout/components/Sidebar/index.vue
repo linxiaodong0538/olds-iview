@@ -8,14 +8,20 @@
     </div>
     <Menu ref="menu" theme="dark" :active-name="activeName" width="auto" :open-names="openNames"
           @on-select="handleSelect">
-      <Submenu v-for="(menu, index) in consts.MENUS" :key="index" :name="menu.name">
+      <Submenu v-for="(menu1, index1) in consts.MENUS" :key="index1" :name="menu1.name">
         <template slot="title">
-          <Icon :type="menu.icon"></Icon>
-          {{ menu.title }}
+          <Icon :type="menu1.icon"></Icon>
+          {{ menu1.title }}
         </template>
-        <Menu-item v-for="(menuChild, childIndex) in menu.children" :key="childIndex" :name="menuChild.route">
-          {{ menuChild.title }}
-        </Menu-item>
+        <Submenu v-for="(menu2, index2) in menu1.children" :key="index2" :name="menu2.name">
+          <template slot="title">
+            <Icon :type="menu2.icon"></Icon>
+            {{ menu2.title }}
+          </template>
+          <MenuItem v-for="(menu3, index3) in menu2.children" :key="index3" :name="menu3.route">
+            {{ menu3.title }}
+          </MenuItem>
+        </Submenu>
       </Submenu>
     </Menu>
   </div>
@@ -48,8 +54,10 @@
         const path = route ? route.path : this.$route.path
         const paths = path.split('/')
 
-        this.openNames = [paths[1]]
-        this.activeName = paths.length >= 4 ? `/${paths[1]}/${paths[2]}/${paths[3]}` : `/${paths[1]}/${paths[2]}`
+        this.openNames = [paths[1], `${paths[1]}/${paths[2]}`]
+        this.activeName = paths.length >= 5
+          ? `/${paths[1]}/${paths[2]}/${paths[3]}/${paths[4]}`
+          : `/${paths[1]}/${paths[2]}/${paths[3]}`
 
         this.$nextTick(() => {
           this.$refs.menu.updateActiveName()

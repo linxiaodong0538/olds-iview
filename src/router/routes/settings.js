@@ -1,5 +1,5 @@
 export default {
-  path: 'settings',
+  path: ':prefix/settings',
   component: resolve => require(['@/modules/Settings'], resolve),
   children: [
     {
