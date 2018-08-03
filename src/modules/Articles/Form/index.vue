@@ -16,11 +16,7 @@
           <Input v-model="formValidate.content" style="display: none;"></Input>
         </Form-item>
         <Form-item label="分类" prop="category_id">
-          <Select v-model="formValidate.category_id" placeholder="请选择分类" clearable style="width: 220px;">
-            <Option v-for="item in categories.categories.items" :value="item.id" :key="item.id">
-              {{ item.title }}
-            </Option>
-          </Select>
+          <Categories :alias="alias" v-model="formValidate.category_id" @on-change="handleCategoryChange"></Categories>
         </Form-item>
         <Form-item label="封面" prop="picture">
           <Uploader key="0" v-if="id && !formValidate.picture" ref="uploader" @change="handleUploaderChange"></Uploader>
@@ -44,6 +40,7 @@
   import consts from '@/utils/consts'
   import Editor from '@/components/Editor'
   import Uploader from '@/components/Uploader'
+  import Categories from '@/components/Categories'
 
   export default {
     name: 'form',
@@ -56,7 +53,8 @@
     },
     components: {
       Editor,
-      Uploader
+      Uploader,
+      Categories
     },
     data () {
       return {
@@ -143,6 +141,9 @@
         this.$refs.formValidate.resetFields()
         this.$refs.editor.html('')
         this.$refs.uploader.remove()
+      },
+      handleCategoryChange (val) {
+        this.formValidate.category_id = val
       }
     },
     computed: mapState([

@@ -4,6 +4,7 @@ import getters from './getters'
 import actions from './actions'
 import mutations from './mutations'
 import articles from './modules/articles'
+import products from './modules/products'
 import categories from './modules/categories'
 import settings from './modules/settings'
 
@@ -18,6 +19,7 @@ export default new Vuex.Store({
   mutations,
   modules: {
     articles,
+    products,
     categories,
     settings
   }

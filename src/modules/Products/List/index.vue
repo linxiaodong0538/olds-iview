@@ -5,7 +5,7 @@
       <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
       <Breadcrumb-item>产品列表</Breadcrumb-item>
     </Breadcrumb>
-    <List :current="current" :columns="columns" :data="articles.articles.items" :total="articles.articles.total"
+    <List :current="current" :columns="columns" :data="products.products.items" :total="products.products.total"
           @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
@@ -15,19 +15,8 @@
         </ListOperations>
         <ListSearch>
           <Form inline @submit.native.prevent="handleSearch">
-            <Form-item prop="attr">
-              <Select v-model="attr.search.which" placeholder="请选择属性" clearable style="width: 220px;">
-                <Option v-for="item in attr.options" :value="item.id" :key="item.id">
-                  {{ item.title }}
-                </Option>
-              </Select>
-            </Form-item>
             <Form-item prop="category_id">
-              <Select v-model="where.category_id.$eq" placeholder="请选择分类" clearable style="width: 220px;">
-                <Option v-for="item in categories.categories.items" :value="item.id" :key="item.id">
-                  {{ item.title }}
-                </Option>
-              </Select>
+              <Categories :alias="alias" v-model="where.category_id.$eq" @on-change="handleCategoryChange"></Categories>
             </Form-item>
             <Form-item prop="title">
               <Input type="text" placeholder="请输入标题" v-model="where.title.$like" style="width: 220px;"></Input>
@@ -42,9 +31,6 @@
     <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    <Modal width="280" v-model="attr.setting.modal" title="请确认" @on-ok="handleSetAttr">
-      <p>{{setAttrTip}}</p>
-    </Modal>
   </div>
 </template>
 
@@ -52,15 +38,14 @@
   import { mapState } from 'vuex'
   import consts from '@/utils/consts'
   import helpers from 'apples/libs/helpers'
-  import time from 'apples/libs/time'
-  import ArticleModal from '../../../models/articles'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import Categories from '@/components/Categories'
 
   export default {
     name: 'list',
     async beforeRouteUpdate (to, from, next) {
       this.categories.categories = {}
-      this.articles.articles = {}
+      this.products.products = {}
       this.prefix = to.params.prefix
       this.alias = to.params.alias
       await this.getCategoryItems()
@@ -69,7 +54,7 @@
     },
     async created () {
       this.categories.categories = {}
-      this.articles.articles = {}
+      this.products.products = {}
       this.prefix = this.$route.params.prefix
       this.alias = this.$route.params.alias
       await this.getCategoryItems()
@@ -79,34 +64,14 @@
       List,
       ListHeader,
       ListOperations,
-      ListSearch
+      ListSearch,
+      Categories
     },
     data () {
       return {
         consts,
         prefix: '',
         alias: '',
-        attr: {
-          search: {
-            which: ''
-          },
-          setting: {
-            id: 0,
-            which: '',
-            modal: false,
-            value: ''
-          },
-          options: [
-            {
-              id: 'is_category_top',
-              title: '是否分类头条'
-            },
-            {
-              id: 'is_home_ad',
-              title: '是否首页广告'
-            }
-          ]
-        },
         del: {
           modal: false,
           id: 0
@@ -144,23 +109,23 @@
           {
             title: '价格',
             key: 'price',
-            width: 180,
+            width: 80,
             render (h, params) {
               return h('span', null, `${params.row.price} 元`)
             }
           },
           {
-            title: '发布时间',
-            key: 'created_at',
-            width: 180,
+            title: '库存',
+            key: 'stock',
+            width: 80,
             render (h, params) {
-              return h('span', null, time.getDateTime(params.row.created_at + '000'))
+              return h('span', null, `${params.row.stock} 件`)
             }
           },
           {
             title: '操作',
             key: 'action',
-            width: 410,
+            width: 450,
             render: (h, params) => {
               const isHomeAd = params.row.is_home_ad === 1
               const isCategoryTop = params.row.is_category_top === 1
@@ -172,7 +137,7 @@
                   },
                   on: {
                     click: () => {
-                      this.$router.push(`/${this.prefix}/${this.alias}/articles/index/form/${params.row.id}`)
+                      this.$router.push(`/${this.prefix}/${this.alias}/products/index/form/${params.row.id}`)
                     }
                   }
                 }, '编辑'),
@@ -192,90 +157,52 @@
                   },
                   on: {
                     click: () => {
-                      this.attr.setting.id = params.row.id
-                      this.attr.setting.which = 'is_home_ad'
-                      this.attr.setting.modal = true
-                      this.attr.setting.value = isHomeAd ? 0 : 1
                     }
                   }
-                }, isHomeAd ? '取消设为首页广告' : '设为首页广告'),
+                }, '查看入库日志'),
                 h('Button', {
                   props: {
                     type: 'ghost'
                   },
                   on: {
                     click: () => {
-                      this.attr.setting.id = params.row.id
-                      this.attr.setting.which = 'is_category_top'
-                      this.attr.setting.modal = true
-                      this.attr.setting.value = isCategoryTop ? 0 : 1
                     }
                   }
-                }, isCategoryTop ? '取消设为分类头条' : '设为分类头条')
+                }, '查看出库日志'),
+                h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: () => {
+                    }
+                  }
+                }, '获取二维码')
               ])
             }
           }
         ]
       }
     },
-    computed: {
-      ...mapState([
-        'articles',
-        'categories'
-      ]),
-      setAttrTip () {
-        const { which, value } = this.attr.setting
-
-        if (which === 'is_home_ad') {
-          return value === 1 ? '确认设为首页广告？' : '确认取消设为首页广告？'
-        } else {
-          return value === 1 ? '确认设为分类头条？' : '确认取消设为分类头条？'
-        }
-      }
-    },
+    computed: mapState([
+      'products',
+      'categories'
+    ]),
     methods: {
-      async handleSetAttr () {
-        const { which, value } = this.attr.setting
-        const actionType = which === 'is_category_top'
-          ? value === 1
-            ? 'SET_CATEGORY_TOP'
-            : 'CANCEL_CATEGORY_TOP'
-          : value === 1
-            ? 'SET_HOME_AD'
-            : 'CANCEL_HOME_AD'
-
-        await new ArticleModal().addPath('actions').POST({
-          body: {
-            type: actionType,
-            id: this.attr.setting.id
-          }
-        })
-
-        this.$Message.success('设置成功！')
-        this.resetSearch()
-        this.getItems()
-      },
       getItems (current = 1) {
-        const attrWhere = this.attr.search.which
-          ? { [this.attr.search.which]: { $eq: 1 } }
-          : null
-
         this.current = current
 
-        return this.$store.dispatch('getArticles', {
+        return this.$store.dispatch('getProducts', {
           query: {
             offset: (current - 1) * consts.PAGE_SIZE,
             limit: consts.PAGE_SIZE,
-            where: Object.assign({
-              alias: this.alias
-            }, this.where, attrWhere)
+            where: { ...this.where, alias: this.alias }
           }
         })
       },
       resetSearch () {
         this.where.category_id.$eq = ''
         this.where.title.$like = ''
-        this.attr.search.which = ''
       },
       getCategoryItems () {
         return this.$store.dispatch('getCategories', {
@@ -296,7 +223,7 @@
         this.del.id = id
       },
       async handleDelOk () {
-        await this.$store.dispatch('deleteArticle', {
+        await this.$store.dispatch('deleteProduct', {
           id: this.del.id
         })
         this.$Message.success('删除成功！')
@@ -304,6 +231,9 @@
         await helpers.sleep(500)
         this.resetSearch()
         this.getItems()
+      },
+      handleCategoryChange (val) {
+        this.where.category_id.$eq = val
       }
     }
   }

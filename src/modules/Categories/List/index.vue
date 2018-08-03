@@ -10,6 +10,7 @@
       <ListHeader>
         <ListOperations>
           <Button class="margin-right-sm" type="primary" @click="handlePost">新增</Button>
+          <Button class="margin-right-sm" type="primary" @click="handleBack" v-if="parents.length">返回上一级</Button>
         </ListOperations>
         <ListSearch>
           <Form inline @submit.native.prevent="handleSearch">
@@ -22,12 +23,27 @@
           </Form>
         </ListSearch>
       </ListHeader>
+      <ListNavigation>
+        <Alert v-if="parents.length">
+          <b>{{ parents[parents.length - 1].title }}</b> 的子分类列表：
+        </Alert>
+        <Alert v-else>
+          <b>顶级分类</b> 的子分类列表：
+        </Alert>
+      </ListNavigation>
     </List>
     <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    <Modal width="500" v-model="formModal" title="新增">
+    <Modal width="500" v-model="formModal" :title="put.id ? '编辑' : '新增'">
       <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
+        <Form-item label="父类" prop="title">
+          <Row>
+            <Col span="20">
+              {{ parents.length ? parents[parents.length - 1].title : '顶级分类'}}
+            </Col>
+          </Row>
+        </Form-item>
         <Form-item label="标题" prop="title">
           <Row>
             <Col span="20">
@@ -61,8 +77,8 @@
 <script>
   import { mapState } from 'vuex'
   import consts from '@/utils/consts'
-  import time from 'apples/libs/time'
-  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import arrayToTree from 'array-to-tree'
+  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
 
   export default {
     name: 'list',
@@ -76,17 +92,24 @@
       this.categories.categories = {}
       this.alias = this.$route.params.alias
       this.getItems()
+
+      setTimeout(() => {
+        console.log(22, arrayToTree(this.categories.categories.items))
+      }, 2000)
     },
     components: {
       List,
       ListHeader,
       ListOperations,
-      ListSearch
+      ListSearch,
+      ListNavigation
     },
     data () {
       return {
+        a: 3,
         consts,
         alias: '',
+        parents: [],
         formModal: false,
         formValidate: {
           title: '',
@@ -113,6 +136,9 @@
           id: 0
         },
         where: {
+          parent_id: {
+            $eq: 0
+          },
           title: {
             $like: ''
           }
@@ -132,17 +158,9 @@
             }
           },
           {
-            title: '发布时间',
-            key: 'created_at',
-            width: 180,
-            render (h, params) {
-              return h('span', null, time.getDateTime(params.row.created_at + '000'))
-            }
-          },
-          {
             title: '操作',
             key: 'action',
-            width: 150,
+            width: 240,
             render: (h, params) => {
               return h('ButtonGroup', [
                 h('Button', {
@@ -164,7 +182,22 @@
                       this.handleDel(params.row.id)
                     }
                   }
-                }, '删除')
+                }, '删除'),
+                h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: () => {
+                      const { id, title } = params.row
+
+                      this.resetSearch()
+                      this.where.parent_id.$eq = id
+                      this.parents.push({ id, title })
+                      this.getItems()
+                    }
+                  }
+                }, '子分类列表')
               ])
             }
           }
@@ -175,6 +208,10 @@
       'categories'
     ]),
     methods: {
+      resetSearch () {
+        this.current = 1
+        this.where.title.$like = ''
+      },
       getItems (current = 1) {
         this.current = current
 
@@ -188,6 +225,15 @@
       },
       getDetails (id) {
         return this.$store.dispatch('getCategory', { id: this.put.id })
+      },
+      handleBack () {
+        this.resetSearch()
+        this.parents.pop()
+        this.where.parent_id.$eq = this.parents.length
+          ? this.parents[this.parents.length - 1].id
+          : 0
+
+        this.getItems()
       },
       handlePageChange (current) {
         this.getItems(current)
@@ -226,13 +272,18 @@
 
             await this.$store.dispatch(action, {
               id: this.put.id,
-              body: { ...this.formValidate, alias: this.alias }
+              body: {
+                ...this.formValidate,
+                alias: this.alias,
+                parent_id: this.where.parent_id.$eq
+              }
             })
 
             this.formModal = false
 
             this.$Message.success((this.put.id ? '编辑' : '新增') + '成功！')
             !this.put.id && this.$refs.formValidate.resetFields()
+            this.resetSearch()
             this.getItems()
           }
         })

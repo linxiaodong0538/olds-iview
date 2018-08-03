@@ -23,11 +23,7 @@
               </Select>
             </Form-item>
             <Form-item prop="category_id">
-              <Select v-model="where.category_id.$eq" placeholder="请选择分类" clearable style="width: 220px;">
-                <Option v-for="item in categories.categories.items" :value="item.id" :key="item.id">
-                  {{ item.title }}
-                </Option>
-              </Select>
+              <Categories :alias="alias" v-model="where.category_id.$eq" @on-change="handleCategoryChange"></Categories>
             </Form-item>
             <Form-item prop="title">
               <Input type="text" placeholder="请输入标题" v-model="where.title.$like" style="width: 220px;"></Input>
@@ -55,6 +51,7 @@
   import time from 'apples/libs/time'
   import ArticleModal from '../../../models/articles'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import Categories from '@/components/Categories'
 
   export default {
     name: 'list',
@@ -79,7 +76,8 @@
       List,
       ListHeader,
       ListOperations,
-      ListSearch
+      ListSearch,
+      Categories
     },
     data () {
       return {
@@ -258,9 +256,7 @@
           query: {
             offset: (current - 1) * consts.PAGE_SIZE,
             limit: consts.PAGE_SIZE,
-            where: Object.assign({
-              alias: this.alias
-            }, this.where, attrWhere)
+            where: { ...this.where, ...attrWhere, alias: this.alias }
           }
         })
       },
@@ -296,6 +292,9 @@
         await helpers.sleep(500)
         this.resetSearch()
         this.getItems()
+      },
+      handleCategoryChange (val) {
+        this.where.category_id.$eq = val
       }
     }
   }

@@ -3,7 +3,7 @@
     <Breadcrumb>
       <Breadcrumb-item href="/">首页</Breadcrumb-item>
       <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
-      <Breadcrumb-item href="/articles/index">产品列表</Breadcrumb-item>
+      <Breadcrumb-item href="/products/index">产品列表</Breadcrumb-item>
       <Breadcrumb-item>{{ id ? '编辑' : '新增' }}</Breadcrumb-item>
     </Breadcrumb>
     <div class="limit-width">
@@ -12,11 +12,7 @@
           <Input v-model="formValidate.title" placeholder="请输入标题"></Input>
         </Form-item>
         <Form-item label="分类" prop="category_id">
-          <Select v-model="formValidate.category_id" placeholder="请选择分类" clearable style="width: 220px;">
-            <Option v-for="item in categories.categories.items" :value="item.id" :key="item.id">
-              {{ item.title }}
-            </Option>
-          </Select>
+          <Categories :alias="alias" v-model="formValidate.category_id" @on-change="handleCategoryChange"></Categories>
         </Form-item>
         <Form-item label="图片 1" prop="picture1">
           <Uploader key="0" v-if="id && !formValidate.picture1" ref="uploader1"
@@ -56,7 +52,7 @@
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
-          <Button type="ghost" @click="$router.push(`/${prefix}/${alias}/articles/index`)">返回</Button>
+          <Button type="ghost" @click="$router.push(`/${prefix}/${alias}/products/index`)">返回</Button>
         </Form-item>
       </Form>
     </div>
@@ -68,6 +64,7 @@
   import consts from '@/utils/consts'
   import Editor from '@/components/Editor'
   import Uploader from '@/components/Uploader'
+  import Categories from '@/components/Categories'
 
   export default {
     name: 'form',
@@ -80,7 +77,8 @@
     },
     components: {
       Editor,
-      Uploader
+      Uploader,
+      Categories
     },
     data () {
       return {
@@ -90,7 +88,7 @@
         id: '',
         formValidate: {
           title: '',
-          category_id: '',
+          category_id: 0,
           picture1: '',
           picture2: '',
           price: '',
@@ -138,7 +136,7 @@
     },
     methods: {
       getDetails (id) {
-        return this.$store.dispatch('getArticle', { id })
+        return this.$store.dispatch('getProduct', { id })
       },
       getCategoryItems () {
         return this.$store.dispatch('getCategories', {
@@ -160,7 +158,7 @@
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             const { id, formValidate, alias } = this
-            const action = id ? 'putArticle' : 'postArticle'
+            const action = id ? 'putProduct' : 'postProduct'
 
             await this.$store.dispatch(action, {
               id,
@@ -175,15 +173,19 @@
       resetFields () {
         this.$refs.formValidate.resetFields()
         this.$refs.editor.html('')
-        this.$refs.uploader.remove()
+        this.$refs.uploader1.remove()
+        this.$refs.uploader2.remove()
+      },
+      handleCategoryChange (val) {
+        this.formValidate.category_id = val
       }
     },
     computed: mapState([
-      'articles',
+      'products',
       'categories'
     ]),
     watch: {
-      'articles.article': {
+      'products.product': {
         handler (newVal) {
           this.formValidate = newVal
           this.$refs.editor.html(newVal.content)
