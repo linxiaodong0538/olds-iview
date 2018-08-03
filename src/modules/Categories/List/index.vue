@@ -28,7 +28,7 @@
           <b>{{ parents[parents.length - 1].title }}</b> 的子分类：
         </Alert>
         <Alert v-else>
-          <b>顶级分类</b> 的子分类列表：
+          <b>顶级分类</b> 的子分类
         </Alert>
       </ListNavigation>
     </List>

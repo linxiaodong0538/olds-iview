@@ -20,10 +20,10 @@
   import arrayToTree from 'array-to-tree'
 
   export default {
-    name: 'category-selector',
+    name: 'categories',
     props: {
       alias: {
-        type: String,
+        type: [Number, String],
         default: ''
       },
       value: {
