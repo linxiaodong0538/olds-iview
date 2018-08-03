@@ -25,7 +25,7 @@
       </ListHeader>
       <ListNavigation>
         <Alert v-if="parents.length">
-          <b>{{ parents[parents.length - 1].title }}</b> 的子分类列表：
+          <b>{{ parents[parents.length - 1].title }}</b> 的子分类：
         </Alert>
         <Alert v-else>
           <b>顶级分类</b> 的子分类列表：
@@ -197,7 +197,7 @@
                       this.getItems()
                     }
                   }
-                }, '子分类列表')
+                }, '管理子分类')
               ])
             }
           }

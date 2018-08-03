@@ -84,16 +84,12 @@ export default [
       },
       {
         icon: 'android-car',
-        name: 'company-app/storehouse',
+        name: 'company-app/cars',
         title: '车辆',
         children: [
           {
-            title: '医疗',
-            route: '/website/news/articles/categories'
-          },
-          {
-            title: '食堂',
-            route: '/website/news/articles/index'
+            title: '车辆列表',
+            route: '/company-app/cars/cars/index'
           }
         ]
       },
