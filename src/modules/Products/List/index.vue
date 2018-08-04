@@ -31,6 +31,12 @@
     <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
+
+
+    <Modal width="500" v-model="qrcode.modal" title="获取二维码">
+      <img :src="qrcode.imgSrc" />
+    </Modal>
+
   </div>
 </template>
 
@@ -40,6 +46,7 @@
   import helpers from '@/utils/helpers/base'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
   import Categories from '@/components/Categories'
+  import QRCode from 'qrcode'
 
   export default {
     name: 'list',
@@ -76,12 +83,17 @@
     },
     data () {
       return {
+        qrcode: {
+          modal: false,
+          id: 0
+        },
         consts,
         routePrefix: '',
         alias: '',
         del: {
+          id: 0,
           modal: false,
-          id: 0
+          imgSrc: ''
         },
         where: {
           category_id: {
@@ -178,7 +190,13 @@
                     type: 'ghost'
                   },
                   on: {
-                    click: () => {
+                    click: async () => {
+                      this.qrcode.id = params.row.id
+                      this.qrcode.imgSrc = await QRCode.toDataURL('abc', {
+                        margin: 1,
+                        width: 200
+                      })
+                      this.qrcode.modal = true
                     }
                   }
                 }, '获取二维码')

@@ -70,6 +70,16 @@
         <Form-item label="补贴" prop="subsidy">
           <Input type="textarea" :rows="4" v-model="formValidate.subsidy" placeholder="请输入补贴"></Input>
         </Form-item>
+        <Form-item v-if="alias === 'carers'" label="籍贯" prop="native_place">
+          <Input v-model="formValidate.native_place" placeholder="请输入籍贯"></Input>
+        </Form-item>
+        <Form-item v-if="alias === 'carers'" label="工龄" prop="seniority">
+          <InputNumber :min="1" :max="100" v-model="formValidate.seniority" style="width: 220px;"></InputNumber>
+          年
+        </Form-item>
+        <Form-item v-if="alias === 'carers'" label="老人入院编号" prop="olds">
+
+        </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
           <Button type="ghost" @click="$router.push(`${routePrefix}/staffs/index`)">返回</Button>
@@ -119,7 +129,9 @@
           release_time: '',
           salary: 0,
           leave: '',
-          subsidy: ''
+          subsidy: '',
+          native_place: '',
+          seniority: 0
         },
         ruleValidate: {
           name: [

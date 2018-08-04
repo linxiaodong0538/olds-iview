@@ -56,7 +56,7 @@
 
         this.openNames = [paths[1], `${paths[1]}/${paths[2]}`]
         this.activeName = `/${paths[1]}/${paths[2]}/${paths[3]}/${paths[4]}/${paths[5]}`
-        
+
         this.$nextTick(() => {
           this.$refs.menu.updateActiveName()
           this.$refs.menu.$children.forEach((item) => {

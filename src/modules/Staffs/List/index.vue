@@ -31,15 +31,20 @@
     name: 'list',
     async beforeRouteUpdate (to, from, next) {
       this.staffs.staffs = {}
+
       this.routePrefix = helpers.getRoutePrefix(to.params)
       this.alias = to.params.alias
+
       this.getItems()
+
       next()
     },
     async created () {
       this.staffs.staffs = {}
+
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.alias = this.$route.params.alias
+
       this.getItems()
     },
     components: {
