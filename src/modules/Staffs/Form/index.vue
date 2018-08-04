@@ -8,13 +8,13 @@
     </Breadcrumb>
     <div class="limit-width">
       <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
-        <Form-item label="车牌号" prop="num">
-          <Input v-model="formValidate.num" placeholder="请输入车牌号"></Input>
+        <Form-item label="姓名" prop="name">
+          <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
         </Form-item>
-        <Form-item label="车主" prop="owner">
-          <Input v-model="formValidate.owner" placeholder="请输入车主"></Input>
+        <Form-item label="身份证" prop="id_card">
+          <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
         </Form-item>
-        <Form-item label="图片" prop="picture">
+        <Form-item label="照片" prop="picture">
           <Uploader key="0" v-if="id && !formValidate.picture" ref="uploader"
                     @change="handleUploaderChange"></Uploader>
           <Uploader key="1" v-if="id && formValidate.picture" ref="uploader" v-model="formValidate.picture"
@@ -23,24 +23,52 @@
           <Input v-model="formValidate.picture" style="display: none;"></Input>
           （尺寸：1150x647）
         </Form-item>
-        <Form-item label="公里数" prop="km">
-          <InputNumber :min="1" :max="100000" v-model="formValidate.km" style="width: 220px;"></InputNumber>
-          公里
+        <Form-item label="性别" prop="gender">
+          <Select v-model="formValidate.gender" placeholder="请选择性别" style="width: 220px">
+            <Option v-for="key in Object.keys(consts.GENDERS)" :value="key" :key="key">
+              {{ consts.GENDERS[key] }}
+            </Option>
+          </Select>
         </Form-item>
-        <Form-item label="年检时间" prop="mot_time">
-          <DatePicker v-model="formValidate.mot_time" type="date" placeholder="请选择年检时间"
-                      style="width: 220px"></DatePicker>
+        <Form-item label="文化程度" prop="education_degree">
+          <Select v-model="formValidate.education_degree" placeholder="请选择文化程度" style="width: 220px">
+            <Option v-for="key in Object.keys(consts.EDUCATION_DEGREES)" :value="key" :key="key">
+              {{ consts.EDUCATION_DEGREES[key] }}
+            </Option>
+          </Select>
         </Form-item>
-        <Form-item label="保险到期时间" prop="insurance_time">
-          <DatePicker v-model="formValidate.insurance_time" type="date" placeholder="请选择保险到期时间"
-                      style="width: 220px"></DatePicker>
+        <Form-item label="从业资格证" prop="qualification_certificate">
+          <Input v-model="formValidate.qualification_certificate" placeholder="请输入从业资格证"></Input>
         </Form-item>
-        <Form-item label="购买日期" prop="buy_time">
-          <DatePicker v-model="formValidate.buy_time" type="date" placeholder="请选择购买日期"
-                      style="width: 220px"></DatePicker>
+        <Form-item label="在职岗位" prop="job">
+          <Input v-model="formValidate.job" placeholder="请输入在职岗位"></Input>
         </Form-item>
-        <Form-item label="备注" prop="remark">
-          <Input type="textarea" :rows="4" v-model="formValidate.remark" placeholder="请输入备注"></Input>
+        <Form-item label="本人电话" prop="telephone">
+          <Input v-model="formValidate.telephone" placeholder="请输入本人电话"></Input>
+        </Form-item>
+        <Form-item label="亲属电话" prop="family_telephones">
+          <Input v-model="formValidate.family_telephones" placeholder="请输入亲属电话"></Input>
+        </Form-item>
+        <Form-item label="从业经历" prop="employment_experience">
+          <Input type="textarea" :rows="4" v-model="formValidate.employment_experience" placeholder="请输入从业经历"></Input>
+        </Form-item>
+        <Form-item label="上岗时间" prop="start_time">
+          <TimePicker v-model="formValidate.start_time" format="HH:mm" placeholder="请选择上岗时间"
+                      style="width: 220px;"></TimePicker>
+        </Form-item>
+        <Form-item label="离岗时间" prop="release_time">
+          <TimePicker v-model="formValidate.release_time" format="HH:mm" placeholder="请选择离岗时间"
+                      style="width: 220px;"></TimePicker>
+        </Form-item>
+        <Form-item label="薪资待遇" prop="salary">
+          <InputNumber :min="1" :max="1000000" v-model="formValidate.salary" style="width: 220px;"></InputNumber>
+          元/月
+        </Form-item>
+        <Form-item label="请假" prop="leave">
+          <Input type="textarea" :rows="4" v-model="formValidate.leave" placeholder="请输入请假"></Input>
+        </Form-item>
+        <Form-item label="补贴" prop="subsidy">
+          <Input type="textarea" :rows="4" v-model="formValidate.subsidy" placeholder="请输入补贴"></Input>
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
@@ -54,7 +82,6 @@
 <script>
   import { mapState } from 'vuex'
   import consts from '@/utils/consts'
-  import Editor from '@/components/Editor'
   import Uploader from '@/components/Uploader'
 
   export default {
@@ -66,7 +93,6 @@
       this.id && this.getDetails(this.id)
     },
     components: {
-      Editor,
       Uploader
     },
     data () {
@@ -76,30 +102,48 @@
         alias: '',
         id: '',
         formValidate: {
-          num: '',
+          name: '',
           picture: '',
-          km: '',
-          mot_time: '',
-          insurance_time: '',
-          buy_time: '',
-          owner: '',
-          remark: ''
+          id_card: '',
+          gender: '',
+          education_degree: '',
+          qualification_certificate: '',
+          job: '',
+          telephone: '',
+          family_telephones: '',
+          employment_experience: '',
+          start_time: '',
+          release_time: '',
+          salary: 0,
+          leave: '',
+          subsidy: ''
         },
         ruleValidate: {
-          num: [
+          name: [
             {
               required: true,
-              message: '车牌号不能为空'
+              message: '姓名不能为空'
             },
             {
               max: 10,
-              message: '车牌号不能多于 10 个字'
+              message: '姓名不能多于 10 个字'
+            }
+          ],
+          id_card: [
+            {
+              required: true,
+              message: '身份证不能为空'
+            },
+            {
+              min: 18,
+              max: 18,
+              message: '身份证格式错误'
             }
           ],
           picture: [
             {
               required: true,
-              message: '请上传图片'
+              message: '请上传照片'
             }
           ]
         }
@@ -108,9 +152,6 @@
     methods: {
       getDetails (id) {
         return this.$store.dispatch('getStaff', { id })
-      },
-      handleEditorChange (html) {
-        this.formValidate.content = html
       },
       handleUploaderChange (file) {
         this.formValidate.picture = file ? file.id : ''
@@ -133,9 +174,7 @@
       },
       resetFields () {
         this.$refs.formValidate.resetFields()
-        this.$refs.editor.html('')
         this.$refs.uploader.remove()
-        this.$refs.uploader2.remove()
       }
     },
     computed: mapState([
@@ -145,7 +184,6 @@
       'staffs.staff': {
         handler (newVal) {
           this.formValidate = newVal
-          this.$refs.editor.html(newVal.content)
         }
       }
     }

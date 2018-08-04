@@ -1,6 +1,8 @@
 import MENUS from './menus'
 import ROLES from './roles'
 import ALIASES from './aliases'
+import GENDERS from './genders'
+import EDUCATION_DEGREES from './educationDegrees'
 
 // 当前 host
 const HOST = window.location.host
@@ -30,6 +32,8 @@ export default {
   MENUS,
   ROLES,
   ALIASES,
+  GENDERS,
+  EDUCATION_DEGREES,
   BASE_URL,
   API_URL,
   PAGE_SIZE,

@@ -54,7 +54,6 @@
 <script>
   import { mapState } from 'vuex'
   import consts from '@/utils/consts'
-  import Editor from '@/components/Editor'
   import Uploader from '@/components/Uploader'
 
   export default {
@@ -66,7 +65,6 @@
       this.id && this.getDetails(this.id)
     },
     components: {
-      Editor,
       Uploader
     },
     data () {
@@ -109,9 +107,6 @@
       getDetails (id) {
         return this.$store.dispatch('getCar', { id })
       },
-      handleEditorChange (html) {
-        this.formValidate.content = html
-      },
       handleUploaderChange (file) {
         this.formValidate.picture = file ? file.id : ''
       },
@@ -133,9 +128,7 @@
       },
       resetFields () {
         this.$refs.formValidate.resetFields()
-        this.$refs.editor.html('')
         this.$refs.uploader.remove()
-        this.$refs.uploader2.remove()
       }
     },
     computed: mapState([
@@ -145,7 +138,6 @@
       'cars.car': {
         handler (newVal) {
           this.formValidate = newVal
-          this.$refs.editor.html(newVal.content)
         }
       }
     }

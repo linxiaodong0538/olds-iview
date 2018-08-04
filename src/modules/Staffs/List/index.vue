@@ -23,7 +23,6 @@
 
 <script>
   import { mapState } from 'vuex'
-  import time from '@/utils/time'
   import consts from '@/utils/consts'
   import helpers from 'apples/libs/helpers'
   import List, { ListHeader, ListOperations } from '@/components/List'
@@ -59,53 +58,53 @@
         },
         columns: [
           {
-            title: '车牌号',
-            key: 'num'
+            title: '姓名',
+            key: 'name'
           },
           {
-            title: '车主',
-            key: 'owner',
+            title: '性别',
+            key: 'gender',
             width: 80,
             render (h, params) {
-              return h('span', null, params.row.owner)
+              return h('span', null, consts.GENDERS[params.row.gender])
             }
           },
           {
-            title: '公里数',
-            key: 'km',
-            width: 100,
+            title: '身份证',
+            key: 'card_id',
+            width: 160,
             render (h, params) {
-              return h('span', null, `${params.row.km} 公里`)
+              return h('span', null, params.row.id_card)
             }
           },
           {
-            title: '年检时间',
-            key: 'mot_time',
+            title: '本人电话',
+            key: 'telephone',
             width: 120,
             render (h, params) {
-              return h('span', null, time.getDate(params.row.mot_time))
+              return h('span', null, params.row.telephone)
             }
           },
           {
-            title: '保险到期时间',
-            key: 'insurance_time',
-            width: 120,
+            title: '在职岗位',
+            key: 'job',
+            width: 140,
             render (h, params) {
-              return h('span', null, time.getDate(params.row.insurance_time))
+              return h('span', null, params.row.job)
             }
           },
           {
-            title: '购买日期',
-            key: 'buy_time',
+            title: '薪资待遇',
+            key: 'salary',
             width: 120,
             render (h, params) {
-              return h('span', null, time.getDate(params.row.insurance_time))
+              return h('span', null, params.row.salary + ' 元/月')
             }
           },
           {
             title: '操作',
             key: 'action',
-            width: 255,
+            width: 150,
             render: (h, params) => {
               return h('ButtonGroup', [
                 h('Button', {
@@ -127,16 +126,7 @@
                       this.handleDel(params.row.id)
                     }
                   }
-                }, '删除'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                    }
-                  }
-                }, '查看维修记录')
+                }, '删除')
               ])
             }
           }
