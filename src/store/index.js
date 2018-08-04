@@ -6,6 +6,7 @@ import mutations from './mutations'
 import articles from './modules/articles'
 import products from './modules/products'
 import cars from './modules/cars'
+import staffs from './modules/staffs'
 import categories from './modules/categories'
 import settings from './modules/settings'
 
@@ -22,6 +23,7 @@ export default new Vuex.Store({
     articles,
     products,
     cars,
+    staffs,
     categories,
     settings
   }

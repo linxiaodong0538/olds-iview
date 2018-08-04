@@ -8,6 +8,7 @@ import home from './routes/home'
 import articles from './routes/articles'
 import products from './routes/products'
 import cars from './routes/cars'
+import Staffs from './routes/staffs'
 import settings from './routes/settings'
 import login from './routes/login'
 import logout from './routes/logout'
@@ -29,6 +30,7 @@ const router = new Router({
             articles,
             products,
             cars,
+            Staffs,
             settings
           ],
           meta: {

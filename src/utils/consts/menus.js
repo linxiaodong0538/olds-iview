@@ -95,16 +95,24 @@ export default [
       },
       {
         icon: 'person',
-        name: 'company-app/storehouse',
+        name: 'company-app/persons',
         title: '人员',
         children: [
           {
-            title: '医疗',
-            route: '/website/news/articles/categories'
+            title: '员工',
+            route: '/company-app/persons/staffs/index'
           },
           {
-            title: '食堂',
-            route: '/website/news/articles/index'
+            title: '老人',
+            route: '/company-app/persons/olds/index'
+          },
+          {
+            title: '家属',
+            route: '/company-app/persons/families/index'
+          },
+          {
+            title: '护工',
+            route: '/company-app/persons/carers/index'
           }
         ]
       },
