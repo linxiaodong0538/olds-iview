@@ -10,7 +10,7 @@
       <ListHeader>
         <ListOperations>
           <Button class="margin-right-sm" type="primary"
-                  @click="$router.push(`/${prefix}/${alias}/products/index/form`)">新增
+                  @click="$router.push(`${routePrefix}/products/index/form`)">新增
           </Button>
         </ListOperations>
         <ListSearch>
@@ -37,7 +37,7 @@
 <script>
   import { mapState } from 'vuex'
   import consts from '@/utils/consts'
-  import helpers from 'apples/libs/helpers'
+  import helpers from '@/utils/helpers/base'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
   import Categories from '@/components/Categories'
 
@@ -46,18 +46,25 @@
     async beforeRouteUpdate (to, from, next) {
       this.categories.categories = {}
       this.products.products = {}
-      this.prefix = to.params.prefix
+
+      this.routePrefix = helpers.getRoutePrefix(to.params)
       this.alias = to.params.alias
+
       await this.getCategoryItems()
+
       this.getItems()
+
       next()
     },
     async created () {
       this.categories.categories = {}
       this.products.products = {}
-      this.prefix = this.$route.params.prefix
+
+      this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.alias = this.$route.params.alias
+
       await this.getCategoryItems()
+
       this.getItems()
     },
     components: {
@@ -70,7 +77,7 @@
     data () {
       return {
         consts,
-        prefix: '',
+        routePrefix: '',
         alias: '',
         del: {
           modal: false,
@@ -134,7 +141,7 @@
                   },
                   on: {
                     click: () => {
-                      this.$router.push(`/${this.prefix}/${this.alias}/products/index/form/${params.row.id}`)
+                      this.$router.push(`${this.routePrefix}/products/index/form/${params.row.id}`)
                     }
                   }
                 }, '编辑'),

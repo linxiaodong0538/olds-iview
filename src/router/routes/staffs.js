@@ -1,5 +1,5 @@
 export default {
-  path: ':prefix/:alias/staffs',
+  path: ':topLevelMenu/:secondLevelMenu/:alias/staffs',
   component: resolve => require(['@/modules/Staffs'], resolve),
   children: [
     {

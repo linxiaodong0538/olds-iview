@@ -28,7 +28,7 @@
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
-          <Button type="ghost" @click="$router.push(`/${prefix}/${alias}/articles/index`)">返回</Button>
+          <Button type="ghost" @click="$router.push(`${routePrefix}/articles/index`)">返回</Button>
         </Form-item>
       </Form>
     </div>
@@ -38,6 +38,7 @@
 <script>
   import { mapState } from 'vuex'
   import consts from '@/utils/consts'
+  import helpers from '@/utils/helpers/base'
   import Editor from '@/components/Editor'
   import Uploader from '@/components/Uploader'
   import Categories from '@/components/Categories'
@@ -45,7 +46,7 @@
   export default {
     name: 'form',
     async created () {
-      this.prefix = this.$route.params.prefix
+      this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.alias = this.$route.params.alias
       this.id = this.$route.params.id
       await this.getCategoryItems()
@@ -59,7 +60,7 @@
     data () {
       return {
         consts,
-        prefix: '',
+        routePrefix: '',
         alias: '',
         id: '',
         formValidate: {

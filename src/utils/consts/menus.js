@@ -11,11 +11,11 @@ export default [
         children: [
           {
             title: '分类列表',
-            route: '/website/news/articles/categories'
+            route: '/website/news/news/articles/categories'
           },
           {
             title: '文章列表',
-            route: '/website/news/articles/index'
+            route: '/website/news/news/articles/index'
           }
         ]
       },
@@ -26,11 +26,11 @@ export default [
         children: [
           {
             title: '分类列表',
-            route: '/website/contact/articles/categories'
+            route: '/website/contact/contact/articles/categories'
           },
           {
             title: '文章列表',
-            route: '/website/contact/articles/index'
+            route: '/website/contact/contact/articles/index'
           }
         ]
       },
@@ -41,7 +41,7 @@ export default [
         children: [
           {
             title: '网站设置',
-            route: '/website/settings/index'
+            route: '/website/settings/settings/index'
           }
         ]
       }
@@ -59,11 +59,11 @@ export default [
         children: [
           {
             title: '分类列表',
-            route: '/company-app/medicines/products/categories'
+            route: '/company-app/medicines/medicines/products/categories'
           },
           {
             title: '产品列表',
-            route: '/company-app/medicines/products/index'
+            route: '/company-app/medicines/medicines/products/index'
           }
         ]
       },
@@ -74,11 +74,11 @@ export default [
         children: [
           {
             title: '分类列表',
-            route: '/company-app/foods/products/categories'
+            route: '/company-app/foods/foods/products/categories'
           },
           {
             title: '产品列表',
-            route: '/company-app/foods/products/index'
+            route: '/company-app/foods/foods/products/index'
           }
         ]
       },
@@ -89,7 +89,7 @@ export default [
         children: [
           {
             title: '车辆列表',
-            route: '/company-app/cars/cars/index'
+            route: '/company-app/cars/cars/cars/index'
           }
         ]
       },
@@ -100,7 +100,7 @@ export default [
         children: [
           {
             title: '员工',
-            route: '/company-app/persons/staffs/index'
+            route: '/company-app/persons/staffs/staffs/index'
           },
           {
             title: '老人',
@@ -112,7 +112,7 @@ export default [
           },
           {
             title: '护工',
-            route: '/company-app/persons/carers/index'
+            route: '/company-app/persons/carers/staffs/index'
           }
         ]
       },

@@ -77,7 +77,6 @@
 <script>
   import { mapState } from 'vuex'
   import consts from '@/utils/consts'
-  import arrayToTree from 'array-to-tree'
   import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
 
   export default {
@@ -85,17 +84,16 @@
     async beforeRouteUpdate (to, from, next) {
       this.categories.categories = {}
       this.alias = to.params.alias
+
       this.getItems()
+
       next()
     },
     created () {
       this.categories.categories = {}
       this.alias = this.$route.params.alias
-      this.getItems()
 
-      setTimeout(() => {
-        console.log(22, arrayToTree(this.categories.categories.items))
-      }, 2000)
+      this.getItems()
     },
     components: {
       List,

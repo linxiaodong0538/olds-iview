@@ -1,5 +1,5 @@
 export default {
-  path: ':prefix/settings',
+  path: ':topLevelMenu/:secondLevelMenu/settings',
   component: resolve => require(['@/modules/Settings'], resolve),
   children: [
     {

@@ -4,5 +4,6 @@ export default {
   medicines: '医疗仓库',
   foods: '食堂仓库',
   cars: '车辆',
-  persons: '人员'
+  persons: '人员',
+  staffs: '员工'
 }

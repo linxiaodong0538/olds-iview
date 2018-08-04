@@ -1,5 +1,5 @@
 export default {
-  path: ':prefix/:alias/products',
+  path: ':topLevelMenu/:secondLevelMenu/:alias/products',
   component: resolve => require(['@/modules/Products'], resolve),
   children: [
     {

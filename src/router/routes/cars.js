@@ -1,5 +1,5 @@
 export default {
-  path: ':prefix/:alias/cars',
+  path: ':topLevelMenu/:secondLevelMenu/:alias/cars',
   component: resolve => require(['@/modules/Cars'], resolve),
   children: [
     {
