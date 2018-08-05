@@ -7,6 +7,7 @@ import articles from './modules/articles'
 import products from './modules/products'
 import cars from './modules/cars'
 import staffs from './modules/staffs'
+import olds from './modules/olds'
 import categories from './modules/categories'
 import settings from './modules/settings'
 
@@ -24,6 +25,7 @@ export default new Vuex.Store({
     products,
     cars,
     staffs,
+    olds,
     categories,
     settings
   }

@@ -104,7 +104,7 @@ export default [
           },
           {
             title: '老人',
-            route: '/company-app/persons/olds/index'
+            route: '/company-app/persons/olds/olds/index'
           },
           {
             title: '家属',
