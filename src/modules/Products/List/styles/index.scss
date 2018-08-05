@@ -1,0 +1,18 @@
+@import "../../../../styles/utils/index";
+
+.qrcode-wrap {
+  text-align: center;
+
+  .qrcode-title {
+    @include text--overflow;
+
+    font-size: 14px;
+  }
+
+  img {
+    @include size(300px, 300px);
+    @include margin(20px, auto, 20px, auto);
+
+    display: block;
+  }
+}

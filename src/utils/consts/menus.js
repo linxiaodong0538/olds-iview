@@ -36,12 +36,12 @@ export default [
       },
       {
         icon: 'android-settings',
-        name: 'website/settings',
+        name: 'website/system',
         title: '系统设置',
         children: [
           {
             title: '网站设置',
-            route: '/website/settings/settings/index'
+            route: '/website/system/settings/settings/index'
           }
         ]
       }

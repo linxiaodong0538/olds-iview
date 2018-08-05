@@ -31,12 +31,13 @@
     <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-
-
-    <Modal width="500" v-model="qrcode.modal" title="获取二维码">
-      <img :src="qrcode.imgSrc" />
+    <Modal width="400" v-model="qrcode.modal" title="获取二维码">
+      <div class="qrcode-wrap">
+        <div class="qrcode-title" :title="qrcode.title">{{ qrcode.title }}</div>
+        <img :src="qrcode.imgSrc" />
+        <a class="ivu-btn ivu-btn-primary" :href="qrcode.imgSrc" :download="qrcode.download">下载二维码</a>
+      </div>
     </Modal>
-
   </div>
 </template>
 
@@ -85,7 +86,9 @@
       return {
         qrcode: {
           modal: false,
-          id: 0
+          id: 0,
+          title: '',
+          download: ''
         },
         consts,
         routePrefix: '',
@@ -114,15 +117,7 @@
             key: 'category_id',
             width: 180,
             render: (h, params) => {
-              const { categories } = this.categories
-
-              if (categories) {
-                const category = categories.items.find(item => item.id === params.row.category_id)
-
-                return h('span', null, category.title)
-              } else {
-                return h('span', null, '')
-              }
+              return h('span', null, this.getCategoryTitle(params.row.category_id))
             }
           },
           {
@@ -192,9 +187,11 @@
                   on: {
                     click: async () => {
                       this.qrcode.id = params.row.id
+                      this.qrcode.title = params.row.title
+                      this.qrcode.download = `${this.getCategoryTitle(params.row.category_id)} - ${params.row.id} - ${params.row.title}.png`
                       this.qrcode.imgSrc = await QRCode.toDataURL('abc', {
                         margin: 1,
-                        width: 200
+                        width: 300
                       })
                       this.qrcode.modal = true
                     }
@@ -256,7 +253,19 @@
       },
       handleCategoryChange (val) {
         this.where.category_id.$eq = val
+      },
+      getCategoryTitle (id) {
+        const items = this.categories.categories.items
+        const item = helpers.getItemById(items, id)
+        const parentItem = item.parent_id
+          ? helpers.getItemById(items, item.parent_id) || {}
+          : {}
+
+        return `${parentItem.title || ''} - ${item.title || ''}`
       }
     }
   }
 </script>
+
+<style lang="scss" scoped src="./styles/index.scss">
+</style>

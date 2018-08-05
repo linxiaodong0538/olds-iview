@@ -12,5 +12,10 @@ export default {
   getRoutePrefix (params) {
     const { topLevelMenu, secondLevelMenu, alias } = params
     return `/${topLevelMenu}/${secondLevelMenu}/${alias}`
+  },
+  getItemById (items, id) {
+    return items && items.length
+      ? (items.find(item => item.id === id) || {})
+      : {}
   }
 }

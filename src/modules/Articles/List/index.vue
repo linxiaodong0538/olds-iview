@@ -133,15 +133,8 @@
             key: 'category_id',
             width: 180,
             render: (h, params) => {
-              const { categories } = this.categories
-
-              if (categories) {
-                const category = categories.items.find(item => item.id === params.row.category_id)
-
-                return h('span', null, category.title)
-              } else {
-                return h('span', null, '')
-              }
+              const item = helpers.getItemById(this.categories.categories.items, params.row.category_id)
+              return h('span', null, item.title || '')
             }
           },
           {
