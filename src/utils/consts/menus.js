@@ -138,7 +138,7 @@ export default [
           },
           {
             title: '权限列表',
-            route: '/company-app/roles/permissions/roles/index'
+            route: '/company-app/roles/permissions/permissions/index'
           }
         ]
       }

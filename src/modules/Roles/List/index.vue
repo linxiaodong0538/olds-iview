@@ -27,6 +27,17 @@
             </Col>
           </Row>
         </Form-item>
+        <Form-item label="包含权限">
+          <Row>
+            <Col span="20">
+              <Checkbox v-for="(item, index) in permissions.permissions.items" :key="index"
+                        v-model="formData.permissions[item.id]"
+                        @on-change="data => { handlePermissionsChange(item.id)(data) }">
+                {{ item.name }}
+              </Checkbox>
+            </Col>
+          </Row>
+        </Form-item>
       </Form>
       <div slot="footer">
         <Button type="text" size="large" @click="formModal = false">取消</Button>
@@ -46,6 +57,7 @@
     name: 'list',
     async beforeRouteUpdate (to, from, next) {
       this.roles.roles = {}
+      this.permissions.permissions = {}
 
       this.routePrefix = helpers.getRoutePrefix(to.params)
       this.alias = to.params.alias
@@ -56,11 +68,13 @@
     },
     async created () {
       this.roles.roles = {}
+      this.permissions.permissions = {}
 
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.alias = this.$route.params.alias
 
-      this.getItems()
+      await this.getPermissionItems()
+      await this.getItems()
     },
     components: {
       List,
@@ -77,6 +91,9 @@
           name: '',
           description: ''
         },
+        formData: {
+          permissions: {}
+        },
         ruleValidate: {
           name: [
             {
@@ -89,7 +106,6 @@
             }
           ]
         },
-
         put: {
           id: 0
         },
@@ -103,10 +119,16 @@
             key: 'name'
           },
           {
-            title: '拥有权限',
+            title: '包含权限',
             width: 300,
-            render (h, params) {
-              return h('span', null, params.row.permissions)
+            render: (h, params) => {
+              const { items } = this.permissions.permissions
+              const permissions = params.row.permissions.split(',').reverse().map(id => {
+                const item = helpers.getItemById(items, id)
+                return item.name || ''
+              }).filter(item => item !== '').join(',')
+
+              return h('span', null, permissions)
             }
           },
           {
@@ -149,7 +171,8 @@
       }
     },
     computed: mapState([
-      'roles'
+      'roles',
+      'permissions'
     ]),
     methods: {
       getItems (current = 1) {
@@ -163,6 +186,14 @@
           }
         })
       },
+      getPermissionItems () {
+        return this.$store.dispatch('getPermissions', {
+          query: {
+            offset: 0,
+            limit: 1000
+          }
+        })
+      },
       getDetails () {
         return this.$store.dispatch('getRole', { id: this.put.id })
       },
@@ -172,6 +203,7 @@
       handlePost () {
         this.formModal = true
         this.put.id = 0
+        this.$set(this.formData, 'permissions', {})
         this.$refs.formValidate.resetFields()
       },
       handlePut (id) {
@@ -195,13 +227,31 @@
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            console.log(this.put.id)
             const action = this.put.id ? 'putRole' : 'postRole'
+            const permissions = (permissions => {
+              let ret = []
+
+              Object.keys(permissions).forEach(key => {
+                if (permissions[key]) {
+                  ret.push(key)
+                }
+
+                return ret
+              })
+
+              return ret.join(',')
+            })(this.formData.permissions)
+
+            if (!permissions) {
+              this.$Message.error('包含权限不能为空')
+              return
+            }
 
             await this.$store.dispatch(action, {
               id: this.put.id,
               body: {
                 ...this.formValidate,
+                permissions,
                 alias: this.alias
               }
             })
@@ -213,13 +263,25 @@
             this.getItems()
           }
         })
+      },
+      handlePermissionsChange (val) {
+        return data => {
+          this.formData.permissions[val] = data
+        }
       }
     },
     watch: {
       'roles.role': {
         handler (newVal) {
-          const { id, ...others } = newVal
+          const { id, permissions, ...others } = newVal
+
           this.formValidate = others
+
+          this.$set(this.formData, 'permissions', {})
+
+          permissions.split(',').forEach(key => {
+            this.$set(this.formData.permissions, key, true)
+          })
         }
       }
     }

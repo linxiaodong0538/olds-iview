@@ -15,7 +15,7 @@ export default {
   },
   getItemById (items, id) {
     return items && items.length
-      ? (items.find(item => item.id === id) || {})
+      ? (items.find(item => +item.id === +id) || {})
       : {}
   }
 }
