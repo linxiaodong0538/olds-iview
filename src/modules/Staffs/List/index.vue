@@ -67,19 +67,19 @@
             key: 'name'
           },
           {
-            title: '性别',
-            key: 'gender',
-            width: 80,
-            render (h, params) {
-              return h('span', null, consts.GENDERS[params.row.gender])
-            }
-          },
-          {
             title: '身份证',
             key: 'card_id',
             width: 160,
             render (h, params) {
               return h('span', null, params.row.id_card)
+            }
+          },
+          {
+            title: '性别',
+            key: 'gender',
+            width: 80,
+            render (h, params) {
+              return h('span', null, consts.GENDERS[params.row.gender])
             }
           },
           {

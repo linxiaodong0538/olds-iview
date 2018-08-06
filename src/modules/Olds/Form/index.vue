@@ -132,7 +132,7 @@
           qualification_certificate: '',
           job: '',
           telephone: '',
-          family_telephones: '',
+          family_telephone: '',
           employment_experience: '',
           start_time: '',
           release_time: '',

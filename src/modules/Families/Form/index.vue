@@ -1,11 +1,5 @@
 <template>
   <div>
-    <Breadcrumb>
-      <Breadcrumb-item href="/">首页</Breadcrumb-item>
-      <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
-      <Breadcrumb-item href="/families/index">员工列表</Breadcrumb-item>
-      <Breadcrumb-item>{{ id ? '编辑' : '新增' }}</Breadcrumb-item>
-    </Breadcrumb>
     <div class="limit-width">
       <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
         <Form-item label="姓名" prop="name">
@@ -30,55 +24,21 @@
             </Option>
           </Select>
         </Form-item>
-        <Form-item label="文化程度" prop="education_degree">
-          <Select v-model="formValidate.education_degree" placeholder="请选择文化程度" style="width: 220px">
-            <Option v-for="key in Object.keys(consts.EDUCATION_DEGREES)" :value="key" :key="key">
-              {{ consts.EDUCATION_DEGREES[key] }}
-            </Option>
-          </Select>
+        <Form-item label="生日" prop="birthday">
+          <DatePicker v-model="formValidate.birthday" type="date" placeholder="请选择生日"
+                      style="width: 220px"></DatePicker>
         </Form-item>
-        <Form-item label="从业资格证" prop="qualification_certificate">
-          <Input v-model="formValidate.qualification_certificate" placeholder="请输入从业资格证"></Input>
+        <Form-item label="住址" prop="address">
+          <Input v-model="formValidate.address" placeholder="请输入住址"></Input>
         </Form-item>
-        <Form-item label="在职岗位" prop="job">
-          <Input v-model="formValidate.job" placeholder="请输入在职岗位"></Input>
+        <Form-item label="联系电话" prop="telephone">
+          <Input v-model="formValidate.telephone" placeholder="请输入联系电话"></Input>
         </Form-item>
-        <Form-item label="本人电话" prop="telephone">
-          <Input v-model="formValidate.telephone" placeholder="请输入本人电话"></Input>
+        <Form-item label="老人入院编号" prop="olds">
+          请在老人详情处设置关联。
         </Form-item>
-        <Form-item label="亲属电话" prop="family_telephones">
-          <Input v-model="formValidate.family_telephones" placeholder="请输入亲属电话"></Input>
-        </Form-item>
-        <Form-item label="从业经历" prop="employment_experience">
-          <Input type="textarea" :rows="4" v-model="formValidate.employment_experience" placeholder="请输入从业经历"></Input>
-        </Form-item>
-        <Form-item label="上岗时间" prop="start_time">
-          <TimePicker v-model="formValidate.start_time" format="HH:mm" placeholder="请选择上岗时间"
-                      style="width: 220px;"></TimePicker>
-        </Form-item>
-        <Form-item label="离岗时间" prop="release_time">
-          <TimePicker v-model="formValidate.release_time" format="HH:mm" placeholder="请选择离岗时间"
-                      style="width: 220px;"></TimePicker>
-        </Form-item>
-        <Form-item label="薪资待遇" prop="salary">
-          <InputNumber :min="1" :max="1000000" v-model="formValidate.salary" style="width: 220px;"></InputNumber>
-          元/月
-        </Form-item>
-        <Form-item label="请假" prop="leave">
-          <Input type="textarea" :rows="4" v-model="formValidate.leave" placeholder="请输入请假"></Input>
-        </Form-item>
-        <Form-item label="补贴" prop="subsidy">
-          <Input type="textarea" :rows="4" v-model="formValidate.subsidy" placeholder="请输入补贴"></Input>
-        </Form-item>
-        <Form-item v-if="alias === 'carers'" label="籍贯" prop="native_place">
-          <Input v-model="formValidate.native_place" placeholder="请输入籍贯"></Input>
-        </Form-item>
-        <Form-item v-if="alias === 'carers'" label="工龄" prop="seniority">
-          <InputNumber :min="1" :max="100" v-model="formValidate.seniority" style="width: 220px;"></InputNumber>
-          年
-        </Form-item>
-        <Form-item v-if="alias === 'carers'" label="老人入院编号" prop="olds">
-
+        <Form-item label="与老人关系" prop="relation">
+          <Input v-model="formValidate.relation" placeholder="请输入与老人关系"></Input>
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
@@ -114,25 +74,7 @@
         routePrefix: '',
         alias: '',
         id: '',
-        formValidate: {
-          name: '',
-          picture: '',
-          id_card: '',
-          gender: '',
-          education_degree: '',
-          qualification_certificate: '',
-          job: '',
-          telephone: '',
-          family_telephones: '',
-          employment_experience: '',
-          start_time: '',
-          release_time: '',
-          salary: 0,
-          leave: '',
-          subsidy: '',
-          native_place: '',
-          seniority: 0
-        },
+        formValidate: {},
         ruleValidate: {
           name: [
             {
@@ -166,16 +108,16 @@
     },
     methods: {
       getDetails (id) {
-        return this.$store.dispatch('getStaff', { id })
+        return this.$store.dispatch('getFamily', { id })
       },
       handleUploaderChange (file) {
-        this.formValidate.picture = file ? file.id : ''
+        this.$set(this.formValidate, 'picture', file ? file.id : '')
       },
       handleSave () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             const { id, formValidate, alias } = this
-            const action = id ? 'putStaff' : 'postStaff'
+            const action = id ? 'putFamily' : 'postFamily'
 
             await this.$store.dispatch(action, {
               id,
@@ -199,7 +141,7 @@
       'families.family': {
         handler (newVal) {
           const { id, ...others } = newVal
-          this.formValidate = others
+          this.$set(this, 'formValidate', others)
         }
       }
     }
