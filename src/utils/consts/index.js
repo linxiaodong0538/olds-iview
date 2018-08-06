@@ -3,6 +3,7 @@ import ROLES from './roles'
 import ALIASES from './aliases'
 import GENDERS from './genders'
 import EDUCATION_DEGREES from './educationDegrees'
+import NURSING_GRADES from './nursingGrades'
 
 // 当前 host
 const HOST = window.location.host
@@ -34,6 +35,7 @@ export default {
   ALIASES,
   GENDERS,
   EDUCATION_DEGREES,
+  NURSING_GRADES,
   BASE_URL,
   API_URL,
   PAGE_SIZE,

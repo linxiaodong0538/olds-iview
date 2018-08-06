@@ -118,16 +118,12 @@ export default [
       },
       {
         icon: 'android-warning',
-        name: 'company-app/storehouse',
+        name: 'company-app/notices',
         title: '报警',
         children: [
           {
-            title: '医疗',
-            route: '/website/news/articles/categories'
-          },
-          {
-            title: '食堂',
-            route: '/website/news/articles/index'
+            title: '车辆',
+            route: '/company-app/notices/cars/notices/index'
           }
         ]
       }

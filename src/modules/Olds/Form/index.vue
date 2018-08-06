@@ -30,55 +30,57 @@
             </Option>
           </Select>
         </Form-item>
-        <Form-item label="文化程度" prop="education_degree">
-          <Select v-model="formValidate.education_degree" placeholder="请选择文化程度" style="width: 220px">
-            <Option v-for="key in Object.keys(consts.EDUCATION_DEGREES)" :value="key" :key="key">
-              {{ consts.EDUCATION_DEGREES[key] }}
+        <Form-item label="入院编号" prop="num">
+          <Input v-model="formValidate.num" placeholder="请输入入院编号"></Input>
+        </Form-item>
+        <Form-item label="既往病史" prop="medical_history">
+          <Input type="textarea" :rows="4" v-model="formValidate.medical_history" placeholder="请输入既往病史"></Input>
+        </Form-item>
+        <Form-item label="入住时间" prop="stay_in_time">
+          <DatePicker v-model="formValidate.stay_in_time" type="date" placeholder="请选择入住时间"
+                      style="width: 220px"></DatePicker>
+        </Form-item>
+        <Form-item label="入住房间" prop="num">
+          <Input v-model="formValidate.num" placeholder="请输入入住房间"></Input>
+        </Form-item>
+        <Form-item label="护理等级" prop="nursing_grade">
+          <Select v-model="formValidate.nursing_grade" placeholder="请选择护理等级" style="width: 220px">
+            <Option v-for="key in Object.keys(consts.NURSING_GRADES)" :value="key" :key="key">
+              {{ consts.NURSING_GRADES[key] }}
             </Option>
           </Select>
         </Form-item>
-        <Form-item label="从业资格证" prop="qualification_certificate">
-          <Input v-model="formValidate.qualification_certificate" placeholder="请输入从业资格证"></Input>
+        <Form-item label="托养费" prop="care_fee">
+          <InputNumber :min="1" :max="1000000" v-model="formValidate.care_fee" style="width: 220px;"></InputNumber>
+          元
         </Form-item>
-        <Form-item label="在职岗位" prop="job">
-          <Input v-model="formValidate.job" placeholder="请输入在职岗位"></Input>
+        <Form-item label="备用金" prop="petty_cash">
+          <InputNumber :min="1" :max="1000000" v-model="formValidate.petty_cash" style="width: 220px;"></InputNumber>
+          元
         </Form-item>
-        <Form-item label="本人电话" prop="telephone">
-          <Input v-model="formValidate.telephone" placeholder="请输入本人电话"></Input>
+        <Form-item label="入院购置费" prop="purchase_cost">
+          <InputNumber :min="1" :max="1000000" v-model="formValidate.purchase_cost" style="width: 220px;"></InputNumber>
+          元
         </Form-item>
-        <Form-item label="亲属电话" prop="family_telephones">
-          <Input v-model="formValidate.family_telephones" placeholder="请输入亲属电话"></Input>
+        <Form-item label="加餐费" prop="extra_meal_fee">
+          <InputNumber :min="1" :max="1000000" v-model="formValidate.extra_meal_fee"
+                       style="width: 220px;"></InputNumber>
+          元
         </Form-item>
-        <Form-item label="从业经历" prop="employment_experience">
-          <Input type="textarea" :rows="4" v-model="formValidate.employment_experience" placeholder="请输入从业经历"></Input>
+        <Form-item label="特殊服务" prop="special_services">
+          <Input v-model="formValidate.job" placeholder="请输入特殊服务"></Input>
         </Form-item>
-        <Form-item label="上岗时间" prop="start_time">
-          <TimePicker v-model="formValidate.start_time" format="HH:mm" placeholder="请选择上岗时间"
-                      style="width: 220px;"></TimePicker>
+        <Form-item label="护理员" prop="carers">
+          <Persons :multiple="false" :get="handleGetPersons" @change="handlePersonChange"
+                   @click-name="handleClickPerson"
+                   :options="personOptions" v-model="formValidate.carers"></Persons>
         </Form-item>
-        <Form-item label="离岗时间" prop="release_time">
-          <TimePicker v-model="formValidate.release_time" format="HH:mm" placeholder="请选择离岗时间"
-                      style="width: 220px;"></TimePicker>
+        <Form-item label="过敏史" prop="allergic_history">
+          <Input type="textarea" :rows="4" v-model="formValidate.allergic_history" placeholder="请输入过敏史"></Input>
         </Form-item>
-        <Form-item label="薪资待遇" prop="salary">
-          <InputNumber :min="1" :max="1000000" v-model="formValidate.salary" style="width: 220px;"></InputNumber>
-          元/月
-        </Form-item>
-        <Form-item label="请假" prop="leave">
-          <Input type="textarea" :rows="4" v-model="formValidate.leave" placeholder="请输入请假"></Input>
-        </Form-item>
-        <Form-item label="补贴" prop="subsidy">
-          <Input type="textarea" :rows="4" v-model="formValidate.subsidy" placeholder="请输入补贴"></Input>
-        </Form-item>
-        <Form-item v-if="alias === 'carers'" label="籍贯" prop="native_place">
-          <Input v-model="formValidate.native_place" placeholder="请输入籍贯"></Input>
-        </Form-item>
-        <Form-item v-if="alias === 'carers'" label="工龄" prop="seniority">
-          <InputNumber :min="1" :max="100" v-model="formValidate.seniority" style="width: 220px;"></InputNumber>
-          年
-        </Form-item>
-        <Form-item v-if="alias === 'carers'" label="老人入院编号" prop="olds">
-
+        <Form-item label="出院时间" prop="leave_hospital_time">
+          <DatePicker v-model="formValidate.leave_hospital_time" type="date" placeholder="请选择出院时间"
+                      style="width: 220px"></DatePicker>
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
@@ -94,10 +96,15 @@
   import consts from '@/utils/consts'
   import helpers from '@/utils/helpers/base'
   import Uploader from '@/components/Uploader'
+  import Persons from '@/components/Persons'
+  import StaffsModel from '@/models/staffs'
 
   export default {
     name: 'form',
     async created () {
+      setTimeout(() => {
+        this.formValidate.carers = '4'
+      }, 2000)
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.alias = this.$route.params.alias
 
@@ -106,7 +113,8 @@
       this.id && this.getDetails(this.id)
     },
     components: {
-      Uploader
+      Uploader,
+      Persons
     },
     data () {
       return {
@@ -114,6 +122,7 @@
         routePrefix: '',
         alias: '',
         id: '',
+        personOptions: [],
         formValidate: {
           name: '',
           picture: '',
@@ -131,7 +140,8 @@
           leave: '',
           subsidy: '',
           native_place: '',
-          seniority: 0
+          seniority: 0,
+          carers: ''
         },
         ruleValidate: {
           name: [
@@ -190,6 +200,27 @@
       resetFields () {
         this.$refs.formValidate.resetFields()
         this.$refs.uploader.remove()
+      },
+      async handleGetPersons (query) {
+        const getStaffsRes = await new StaffsModel().GET({
+          query: {
+            offset: 0,
+            limit: 100,
+            where: {
+              alias: 'carers'
+            }
+          }
+        })
+
+        return getStaffsRes.data.items.length
+          ? getStaffsRes.data.items.map(item => ({ label: item.name, value: item.id }))
+          : []
+      },
+      handlePersonChange (value) {
+        this.formValidate.carer = value
+      },
+      handleClickPerson (id) {
+        console.log(id)
       }
     },
     computed: mapState([
