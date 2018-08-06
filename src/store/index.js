@@ -9,6 +9,8 @@ import cars from './modules/cars'
 import staffs from './modules/staffs'
 import olds from './modules/olds'
 import notices from './modules/notices'
+import roles from './modules/roles'
+import permissions from './modules/permissions'
 import categories from './modules/categories'
 import settings from './modules/settings'
 
@@ -28,6 +30,8 @@ export default new Vuex.Store({
     staffs,
     olds,
     notices,
+    roles,
+    permissions,
     categories,
     settings
   }

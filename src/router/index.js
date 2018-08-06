@@ -11,6 +11,8 @@ import cars from './routes/cars'
 import staffs from './routes/staffs'
 import olds from './routes/olds'
 import notices from './routes/notices'
+import roles from './routes/roles'
+import permissions from './routes/permissions'
 import settings from './routes/settings'
 import login from './routes/login'
 import logout from './routes/logout'
@@ -35,6 +37,8 @@ const router = new Router({
             staffs,
             olds,
             notices,
+            roles,
+            permissions,
             settings
           ],
           meta: {

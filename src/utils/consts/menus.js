@@ -126,6 +126,21 @@ export default [
             route: '/company-app/notices/cars/notices/index'
           }
         ]
+      },
+      {
+        icon: 'android-warning',
+        name: 'company-app/roles',
+        title: '角色权限',
+        children: [
+          {
+            title: '权限列表',
+            route: '/company-app/roles/permissions/roles/index'
+          },
+          {
+            title: '角色列表',
+            route: '/company-app/roles/roles/roles/index'
+          }
+        ]
       }
     ]
   }
