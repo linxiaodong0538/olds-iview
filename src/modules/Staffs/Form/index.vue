@@ -198,7 +198,8 @@
     watch: {
       'staffs.staff': {
         handler (newVal) {
-          this.formValidate = newVal
+          const { id, ...others } = newVal
+          this.formValidate = others
         }
       }
     }

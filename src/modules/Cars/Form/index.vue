@@ -140,7 +140,8 @@
     watch: {
       'cars.car': {
         handler (newVal) {
-          this.formValidate = newVal
+          const { id, ...others } = newVal
+          this.formValidate = others
         }
       }
     }

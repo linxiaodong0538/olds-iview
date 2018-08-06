@@ -1,29 +1,43 @@
 <template>
   <div>
-    <Breadcrumb>
-      <Breadcrumb-item href="/">首页</Breadcrumb-item>
-      <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
-      <Breadcrumb-item>车辆列表</Breadcrumb-item>
-    </Breadcrumb>
     <List :current="current" :columns="columns" :data="roles.roles.items" :total="roles.roles.total"
           @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary"
-                  @click="$router.push(`${routePrefix}/roles/index/form`)">新增
-          </Button>
+          <Button class="margin-right-sm" type="primary" @click="handlePost">新增</Button>
         </ListOperations>
       </ListHeader>
     </List>
     <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
+    <Modal width="500" v-model="formModal" :title="put.id ? '编辑' : '新增'">
+      <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
+        <Form-item label="名称" prop="name">
+          <Row>
+            <Col span="20">
+              <Input v-model="formValidate.name" placeholder="请输入名称"></Input>
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item label="描述" prop="description">
+          <Row>
+            <Col span="20">
+              <Input v-model="formValidate.description" type="textarea" :rows="3" placeholder="请输入描述"></Input>
+            </Col>
+          </Row>
+        </Form-item>
+      </Form>
+      <div slot="footer">
+        <Button type="text" size="large" @click="formModal = false">取消</Button>
+        <Button type="primary" size="large" @click="handleFormOk">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
-  import time from '@/utils/time'
   import consts from '@/utils/consts'
   import helpers from '@/utils/helpers/base'
   import List, { ListHeader, ListOperations } from '@/components/List'
@@ -58,59 +72,54 @@
         consts,
         routePrefix: '',
         alias: '',
+        formModal: false,
+        formValidate: {
+          name: '',
+          description: ''
+        },
+        ruleValidate: {
+          name: [
+            {
+              required: true,
+              message: '名称不能为空'
+            },
+            {
+              max: 100,
+              message: '名称不能多于 100 个字'
+            }
+          ]
+        },
+
+        put: {
+          id: 0
+        },
         del: {
           modal: false,
           id: 0
         },
         columns: [
           {
-            title: '车牌号',
-            key: 'num'
+            title: '名称',
+            key: 'name'
           },
           {
-            title: '车主',
-            key: 'owner',
-            width: 80,
+            title: '拥有权限',
+            width: 300,
             render (h, params) {
-              return h('span', null, params.row.owner)
+              return h('span', null, params.row.permissions)
             }
           },
           {
-            title: '公里数',
-            key: 'km',
-            width: 100,
+            title: '描述',
+            width: 300,
             render (h, params) {
-              return h('span', null, `${params.row.km} 公里`)
-            }
-          },
-          {
-            title: '年检时间',
-            key: 'mot_time',
-            width: 120,
-            render (h, params) {
-              return h('span', null, time.getDate(params.row.mot_time))
-            }
-          },
-          {
-            title: '保险到期时间',
-            key: 'insurance_time',
-            width: 120,
-            render (h, params) {
-              return h('span', null, time.getDate(params.row.insurance_time))
-            }
-          },
-          {
-            title: '购买日期',
-            key: 'buy_time',
-            width: 120,
-            render (h, params) {
-              return h('span', null, time.getDate(params.row.insurance_time))
+              return h('span', null, params.row.description)
             }
           },
           {
             title: '操作',
             key: 'action',
-            width: 255,
+            width: 150,
             render: (h, params) => {
               return h('ButtonGroup', [
                 h('Button', {
@@ -119,7 +128,7 @@
                   },
                   on: {
                     click: () => {
-                      this.$router.push(`${this.routePrefix}/roles/index/form/${params.row.id}`)
+                      this.handlePut(params.row.id)
                     }
                   }
                 }, '编辑'),
@@ -132,16 +141,7 @@
                       this.handleDel(params.row.id)
                     }
                   }
-                }, '删除'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                    }
-                  }
-                }, '查看维修记录')
+                }, '删除')
               ])
             }
           }
@@ -159,12 +159,25 @@
           query: {
             offset: (current - 1) * consts.PAGE_SIZE,
             limit: consts.PAGE_SIZE,
-            where: { ...this.where, alias: this.alias }
+            where: { alias: this.alias }
           }
         })
       },
+      getDetails () {
+        return this.$store.dispatch('getRole', { id: this.put.id })
+      },
       handlePageChange (current) {
         this.getItems(current)
+      },
+      handlePost () {
+        this.formModal = true
+        this.put.id = 0
+        this.$refs.formValidate.resetFields()
+      },
+      handlePut (id) {
+        this.put.id = id
+        this.formModal = true
+        this.getDetails()
       },
       handleDel (id) {
         this.del.modal = true
@@ -178,6 +191,36 @@
         // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
         await helpers.sleep(500)
         this.getItems()
+      },
+      handleFormOk () {
+        this.$refs.formValidate.validate(async valid => {
+          if (valid) {
+            console.log(this.put.id)
+            const action = this.put.id ? 'putRole' : 'postRole'
+
+            await this.$store.dispatch(action, {
+              id: this.put.id,
+              body: {
+                ...this.formValidate,
+                alias: this.alias
+              }
+            })
+
+            this.formModal = false
+
+            this.$Message.success((this.put.id ? '编辑' : '新增') + '成功！')
+            !this.put.id && this.$refs.formValidate.resetFields()
+            this.getItems()
+          }
+        })
+      }
+    },
+    watch: {
+      'roles.role': {
+        handler (newVal) {
+          const { id, ...others } = newVal
+          this.formValidate = others
+        }
       }
     }
   }

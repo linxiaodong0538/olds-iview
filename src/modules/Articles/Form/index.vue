@@ -154,8 +154,10 @@
     watch: {
       'articles.article': {
         handler (newVal) {
-          this.formValidate = newVal
-          this.$refs.editor.html(newVal.content)
+          const { id, ...others } = newVal
+
+          this.formValidate = others
+          this.$refs.editor.html(others.content)
         }
       }
     }

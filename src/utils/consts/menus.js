@@ -133,12 +133,12 @@ export default [
         title: '角色权限',
         children: [
           {
-            title: '权限列表',
-            route: '/company-app/roles/permissions/roles/index'
-          },
-          {
             title: '角色列表',
             route: '/company-app/roles/roles/roles/index'
+          },
+          {
+            title: '权限列表',
+            route: '/company-app/roles/permissions/roles/index'
           }
         ]
       }
