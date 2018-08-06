@@ -10,6 +10,7 @@ import products from './routes/products'
 import cars from './routes/cars'
 import staffs from './routes/staffs'
 import olds from './routes/olds'
+import families from './routes/families'
 import notices from './routes/notices'
 import roles from './routes/roles'
 import permissions from './routes/permissions'
@@ -36,6 +37,7 @@ const router = new Router({
             cars,
             staffs,
             olds,
+            families,
             notices,
             roles,
             permissions,

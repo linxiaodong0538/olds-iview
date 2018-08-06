@@ -108,7 +108,7 @@ export default [
           },
           {
             title: '家属',
-            route: '/company-app/persons/families/index'
+            route: '/company-app/persons/families/families/index'
           },
           {
             title: '护工',
