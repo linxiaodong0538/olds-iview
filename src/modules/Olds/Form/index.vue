@@ -30,8 +30,24 @@
             </Option>
           </Select>
         </Form-item>
+        <Form-item label="生日" prop="birthday">
+          <DatePicker v-model="formValidate.birthday" type="date" placeholder="请选择生日"
+                      style="width: 220px"></DatePicker>
+        </Form-item>
         <Form-item label="入院编号" prop="num">
           <Input v-model="formValidate.num" placeholder="请输入入院编号"></Input>
+        </Form-item>
+        <Form-item label="家属" prop="families">
+          <Persons key="0" :multiple="true" :get="handleGetPersons('families')"
+                   @change="val => { handlePersonChange('families', val) }"
+                   @click-name="id => { handleClickPerson('families', id) }"
+                   v-model="formValidate.families"></Persons>
+        </Form-item>
+        <Form-item label="护理员" prop="carer">
+          <Persons key="1" :multiple="false" :get="handleGetPersons('carers')"
+                   @change="val => { handlePersonChange('carer', val) }"
+                   @click-name="id => { handleClickPerson('carers', id) }"
+                   v-model="formValidate.carer"></Persons>
         </Form-item>
         <Form-item label="既往病史" prop="medical_history">
           <Input type="textarea" :rows="4" v-model="formValidate.medical_history" placeholder="请输入既往病史"></Input>
@@ -40,8 +56,8 @@
           <DatePicker v-model="formValidate.stay_in_time" type="date" placeholder="请选择入住时间"
                       style="width: 220px"></DatePicker>
         </Form-item>
-        <Form-item label="入住房间" prop="num">
-          <Input v-model="formValidate.num" placeholder="请输入入住房间"></Input>
+        <Form-item label="入住房间" prop="stay_in_room">
+          <Input v-model="formValidate.stay_in_room" placeholder="请输入入住房间"></Input>
         </Form-item>
         <Form-item label="护理等级" prop="nursing_grade">
           <Select v-model="formValidate.nursing_grade" placeholder="请选择护理等级" style="width: 220px">
@@ -51,29 +67,24 @@
           </Select>
         </Form-item>
         <Form-item label="托养费" prop="care_fee">
-          <InputNumber :min="1" :max="1000000" v-model="formValidate.care_fee" style="width: 220px;"></InputNumber>
+          <InputNumber :min="0" :max="1000000" v-model="formValidate.care_fee" style="width: 220px;"></InputNumber>
           元
         </Form-item>
         <Form-item label="备用金" prop="petty_cash">
-          <InputNumber :min="1" :max="1000000" v-model="formValidate.petty_cash" style="width: 220px;"></InputNumber>
+          <InputNumber :min="0" :max="1000000" v-model="formValidate.petty_cash" style="width: 220px;"></InputNumber>
           元
         </Form-item>
         <Form-item label="入院购置费" prop="purchase_cost">
-          <InputNumber :min="1" :max="1000000" v-model="formValidate.purchase_cost" style="width: 220px;"></InputNumber>
+          <InputNumber :min="0" :max="1000000" v-model="formValidate.purchase_cost" style="width: 220px;"></InputNumber>
           元
         </Form-item>
         <Form-item label="加餐费" prop="extra_meal_fee">
-          <InputNumber :min="1" :max="1000000" v-model="formValidate.extra_meal_fee"
+          <InputNumber :min="0" :max="1000000" v-model="formValidate.extra_meal_fee"
                        style="width: 220px;"></InputNumber>
           元
         </Form-item>
         <Form-item label="特殊服务" prop="special_services">
-          <Input v-model="formValidate.job" placeholder="请输入特殊服务"></Input>
-        </Form-item>
-        <Form-item label="护理员" prop="carers">
-          <Persons :multiple="false" :get="handleGetPersons" @change="handlePersonChange"
-                   @click-name="handleClickPerson"
-                   :options="personOptions" v-model="formValidate.carers"></Persons>
+          <Input type="textarea" :rows="4" v-model="formValidate.special_services" placeholder="请输入特殊服务"></Input>
         </Form-item>
         <Form-item label="过敏史" prop="allergic_history">
           <Input type="textarea" :rows="4" v-model="formValidate.allergic_history" placeholder="请输入过敏史"></Input>
@@ -98,13 +109,11 @@
   import Uploader from '@/components/Uploader'
   import Persons from '@/components/Persons'
   import StaffsModel from '@/models/staffs'
+  import FamiliesModel from '@/models/families'
 
   export default {
     name: 'form',
     async created () {
-      setTimeout(() => {
-        this.formValidate.carers = '4'
-      }, 2000)
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.alias = this.$route.params.alias
 
@@ -123,26 +132,7 @@
         alias: '',
         id: '',
         personOptions: [],
-        formValidate: {
-          name: '',
-          picture: '',
-          id_card: '',
-          gender: '',
-          education_degree: '',
-          qualification_certificate: '',
-          job: '',
-          telephone: '',
-          family_telephone: '',
-          employment_experience: '',
-          start_time: '',
-          release_time: '',
-          salary: 0,
-          leave: '',
-          subsidy: '',
-          native_place: '',
-          seniority: 0,
-          carers: ''
-        },
+        formValidate: {},
         ruleValidate: {
           name: [
             {
@@ -179,7 +169,7 @@
         return this.$store.dispatch('getOld', { id })
       },
       handleUploaderChange (file) {
-        this.formValidate.picture = file ? file.id : ''
+        this.$set(this.formValidate, 'picture', file ? file.id : '')
       },
       handleSave () {
         this.$refs.formValidate.validate(async valid => {
@@ -201,26 +191,29 @@
         this.$refs.formValidate.resetFields()
         this.$refs.uploader.remove()
       },
-      async handleGetPersons (query) {
-        const getStaffsRes = await new StaffsModel().GET({
-          query: {
-            offset: 0,
-            limit: 100,
-            where: {
-              alias: 'carers'
-            }
-          }
-        })
+      handleGetPersons (alias) {
+        return async () => {
+          const model = alias === 'families'
+            ? new FamiliesModel()
+            : new StaffsModel()
+          const getRes = await model.GET({
+            query: { offset: 0, limit: 1000 }
+          })
 
-        return getStaffsRes.data.items.length
-          ? getStaffsRes.data.items.map(item => ({ label: item.name, value: item.id }))
-          : []
+          return getRes.data.items.length
+            ? getRes.data.items.map(item => ({ label: item.name, value: item.id }))
+            : []
+        }
       },
-      handlePersonChange (value) {
-        this.formValidate.carer = value
+      handlePersonChange (key, value) {
+        this.$set(this.formValidate, key, value)
       },
-      handleClickPerson (id) {
-        console.log(id)
+      handleClickPerson (alias, id) {
+        window.open(
+          alias === 'families'
+            ? `/#/company-app/persons/families/families/index/form/${id}`
+            : `/#/company-app/persons/carers/staffs/index/form/${id}`
+        )
       }
     },
     computed: mapState([
@@ -230,7 +223,7 @@
       'olds.old': {
         handler (newVal) {
           const { id, ...others } = newVal
-          this.formValidate = others
+          this.$set(this, 'formValidate', others)
         }
       }
     }

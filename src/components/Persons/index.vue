@@ -31,7 +31,7 @@
         default: '请选择人员'
       },
       value: {
-        type: String,
+        type: [String, Number],
         default: ''
       },
       get: {

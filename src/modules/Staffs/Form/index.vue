@@ -59,7 +59,7 @@
                       style="width: 220px"></DatePicker>
         </Form-item>
         <Form-item label="薪资待遇" prop="salary">
-          <InputNumber :min="1" :max="1000000" v-model="formValidate.salary" style="width: 220px;"></InputNumber>
+          <InputNumber :min="0" :max="1000000" v-model="formValidate.salary" style="width: 220px;"></InputNumber>
           元/月
         </Form-item>
         <Form-item label="请假" prop="leave">
@@ -75,7 +75,7 @@
           <Input v-model="formValidate.native_place" placeholder="请输入籍贯"></Input>
         </Form-item>
         <Form-item v-if="alias === 'carers'" label="工龄" prop="seniority">
-          <InputNumber :min="1" :max="100" v-model="formValidate.seniority" style="width: 220px;"></InputNumber>
+          <InputNumber :min="0" :max="100" v-model="formValidate.seniority" style="width: 220px;"></InputNumber>
           年
         </Form-item>
         <Form-item v-if="alias === 'carers'" label="负责房间" prop="room">

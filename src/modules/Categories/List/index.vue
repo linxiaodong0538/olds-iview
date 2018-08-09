@@ -61,7 +61,7 @@
         <Form-item label="排序" prop="order">
           <Row>
             <Col span="20">
-              <InputNumber :min="1" :max="100" v-model="formValidate.order"></InputNumber>
+              <InputNumber :min="0" :max="100" v-model="formValidate.order"></InputNumber>
             </Col>
           </Row>
         </Form-item>

@@ -33,11 +33,11 @@
           （尺寸：1150x647）
         </Form-item>
         <Form-item label="价格" prop="price">
-          <InputNumber :min="1" :max="100000" v-model="formValidate.price"></InputNumber>
+          <InputNumber :min="0" :max="100000" v-model="formValidate.price"></InputNumber>
           元
         </Form-item>
         <Form-item label="库存" prop="stock">
-          <InputNumber :min="1" :max="100000" v-model="formValidate.stock"></InputNumber>
+          <InputNumber :min="0" :max="100000" v-model="formValidate.stock"></InputNumber>
           件
         </Form-item>
         <Form-item label="采购地点" prop="purchase_address">

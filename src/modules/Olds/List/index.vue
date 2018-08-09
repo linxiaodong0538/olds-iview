@@ -1,10 +1,5 @@
 <template>
   <div>
-    <Breadcrumb>
-      <Breadcrumb-item href="/">首页</Breadcrumb-item>
-      <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
-      <Breadcrumb-item>员工列表</Breadcrumb-item>
-    </Breadcrumb>
     <List :current="current" :columns="columns" :data="olds.olds.items" :total="olds.olds.total"
           @on-change="handlePageChange">
       <ListHeader>
@@ -67,14 +62,6 @@
             key: 'name'
           },
           {
-            title: '性别',
-            key: 'gender',
-            width: 80,
-            render (h, params) {
-              return h('span', null, consts.GENDERS[params.row.gender])
-            }
-          },
-          {
             title: '身份证',
             key: 'card_id',
             width: 160,
@@ -83,27 +70,19 @@
             }
           },
           {
-            title: '本人电话',
-            key: 'telephone',
-            width: 120,
+            title: '性别',
+            key: 'gender',
+            width: 80,
             render (h, params) {
-              return h('span', null, params.row.telephone)
+              return h('span', null, consts.GENDERS[params.row.gender])
             }
           },
           {
-            title: '在职岗位',
-            key: 'job',
-            width: 140,
-            render (h, params) {
-              return h('span', null, params.row.job)
-            }
-          },
-          {
-            title: '薪资待遇',
-            key: 'salary',
+            title: '入院编号',
+            key: 'num',
             width: 120,
             render (h, params) {
-              return h('span', null, params.row.salary + ' 元/月')
+              return h('span', null, params.row.num)
             }
           },
           {

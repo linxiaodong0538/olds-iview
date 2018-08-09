@@ -27,7 +27,7 @@
             </Col>
           </Row>
         </Form-item>
-        <Form-item label="包含权限">
+        <Form-item label="权限">
           <Row>
             <Col span="20">
               <Checkbox
@@ -125,7 +125,7 @@
             key: 'name'
           },
           {
-            title: '包含权限',
+            title: '权限',
             width: 300,
             render: (h, params) => {
               const { items } = this.permissions.permissions
@@ -249,7 +249,7 @@
             })(this.formData.permissions)
 
             if (!permissions) {
-              this.$Message.error('包含权限不能为空')
+              this.$Message.error('权限不能为空')
               return
             }
 
