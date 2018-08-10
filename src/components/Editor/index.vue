@@ -9,6 +9,7 @@
                     @change="handleUploaderChange"></Uploader>
           <Uploader key="2" v-if="!id" ref="uploader" @change="handleUploaderChange"></Uploader>
           <Input v-model="formValidate.picture" style="display: none;"></Input>
+          （尺寸：1150x647）
         </Form-item>
       </Form>
       <div slot="footer">

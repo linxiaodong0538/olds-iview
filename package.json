@@ -21,6 +21,7 @@
     "dayjs": "^1.7.4",
     "iview": "^2.13.0",
     "kindeditor": "^4.1.10",
+    "qrcode": "^1.2.2",
     "sass-utils": "^1.0.10",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
