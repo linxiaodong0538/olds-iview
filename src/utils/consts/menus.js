@@ -83,6 +83,21 @@ export default [
         ]
       },
       {
+        icon: 'android-restaurant',
+        name: 'company-app/supplies',
+        title: '日用品仓库',
+        children: [
+          {
+            title: '分类列表',
+            route: '/company-app/supplies/supplies/products/categories'
+          },
+          {
+            title: '产品列表',
+            route: '/company-app/supplies/supplies/products/index'
+          }
+        ]
+      },
+      {
         icon: 'android-car',
         name: 'company-app/cars',
         title: '车辆',
