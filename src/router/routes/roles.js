@@ -1,10 +1,10 @@
 export default {
   path: ':topLevelMenu/:secondLevelMenu/:alias/roles',
-  component: resolve => require(['@/modules/Roles'], resolve),
+  component: resolve => require(['@/pages/Roles'], resolve),
   children: [
     {
       path: 'index',
-      component: resolve => require(['@/modules/Roles/List'], resolve)
+      component: resolve => require(['@/pages/Roles/List'], resolve)
     }
   ]
 }

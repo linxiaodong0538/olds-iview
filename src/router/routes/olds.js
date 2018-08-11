@@ -1,14 +1,14 @@
 export default {
   path: ':topLevelMenu/:secondLevelMenu/:alias/olds',
-  component: resolve => require(['@/modules/Olds'], resolve),
+  component: resolve => require(['@/pages/Olds'], resolve),
   children: [
     {
       path: 'index',
-      component: resolve => require(['@/modules/Olds/List'], resolve)
+      component: resolve => require(['@/pages/Olds/List'], resolve)
     },
     {
       path: 'index/form/:id?',
-      component: resolve => require(['@/modules/Olds/Form'], resolve)
+      component: resolve => require(['@/pages/Olds/Form'], resolve)
     }
   ]
 }

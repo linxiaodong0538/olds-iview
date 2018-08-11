@@ -1,10 +1,10 @@
 export default {
   path: ':topLevelMenu/:secondLevelMenu/:alias/permissions',
-  component: resolve => require(['@/modules/Permissions'], resolve),
+  component: resolve => require(['@/pages/Permissions'], resolve),
   children: [
     {
       path: 'index',
-      component: resolve => require(['@/modules/Permissions/List'], resolve)
+      component: resolve => require(['@/pages/Permissions/List'], resolve)
     }
   ]
 }

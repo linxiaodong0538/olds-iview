@@ -1,18 +1,18 @@
 export default {
   path: ':topLevelMenu/:secondLevelMenu/:alias/products',
-  component: resolve => require(['@/modules/Products'], resolve),
+  component: resolve => require(['@/pages/Products'], resolve),
   children: [
     {
       path: 'index',
-      component: resolve => require(['@/modules/Products/List'], resolve)
+      component: resolve => require(['@/pages/Products/List'], resolve)
     },
     {
       path: 'index/form/:id?',
-      component: resolve => require(['@/modules/Products/Form'], resolve)
+      component: resolve => require(['@/pages/Products/Form'], resolve)
     },
     {
       path: 'categories',
-      component: resolve => require(['@/modules/Categories/List'], resolve)
+      component: resolve => require(['@/pages/Categories/List'], resolve)
     }
   ]
 }

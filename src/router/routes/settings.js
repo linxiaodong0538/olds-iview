@@ -1,10 +1,10 @@
 export default {
   path: ':topLevelMenu/:secondLevelMenu/:alias/settings',
-  component: resolve => require(['@/modules/Settings'], resolve),
+  component: resolve => require(['@/pages/Settings'], resolve),
   children: [
     {
       path: 'index',
-      component: resolve => require(['@/modules/Settings/Form'], resolve)
+      component: resolve => require(['@/pages/Settings/Form'], resolve)
     }
   ]
 }

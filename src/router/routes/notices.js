@@ -1,10 +1,10 @@
 export default {
   path: ':topLevelMenu/:secondLevelMenu/:alias/notices',
-  component: resolve => require(['@/modules/Notices'], resolve),
+  component: resolve => require(['@/pages/Notices'], resolve),
   children: [
     {
       path: 'index',
-      component: resolve => require(['@/modules/Notices/List'], resolve)
+      component: resolve => require(['@/pages/Notices/List'], resolve)
     }
   ]
 }
