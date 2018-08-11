@@ -136,7 +136,7 @@
                   },
                   on: {
                     click: () => {
-                      this.$router.push(`${this.routePrefix}/cars/index/trips`)
+                      this.$router.push(`${this.routePrefix}/cars/index/trips/${params.row.id}`)
                     }
                   }
                 }, '查看行程')
