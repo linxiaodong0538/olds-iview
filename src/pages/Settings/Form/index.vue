@@ -1,10 +1,5 @@
 <template>
   <div>
-    <Breadcrumb>
-      <Breadcrumb-item href="/">首页</Breadcrumb-item>
-      <Breadcrumb-item href="#">系统设置</Breadcrumb-item>
-      <Breadcrumb-item>网站设置</Breadcrumb-item>
-    </Breadcrumb>
     <div class="limit-width">
       <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
         <Form-item label="标题" prop="title">

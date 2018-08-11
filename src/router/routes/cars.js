@@ -9,6 +9,14 @@ export default {
     {
       path: 'index/form/:id?',
       component: resolve => require(['@/pages/Cars/Form'], resolve)
+    },
+    {
+      path: 'index/breakdowns',
+      component: resolve => require(['@/pages/Cars/Breakdowns'], resolve)
+    },
+    {
+      path: 'index/trips',
+      component: resolve => require(['@/pages/Cars/Trips'], resolve)
     }
   ]
 }

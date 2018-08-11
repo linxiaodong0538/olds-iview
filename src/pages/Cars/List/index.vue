@@ -1,10 +1,5 @@
 <template>
   <div>
-    <Breadcrumb>
-      <Breadcrumb-item href="/">首页</Breadcrumb-item>
-      <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
-      <Breadcrumb-item>车辆列表</Breadcrumb-item>
-    </Breadcrumb>
     <List :current="current" :columns="columns" :data="cars.cars.items" :total="cars.cars.total"
           @on-change="handlePageChange">
       <ListHeader>
@@ -76,14 +71,6 @@
             }
           },
           {
-            title: '公里数',
-            key: 'km',
-            width: 100,
-            render (h, params) {
-              return h('span', null, `${params.row.km} 公里`)
-            }
-          },
-          {
             title: '年检时间',
             key: 'mot_time',
             width: 120,
@@ -139,6 +126,7 @@
                   },
                   on: {
                     click: () => {
+                      this.$router.push(`${this.routePrefix}/cars/index/breakdowns`)
                     }
                   }
                 }, '查看维修记录'),
@@ -148,6 +136,7 @@
                   },
                   on: {
                     click: () => {
+                      this.$router.push(`${this.routePrefix}/cars/index/trips`)
                     }
                   }
                 }, '查看行程')

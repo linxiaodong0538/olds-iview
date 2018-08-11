@@ -1,11 +1,5 @@
 <template>
   <div>
-    <Breadcrumb>
-      <Breadcrumb-item href="/">首页</Breadcrumb-item>
-      <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
-      <Breadcrumb-item href="/olds/index">员工列表</Breadcrumb-item>
-      <Breadcrumb-item>{{ id ? '编辑' : '新增' }}</Breadcrumb-item>
-    </Breadcrumb>
     <div class="limit-width">
       <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
         <Form-item label="姓名" prop="name">

@@ -1,10 +1,5 @@
 <template>
   <div>
-    <Breadcrumb>
-      <Breadcrumb-item href="/">首页</Breadcrumb-item>
-      <Breadcrumb-item href="#">{{ consts.ALIASES[alias] }}</Breadcrumb-item>
-      <Breadcrumb-item>员工列表</Breadcrumb-item>
-    </Breadcrumb>
     <List :current="current" :columns="columns" :data="staffs.staffs.items" :total="staffs.staffs.total"
           @on-change="handlePageChange">
       <ListHeader>
