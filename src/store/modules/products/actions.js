@@ -41,7 +41,7 @@ export default {
   /**
    * 删除
    */
-  deleteProduct ({ commit }, { id }) {
+  delProduct ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }

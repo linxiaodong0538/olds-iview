@@ -41,7 +41,7 @@ export default {
   /**
    * 删除
    */
-  deletePermission ({ commit }, { id }) {
+  delPermission ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }

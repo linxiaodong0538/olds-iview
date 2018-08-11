@@ -41,7 +41,7 @@ export default {
   /**
    * 删除
    */
-  deleteCategory ({ commit }, { id }) {
+  delCategory ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }

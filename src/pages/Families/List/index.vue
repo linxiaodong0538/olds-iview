@@ -156,7 +156,7 @@
         this.del.id = id
       },
       async handleDelOk () {
-        await this.$store.dispatch('deleteFamily', {
+        await this.$store.dispatch('delFamily', {
           id: this.del.id
         })
         this.$Message.success('删除成功！')

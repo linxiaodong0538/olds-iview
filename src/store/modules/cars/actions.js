@@ -41,7 +41,7 @@ export default {
   /**
    * 删除
    */
-  deleteCar ({ commit }, { id }) {
+  delCar ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }

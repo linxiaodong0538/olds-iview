@@ -41,7 +41,7 @@ export default {
   /**
    * 删除
    */
-  deleteRole ({ commit }, { id }) {
+  delRole ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }

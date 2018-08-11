@@ -1,6 +1,6 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="carBreakdowns.carBreakdowns.items" :total="carBreakdowns.carBreakdowns.total"
+    <List :current="current" :columns="columns" :data="carTrips.carTrips.items" :total="carTrips.carTrips.total"
           @on-change="handlePageChange"></List>
     <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
       <p>确认删除？</p>
@@ -18,7 +18,7 @@
   export default {
     name: 'list',
     async beforeRouteUpdate (to, from, next) {
-      this.carBreakdowns.carBreakdowns = {}
+      this.carTrips.carTrips = {}
 
       this.routePrefix = helpers.getRoutePrefix(to.params)
       this.alias = to.params.alias
@@ -28,7 +28,7 @@
       next()
     },
     async created () {
-      this.carBreakdowns.carBreakdowns = {}
+      this.carTrips.carTrips = {}
 
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.alias = this.$route.params.alias
@@ -106,7 +106,7 @@
                   },
                   on: {
                     click: () => {
-                      this.$router.push(`${this.routePrefix}/carBreakdowns/index/form/${params.row.id}`)
+                      this.$router.push(`${this.routePrefix}/carTrips/index/form/${params.row.id}`)
                     }
                   }
                 }, '编辑'),
@@ -145,7 +145,7 @@
       }
     },
     computed: mapState([
-      'carBreakdowns'
+      'carTrips'
     ]),
     methods: {
       getItems (current = 1) {

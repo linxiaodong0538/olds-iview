@@ -41,7 +41,7 @@ export default {
   /**
    * 删除
    */
-  deleteFamily ({ commit }, { id }) {
+  delFamily ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }

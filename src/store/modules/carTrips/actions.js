@@ -1,13 +1,13 @@
 import types from './types'
-import Model from '../../../models/staffs'
+import Model from '../../../models/carTrips'
 
 export default {
   /**
    * 获取列表
    */
-  getStaffs ({ commit }, { query }) {
+  getCarTrips ({ commit }, { query }) {
     return new Model().GET({ query }).then((res) => {
-      commit(types.GET_STAFFS, {
+      commit(types.GET_CAR_TRIPS, {
         data: res.data
       })
     })
@@ -16,9 +16,9 @@ export default {
   /**
    * 获取详情
    */
-  getStaff ({ commit }, { id }) {
+  getCarTrip ({ commit }, { id }) {
     return new Model().GET({ id }).then((res) => {
-      commit(types.GET_STAFF, {
+      commit(types.GET_CAR_TRIP, {
         data: res.data
       })
     })
@@ -27,21 +27,21 @@ export default {
   /**
    * 新增
    */
-  postStaff ({ commit }, { body }) {
+  postCarTrip ({ commit }, { body }) {
     return new Model().POST({ body })
   },
 
   /**
    * 编辑
    */
-  putStaff ({ commit }, { id, body }) {
+  putCarTrip ({ commit }, { id, body }) {
     return new Model().PUT({ id, body })
   },
 
   /**
    * 删除
    */
-  delStaff ({ commit }, { id }) {
+  delCarTrip ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }

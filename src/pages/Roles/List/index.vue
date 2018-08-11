@@ -222,7 +222,7 @@
         this.del.id = id
       },
       async handleDelOk () {
-        await this.$store.dispatch('deleteRole', {
+        await this.$store.dispatch('delRole', {
           id: this.del.id
         })
         this.$Message.success('删除成功！')
