@@ -17,10 +17,6 @@
           <Input v-model="formValidate.picture" style="display: none;"></Input>
           （尺寸：1150x647）
         </Form-item>
-        <Form-item label="公里数" prop="km">
-          <InputNumber :min="0" :max="100000" v-model="formValidate.km" style="width: 220px;"></InputNumber>
-          公里
-        </Form-item>
         <Form-item label="年检时间" prop="mot_time">
           <DatePicker v-model="formValidate.mot_time" type="date" placeholder="请选择年检时间"
                       style="width: 220px"></DatePicker>

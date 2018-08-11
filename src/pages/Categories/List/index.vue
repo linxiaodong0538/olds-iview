@@ -5,7 +5,7 @@
       <ListHeader>
         <ListOperations>
           <Button class="margin-right-sm" type="primary" @click="handlePost">新增</Button>
-          <Button class="margin-right-sm" type="primary" @click="handleBack" v-if="parents.length">返回上一级</Button>
+          <Button class="margin-right-sm" type="ghost" @click="handleBack" v-if="parents.length">返回上一级</Button>
         </ListOperations>
         <ListSearch>
           <Form inline @submit.native.prevent="handleSearch">
@@ -104,11 +104,7 @@
         alias: '',
         parents: [],
         formModal: false,
-        formValidate: {
-          title: '',
-          description: '',
-          order: 1
-        },
+        formValidate: {},
         ruleValidate: {
           title: [
             {
@@ -216,7 +212,7 @@
           }
         })
       },
-      getDetails (id) {
+      getDetails () {
         return this.$store.dispatch('getCategory', { id: this.put.id })
       },
       handleBack () {
@@ -286,7 +282,7 @@
       'categories.category': {
         handler (newVal) {
           const { id, ...others } = newVal
-          this.formValidate = others
+          this.$set(this, 'formValidate', others)
         }
       }
     }

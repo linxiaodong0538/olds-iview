@@ -11,7 +11,7 @@ export default {
       component: resolve => require(['@/pages/Cars/Form'], resolve)
     },
     {
-      path: 'index/breakdowns',
+      path: 'index/breakdowns/:car_id?',
       component: resolve => require(['@/pages/Cars/Breakdowns'], resolve)
     },
     {

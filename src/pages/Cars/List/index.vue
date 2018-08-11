@@ -126,7 +126,7 @@
                   },
                   on: {
                     click: () => {
-                      this.$router.push(`${this.routePrefix}/cars/index/breakdowns`)
+                      this.$router.push(`${this.routePrefix}/cars/index/breakdowns/${params.row.id}`)
                     }
                   }
                 }, '查看维修记录'),
