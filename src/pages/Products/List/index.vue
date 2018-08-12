@@ -134,7 +134,7 @@
           {
             title: '操作',
             key: 'action',
-            width: 240,
+            width: 450,
             render: (h, params) => {
               return h('ButtonGroup', [
                 h('Button', {
@@ -157,6 +157,26 @@
                     }
                   }
                 }, '删除'),
+                h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: () => {
+                      this.handleDel(params.row.id)
+                    }
+                  }
+                }, '查看出库记录'),
+                h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: () => {
+                      this.handleDel(params.row.id)
+                    }
+                  }
+                }, '查看入库记录'),
                 h('Button', {
                   props: {
                     type: 'ghost'
