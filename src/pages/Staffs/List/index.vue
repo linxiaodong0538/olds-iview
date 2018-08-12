@@ -8,6 +8,16 @@
                   @click="$router.push(`${routePrefix}/staffs/index/form`)">新增
           </Button>
         </ListOperations>
+        <ListSearch>
+          <Form inline @submit.native.prevent="handleSearch">
+            <Form-item prop="name">
+              <Input type="text" placeholder="请输入姓名" v-model="where.name.$like" style="width: 220px;"></Input>
+            </Form-item>
+            <Form-item>
+              <Button type="primary" @click="handleSearch">查询</Button>
+            </Form-item>
+          </Form>
+        </ListSearch>
       </ListHeader>
     </List>
     <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
@@ -38,7 +48,7 @@
   import { mapState } from 'vuex'
   import consts from '@/utils/consts'
   import helpers from '@/utils/helpers/base'
-  import List, { ListHeader, ListOperations } from '@/components/List'
+  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
   export default {
     name: 'list',
@@ -67,7 +77,8 @@
     components: {
       List,
       ListHeader,
-      ListOperations
+      ListOperations,
+      ListSearch
     },
     data () {
       return {
@@ -84,7 +95,23 @@
           modal: false,
           id: 0
         },
-        columns: [
+        where: {
+          name: {
+            $like: ''
+          }
+        },
+        current: 1
+      }
+    },
+    computed: {
+      ...mapState([
+        'roles',
+        'staffs'
+      ]),
+      columns () {
+        this.alias = this.$route.params.alias
+
+        let columns = [
           {
             title: '姓名',
             key: 'name'
@@ -130,19 +157,9 @@
             }
           },
           {
-            title: '角色',
-            key: 'role',
-            width: 120,
-            render: (h, params) => {
-              const item = helpers.getItemById(this.roles.roles.items, params.row.role)
-
-              return h('span', null, item.name || '')
-            }
-          },
-          {
             title: '操作',
             key: 'action',
-            width: 230,
+            width: this.alias === 'staffs' ? 230 : 150,
             render: (h, params) => {
               let nodes = [
                 h('Button', {
@@ -167,7 +184,7 @@
                 }, '删除')
               ]
 
-              nodes.push(
+              this.alias === 'staffs' && nodes.push(
                 h('Button', {
                   props: {
                     type: 'ghost'
@@ -186,12 +203,21 @@
             }
           }
         ]
+
+        this.alias === 'staffs' && columns.splice(6, 0, {
+          title: '角色',
+          key: 'role',
+          width: 120,
+          render: (h, params) => {
+            const item = helpers.getItemById(this.roles.roles.items, params.row.role)
+
+            return h('span', null, item.name || '')
+          }
+        })
+
+        return columns
       }
     },
-    computed: mapState([
-      'roles',
-      'staffs'
-    ]),
     methods: {
       getItems (current = 1) {
         this.current = current
@@ -212,8 +238,15 @@
           }
         })
       },
+      resetSearch () {
+        this.where.name.$like = ''
+      },
       handlePageChange (current) {
         this.getItems(current)
+      },
+      handleSearch () {
+        this.current = 1
+        this.getItems()
       },
       handleDel (id) {
         this.del.modal = true
@@ -226,6 +259,7 @@
         this.$Message.success('删除成功！')
         // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
         await helpers.sleep(500)
+        this.resetSearch()
         this.getItems()
       },
       handleFormOk () {

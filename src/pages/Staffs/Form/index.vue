@@ -48,7 +48,7 @@
           <Input v-model="formValidate.family_telephone" placeholder="请输入亲属电话"></Input>
         </Form-item>
         <Form-item label="从业经历" prop="employment_experience">
-          <Input type="textarea" :rows="4" v-model="formValidate.employment_experience" placeholder="请输入从业经历"></Input>
+          <Input type="textarea" :rows="3" v-model="formValidate.employment_experience" placeholder="请输入从业经历"></Input>
         </Form-item>
         <Form-item label="上岗时间" prop="start_time">
           <DatePicker v-model="formValidate.start_time" type="date" placeholder="请选择上岗时间"
@@ -63,10 +63,10 @@
           元/月
         </Form-item>
         <Form-item label="请假" prop="leave">
-          <Input type="textarea" :rows="4" v-model="formValidate.leave" placeholder="请输入请假"></Input>
+          <Input type="textarea" :rows="3" v-model="formValidate.leave" placeholder="请输入请假"></Input>
         </Form-item>
         <Form-item label="补贴" prop="subsidy">
-          <Input type="textarea" :rows="4" v-model="formValidate.subsidy" placeholder="请输入补贴"></Input>
+          <Input type="textarea" :rows="3" v-model="formValidate.subsidy" placeholder="请输入补贴"></Input>
         </Form-item>
         <Form-item v-if="alias === 'carers'" label="老人入院编号" prop="olds">
           请在老人详情处设置关联。
@@ -80,6 +80,12 @@
         </Form-item>
         <Form-item v-if="alias === 'carers'" label="负责房间" prop="room">
           <Input v-model="formValidate.room" placeholder="请输入负责房间"></Input>
+        </Form-item>
+        <Form-item label="不良记录" prop="bad_record">
+          <Input type="textarea" :rows="3" v-model="formValidate.bad_record" placeholder="请输入不良记录"></Input>
+        </Form-item>
+        <Form-item label="备注" prop="remark">
+          <Input type="textarea" :rows="3" v-model="formValidate.remark" placeholder="请输入备注"></Input>
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>

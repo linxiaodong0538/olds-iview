@@ -31,6 +31,9 @@
         <Form-item label="入院编号" prop="num">
           <Input v-model="formValidate.num" placeholder="请输入入院编号"></Input>
         </Form-item>
+        <Form-item label="地址" prop="address">
+          <Input v-model="formValidate.address" placeholder="请输入地址"></Input>
+        </Form-item>
         <Form-item label="家属" prop="families">
           <Persons key="0" :multiple="true" :get="handleGetPersons('families')"
                    @change="val => { handlePersonChange('families', val) }"
@@ -44,7 +47,7 @@
                    v-model="formValidate.carer"></Persons>
         </Form-item>
         <Form-item label="既往病史" prop="medical_history">
-          <Input type="textarea" :rows="4" v-model="formValidate.medical_history" placeholder="请输入既往病史"></Input>
+          <Input type="textarea" :rows="3" v-model="formValidate.medical_history" placeholder="请输入既往病史"></Input>
         </Form-item>
         <Form-item label="入住时间" prop="stay_in_time">
           <DatePicker v-model="formValidate.stay_in_time" type="date" placeholder="请选择入住时间"
@@ -78,14 +81,26 @@
           元
         </Form-item>
         <Form-item label="特殊服务" prop="special_services">
-          <Input type="textarea" :rows="4" v-model="formValidate.special_services" placeholder="请输入特殊服务"></Input>
+          <Input type="textarea" :rows="3" v-model="formValidate.special_services" placeholder="请输入特殊服务"></Input>
         </Form-item>
         <Form-item label="过敏史" prop="allergic_history">
-          <Input type="textarea" :rows="4" v-model="formValidate.allergic_history" placeholder="请输入过敏史"></Input>
+          <Input type="textarea" :rows="3" v-model="formValidate.allergic_history" placeholder="请输入过敏史"></Input>
         </Form-item>
         <Form-item label="出院时间" prop="leave_hospital_time">
           <DatePicker v-model="formValidate.leave_hospital_time" type="date" placeholder="请选择出院时间"
                       style="width: 220px"></DatePicker>
+        </Form-item>
+        <Form-item label="出院原由" prop="leave_hospital_reason">
+          <Input type="textarea" :rows="3" v-model="formValidate.leave_hospital_reason" placeholder="请输入出院原由"></Input>
+        </Form-item>
+        <Form-item label="请假" prop="leave">
+          <Input type="textarea" :rows="3" v-model="formValidate.leave" placeholder="请输入请假"></Input>
+        </Form-item>
+        <Form-item label="不良记录" prop="bad_record">
+          <Input type="textarea" :rows="3" v-model="formValidate.bad_record" placeholder="请输入不良记录"></Input>
+        </Form-item>
+        <Form-item label="备注" prop="remark">
+          <Input type="textarea" :rows="3" v-model="formValidate.remark" placeholder="请输入备注"></Input>
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>

@@ -52,7 +52,7 @@
         },
         columns: [
           {
-            title: '报警车辆',
+            title: '报警对象',
             key: 'resource_name',
             width: 120,
             render (h, params) {
@@ -75,14 +75,6 @@
             }
           },
           {
-            title: '到期时间',
-            key: 'created_at',
-            width: 180,
-            render (h, params) {
-              return h('span', null, time.getDate(params.resource_column_value))
-            }
-          },
-          {
             title: '操作',
             key: 'action',
             width: 120,
@@ -97,7 +89,7 @@
                       window.open(`/#/company-app/cars/cars/cars/index/form/${params.row.resource_id}`)
                     }
                   }
-                }, '查看车辆')
+                }, '查看对象')
               ])
             }
           }

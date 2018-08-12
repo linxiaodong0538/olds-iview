@@ -30,7 +30,7 @@
                       style="width: 220px"></DatePicker>
         </Form-item>
         <Form-item label="备注" prop="remark">
-          <Input type="textarea" :rows="4" v-model="formValidate.remark" placeholder="请输入备注"></Input>
+          <Input type="textarea" :rows="3" v-model="formValidate.remark" placeholder="请输入备注"></Input>
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>

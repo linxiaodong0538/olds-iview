@@ -34,7 +34,7 @@
         <Form-item label="公里数" prop="km">
           <Row>
             <Col span="20">
-              <InputNumber :min="0" :max="100000" v-model="formValidate.km"></InputNumber>
+              <InputNumber :min="0" :max="100000" v-model="formValidate.km" style="width: 220px;"></InputNumber>
               公里
             </Col>
           </Row>

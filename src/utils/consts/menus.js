@@ -139,6 +139,10 @@ export default [
           {
             title: '车辆',
             route: '/company-app/notices/cars/notices/index'
+          },
+          {
+            title: '库存',
+            route: '/company-app/notices/products/notices/index'
           }
         ]
       },

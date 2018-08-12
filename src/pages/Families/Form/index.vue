@@ -40,6 +40,12 @@
         <Form-item label="与老人关系" prop="relation">
           <Input v-model="formValidate.relation" placeholder="请输入与老人关系"></Input>
         </Form-item>
+        <Form-item label="不良记录" prop="bad_record">
+          <Input type="textarea" :rows="3" v-model="formValidate.bad_record" placeholder="请输入不良记录"></Input>
+        </Form-item>
+        <Form-item label="备注" prop="remark">
+          <Input type="textarea" :rows="3" v-model="formValidate.remark" placeholder="请输入备注"></Input>
+        </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
           <Button type="ghost" @click="$router.push(`${routePrefix}/families/index`)">返回</Button>
