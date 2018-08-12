@@ -11,6 +11,10 @@ export default {
       component: resolve => require(['@/pages/Products/Form'], resolve)
     },
     {
+      path: 'index/stocks/:type/:productId',
+      component: resolve => require(['@/pages/Products/Stocks'], resolve)
+    },
+    {
       path: 'categories',
       component: resolve => require(['@/pages/Categories/List'], resolve)
     }

@@ -34,6 +34,10 @@
           <InputNumber :min="0" :max="100000" v-model="formValidate.stock"></InputNumber>
           件
         </Form-item>
+        <Form-item label="库存告警临界值" prop="stock_threshold">
+          <InputNumber :min="0" :max="100000" v-model="formValidate.stock_threshold"></InputNumber>
+          件
+        </Form-item>
         <Form-item label="采购地点" prop="purchase_address">
           <Input v-model="formValidate.purchase_address" placeholder="请输入采购地点"></Input>
         </Form-item>

@@ -163,7 +163,7 @@
                   },
                   on: {
                     click: () => {
-                      this.handleDel(params.row.id)
+                      this.$router.push(`${this.routePrefix}/products/index/stocks/1/${params.row.id}`)
                     }
                   }
                 }, '查看出库记录'),
@@ -173,7 +173,7 @@
                   },
                   on: {
                     click: () => {
-                      this.handleDel(params.row.id)
+                      this.$router.push(`${this.routePrefix}/products/index/stocks/2/${params.row.id}`)
                     }
                   }
                 }, '查看入库记录'),
