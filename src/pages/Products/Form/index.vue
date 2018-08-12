@@ -88,12 +88,11 @@
           category_id: 0,
           picture1: '',
           picture2: '',
-          price: '',
-          stock: '',
+          price: 0,
+          stock: 0,
           purchase_address: '',
           seller_telephone: '',
-          content: '',
-          picture: ''
+          content: ''
         },
         ruleValidate: {
           title: [

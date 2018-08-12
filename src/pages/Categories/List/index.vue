@@ -234,7 +234,7 @@
       handlePost () {
         this.formModal = true
         this.put.id = 0
-        this.$refs.formValidate.resetFields()
+        this.resetFields()
       },
       handlePut (id) {
         this.put.id = id
@@ -271,11 +271,15 @@
             this.formModal = false
 
             this.$Message.success((this.put.id ? '编辑' : '新增') + '成功！')
-            !this.put.id && this.$refs.formValidate.resetFields()
+            !this.put.id && this.resetFields()
             this.resetSearch()
             this.getItems()
           }
         })
+      },
+      resetFields () {
+        this.$refs.formValidate.resetFields()
+        this.$set(this, 'formValidate', {})
       }
     },
     watch: {
