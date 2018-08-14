@@ -166,7 +166,7 @@
                       this.$router.push(`${this.routePrefix}/products/index/stocks/1/${params.row.id}`)
                     }
                   }
-                }, '查看出库记录'),
+                }, '查看入库记录'),
                 h('Button', {
                   props: {
                     type: 'ghost'
@@ -176,7 +176,7 @@
                       this.$router.push(`${this.routePrefix}/products/index/stocks/2/${params.row.id}`)
                     }
                   }
-                }, '查看入库记录'),
+                }, '查看出库记录'),
                 h('Button', {
                   props: {
                     type: 'ghost'

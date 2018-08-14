@@ -52,7 +52,7 @@
         },
         columns: [
           {
-            title: '报警对象',
+            title: '告警对象',
             key: 'resource_name',
             width: 120,
             render (h, params) {
@@ -60,14 +60,14 @@
             }
           },
           {
-            title: '报警内容',
+            title: '告警内容',
             key: 'title',
             render (h, params) {
               return h('span', null, `${params.row.resource_name}的${consts.NOTICE_COLUMNS[params.row.resource_column]}将于 3 天后到期，请注意处理。`)
             }
           },
           {
-            title: '报警时间',
+            title: '告警时间',
             key: 'created_at',
             width: 180,
             render (h, params) {

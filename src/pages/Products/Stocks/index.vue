@@ -69,8 +69,8 @@
             title: '出/入库数量',
             key: 'count',
             width: 150,
-            render (h, params) {
-              return h('span', null, (this.where.type === '1' ? '+' : '-') + params.row.count)
+            render: (h, params) => {
+              return h('span', null, params.row.count)
             }
           },
           {
