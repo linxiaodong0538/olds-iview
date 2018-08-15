@@ -35,7 +35,12 @@
           <Input v-model="formValidate.telephone" placeholder="请输入联系电话"></Input>
         </Form-item>
         <Form-item label="老人入院编号" prop="olds">
-          请在老人详情处设置关联。
+          <p class="person-item" v-for="item in myOlds">
+            <Button type="ghost" :key="item.id" title="点击查看详情" @click="handleClickOld(item.id)">
+              {{ `${item.num}（${item.name}）` }}
+            </Button>
+          </p>
+          （请在老人详情处设置关联。）
         </Form-item>
         <Form-item label="与老人关系" prop="relation">
           <Input v-model="formValidate.relation" placeholder="请输入与老人关系"></Input>
@@ -70,6 +75,8 @@
       this.id = this.$route.params.id
 
       this.id && this.getDetails(this.id)
+      this.id && this.$set(this.formData, 'olds', await this.getRelations('olds,families', this.id))
+      this.getOlds()
     },
     components: {
       Uploader
@@ -81,6 +88,8 @@
         alias: '',
         id: '',
         formValidate: {},
+        formData: {},
+        myOlds: [],
         ruleValidate: {
           name: [
             {
@@ -116,6 +125,20 @@
       getDetails (id) {
         return this.$store.dispatch('getFamily', { id })
       },
+      async getRelations (between, id) {
+        const getRelationsRes = await this.$store.dispatch('getRelations', {
+          query: {
+            where: { between, resource2_id: id }
+          }
+        })
+
+        return getRelationsRes.data.resource1_ids
+      },
+      async getOlds () {
+        return this.$store.dispatch('getOlds', {
+          query: { where: { alias: 'olds' } }
+        })
+      },
       handleUploaderChange (file) {
         this.$set(this.formValidate, 'picture', file ? file.id : '')
       },
@@ -138,10 +161,14 @@
       resetFields () {
         this.$refs.formValidate.resetFields()
         this.$refs.uploader.remove()
+      },
+      handleClickOld (id) {
+        window.open(`/#/company-app/persons/olds/olds/index/form/${id}`)
       }
     },
     computed: mapState([
-      'families'
+      'families',
+      'olds'
     ]),
     watch: {
       'families.family': {
@@ -149,7 +176,16 @@
           const { id, ...others } = newVal
           this.$set(this, 'formValidate', others)
         }
+      },
+      'olds.olds': {
+        handler (newVal) {
+          const items = newVal.items || []
+          this.myOlds = this.formData.olds.split(',').map(id => helpers.getItemById(items, id))
+        }
       }
     }
   }
 </script>
+
+<style lang="scss" scoped src="./styles/index.scss">
+</style>

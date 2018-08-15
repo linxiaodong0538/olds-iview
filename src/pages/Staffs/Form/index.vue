@@ -69,7 +69,12 @@
           <Input type="textarea" :rows="3" v-model="formValidate.subsidy" placeholder="请输入补贴"></Input>
         </Form-item>
         <Form-item v-if="alias === 'carers'" label="老人入院编号" prop="olds">
-          请在老人详情处设置关联。
+          <p class="person-item" v-for="item in myOlds">
+            <Button type="ghost" :key="item.id" title="点击查看详情" @click="handleClickOld(item.id)">
+              {{ `${item.num}（${item.name}）` }}
+            </Button>
+          </p>
+          （请在老人详情处设置关联。）
         </Form-item>
         <Form-item v-if="alias === 'carers'" label="籍贯" prop="native_place">
           <Input v-model="formValidate.native_place" placeholder="请输入籍贯"></Input>
@@ -111,6 +116,8 @@
       this.id = this.$route.params.id
 
       this.id && this.getDetails(this.id)
+      this.id && this.$set(this.formData, 'olds', await this.getRelations('olds,carer', this.id))
+      this.getOlds()
     },
     components: {
       Uploader
@@ -118,10 +125,13 @@
     data () {
       return {
         consts,
+        helpers,
+        myOlds: [],
         routePrefix: '',
         alias: '',
         id: '',
         formValidate: {},
+        formData: {},
         ruleValidate: {
           name: [
             {
@@ -157,6 +167,20 @@
       getDetails (id) {
         return this.$store.dispatch('getStaff', { id })
       },
+      async getRelations (between, id) {
+        const getRelationsRes = await this.$store.dispatch('getRelations', {
+          query: {
+            where: { between, resource2_id: id }
+          }
+        })
+
+        return getRelationsRes.data.resource1_ids
+      },
+      async getOlds () {
+        return this.$store.dispatch('getOlds', {
+          query: { where: { alias: 'olds' } }
+        })
+      },
       handleUploaderChange (file) {
         this.$set(this.formValidate, 'picture', file ? file.id : '')
       },
@@ -179,18 +203,33 @@
       resetFields () {
         this.$refs.formValidate.resetFields()
         this.$refs.uploader.remove()
+      },
+      handleClickOld (id) {
+        window.open(`/#/company-app/persons/olds/olds/index/form/${id}`)
       }
     },
-    computed: mapState([
-      'staffs'
-    ]),
+    computed: {
+      ...mapState([
+        'staffs',
+        'olds'
+      ])
+    },
     watch: {
       'staffs.staff': {
         handler (newVal) {
           const { id, ...others } = newVal
           this.$set(this, 'formValidate', others)
         }
+      },
+      'olds.olds': {
+        handler (newVal) {
+          const items = newVal.items || []
+          this.myOlds = this.formData.olds.split(',').map(id => helpers.getItemById(items, id))
+        }
       }
     }
   }
 </script>
+
+<style lang="scss" scoped src="./styles/index.scss">
+</style>

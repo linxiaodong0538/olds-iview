@@ -35,16 +35,16 @@
           <Input v-model="formValidate.address" placeholder="请输入地址"></Input>
         </Form-item>
         <Form-item label="家属" prop="families">
-          <Persons key="0" :multiple="true" :get="handleGetPersons('families')"
+          <Persons key="0" multiple :get="handleGetPersons('families')"
                    @change="val => { handlePersonChange('families', val) }"
                    @click-name="id => { handleClickPerson('families', id) }"
-                   v-model="formValidate.families"></Persons>
+                   v-model="formData.families"></Persons>
         </Form-item>
         <Form-item label="护理员" prop="carer">
-          <Persons key="1" :multiple="false" :get="handleGetPersons('carers')"
+          <Persons key="1" :get="handleGetPersons('carers')"
                    @change="val => { handlePersonChange('carer', val) }"
                    @click-name="id => { handleClickPerson('carers', id) }"
-                   v-model="formValidate.carer"></Persons>
+                   v-model="formData.carer"></Persons>
         </Form-item>
         <Form-item label="既往病史" prop="medical_history">
           <Input type="textarea" :rows="3" v-model="formValidate.medical_history" placeholder="请输入既往病史"></Input>
@@ -119,6 +119,7 @@
   import Persons from '@/components/Persons'
   import StaffsModel from '@/models/staffs'
   import FamiliesModel from '@/models/families'
+  import RelationsModel from '@/models/relations'
 
   export default {
     name: 'form',
@@ -129,6 +130,8 @@
       this.id = this.$route.params.id
 
       this.id && this.getDetails(this.id)
+      this.id && this.$set(this.formData, 'families', await this.getRelations('olds,families', this.id))
+      this.id && this.$set(this.formData, 'carer', await this.getRelations('olds,carer', this.id))
     },
     components: {
       Uploader,
@@ -142,6 +145,7 @@
         id: '',
         personOptions: [],
         formValidate: {},
+        formData: {},
         ruleValidate: {
           name: [
             {
@@ -180,16 +184,46 @@
       handleUploaderChange (file) {
         this.$set(this.formValidate, 'picture', file ? file.id : '')
       },
+      async getRelations (between, id) {
+        const getRelationsRes = await this.$store.dispatch('getRelations', {
+          query: {
+            where: { between, resource1_id: id }
+          }
+        })
+
+        return getRelationsRes.data.resource2_ids
+      },
+      async putRelation (id) {
+        const { families, carer } = this.formData
+
+        await this.$store.dispatch('putRelation', {
+          body: {
+            resource1_id: id,
+            resource2_ids: families,
+            between: 'olds,families'
+          }
+        })
+
+        await this.$store.dispatch('putRelation', {
+          body: {
+            resource1_id: id,
+            resource2_ids: carer,
+            between: 'olds,carer'
+          }
+        })
+      },
       handleSave () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             const { id, formValidate, alias } = this
             const action = id ? 'putOld' : 'postOld'
 
-            await this.$store.dispatch(action, {
+            const putOrPostOldRes = await this.$store.dispatch(action, {
               id,
               body: { ...formValidate, alias }
             })
+
+            await this.putRelation(id || putOrPostOldRes.data.id)
 
             this.$Message.success((this.id ? '编辑' : '新增') + '成功！')
             !id && this.resetFields()
@@ -199,6 +233,7 @@
       resetFields () {
         this.$refs.formValidate.resetFields()
         this.$refs.uploader.remove()
+        this.$set(this, 'formData', {})
       },
       handleGetPersons (alias) {
         return async () => {
@@ -206,7 +241,7 @@
             ? new FamiliesModel()
             : new StaffsModel()
           const getRes = await model.GET({
-            query: { offset: 0, limit: 1000 }
+            query: { offset: 0, limit: 1000, where: { alias } }
           })
 
           return getRes.data.items.length
@@ -215,18 +250,17 @@
         }
       },
       handlePersonChange (key, value) {
-        this.$set(this.formValidate, key, value)
+        this.$set(this.formData, key, value)
       },
       handleClickPerson (alias, id) {
-        window.open(
-          alias === 'families'
-            ? `/#/company-app/persons/families/families/index/form/${id}`
-            : `/#/company-app/persons/carers/staffs/index/form/${id}`
-        )
+        window.open(alias === 'families'
+          ? `/#/company-app/persons/families/families/index/form/${id}`
+          : `/#/company-app/persons/carers/staffs/index/form/${id}`)
       }
     },
     computed: mapState([
-      'olds'
+      'olds',
+      'relations'
     ]),
     watch: {
       'olds.old': {

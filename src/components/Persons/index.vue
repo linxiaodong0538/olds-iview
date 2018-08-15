@@ -2,7 +2,7 @@
   <div class="persons">
     <p class="person-item" v-for="(item, index) in values" :key="index">
       <ButtonGroup>
-        <Button type="ghost" @click="$emit('click-name', item)">{{ getLabel(item) }}</Button>
+        <Button type="ghost" title="点击查看详情" @click="$emit('click-name', item)">{{ getLabel(item) }}</Button>
         <Button type="ghost" icon="android-close" @click="values.splice(index, 1)"></Button>
       </ButtonGroup>
     </p>
@@ -24,7 +24,7 @@
     props: {
       multiple: {
         type: Boolean,
-        default: true
+        default: false
       },
       placeholder: {
         type: String,

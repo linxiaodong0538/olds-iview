@@ -17,6 +17,7 @@ import roles from './modules/roles'
 import permissions from './modules/permissions'
 import categories from './modules/categories'
 import settings from './modules/settings'
+import relations from './modules/relations'
 
 Vue.use(Vuex)
 
@@ -41,6 +42,7 @@ export default new Vuex.Store({
     roles,
     permissions,
     categories,
-    settings
+    settings,
+    relations
   }
 })

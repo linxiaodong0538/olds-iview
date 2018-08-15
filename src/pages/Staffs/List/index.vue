@@ -57,7 +57,7 @@
       this.roles.roles = {}
 
       this.routePrefix = helpers.getRoutePrefix(to.params)
-      this.alias = to.params.alias
+      this.$set(this.where, 'alias', to.params.alias)
 
       await this.getRoleItems()
       this.getItems()
@@ -69,7 +69,7 @@
       this.roles.roles = {}
 
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
-      this.alias = this.$route.params.alias
+      this.$set(this.where, 'alias', this.$route.params.alias)
 
       await this.getRoleItems()
       this.getItems()
@@ -84,7 +84,6 @@
       return {
         consts,
         routePrefix: '',
-        alias: '',
         setRole: {
           id: 0,
           modal: false
@@ -109,8 +108,6 @@
         'staffs'
       ]),
       columns () {
-        this.alias = this.$route.params.alias
-
         let columns = [
           {
             title: '姓名',
@@ -159,7 +156,7 @@
           {
             title: '操作',
             key: 'action',
-            width: this.alias === 'staffs' ? 230 : 150,
+            width: this.where.alias === 'staffs' ? 230 : 150,
             render: (h, params) => {
               let nodes = [
                 h('Button', {
@@ -184,7 +181,7 @@
                 }, '删除')
               ]
 
-              this.alias === 'staffs' && nodes.push(
+              this.where.alias === 'staffs' && nodes.push(
                 h('Button', {
                   props: {
                     type: 'ghost'
@@ -204,7 +201,7 @@
           }
         ]
 
-        this.alias === 'staffs' && columns.splice(6, 0, {
+        this.where.alias === 'staffs' && columns.splice(6, 0, {
           title: '角色',
           key: 'role',
           width: 120,
@@ -226,7 +223,7 @@
           query: {
             offset: (current - 1) * consts.PAGE_SIZE,
             limit: consts.PAGE_SIZE,
-            where: { ...this.where, alias: this.alias }
+            where: this.where
           }
         })
       },
