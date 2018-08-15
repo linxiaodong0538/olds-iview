@@ -1,6 +1,7 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="permissions.permissions.items" :total="permissions.permissions.total"
+    <List :current="current" :columns="columns" :data="permissions.permissions.items"
+          :total="permissions.permissions.total"
           @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
@@ -17,6 +18,13 @@
           <Row>
             <Col span="20">
               <Input v-model="formValidate.name" placeholder="请输入名称"></Input>
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item label="代码" prop="code">
+          <Row>
+            <Col span="20">
+              <Input v-model="formValidate.code" placeholder="请输入代码"></Input>
             </Col>
           </Row>
         </Form-item>
@@ -75,6 +83,7 @@
         formModal: false,
         formValidate: {
           name: '',
+          code: '',
           description: ''
         },
         ruleValidate: {
@@ -86,6 +95,12 @@
             {
               max: 100,
               message: '名称不能多于 100 个字'
+            }
+          ],
+          code: [
+            {
+              required: true,
+              message: '代码不能为空'
             }
           ]
         },
@@ -101,6 +116,11 @@
           {
             title: '名称',
             key: 'name'
+          },
+          {
+            title: '代码',
+            key: 'code',
+            width: 200
           },
           {
             title: '描述',

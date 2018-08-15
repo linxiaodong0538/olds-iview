@@ -13,6 +13,11 @@ export default {
     const { topLevelMenu, secondLevelMenu, alias } = params
     return `/${topLevelMenu}/${secondLevelMenu}/${alias}`
   },
+  getItem (items, key, val) {
+    return items && items.length
+      ? (items.find(item => item[key] === val) || {})
+      : {}
+  },
   getItemById (items, id) {
     return items && items.length
       ? (items.find(item => +item.id === +id) || {})

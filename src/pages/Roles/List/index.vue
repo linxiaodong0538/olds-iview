@@ -32,9 +32,10 @@
             <Col span="20">
               <Checkbox
                 v-if="permissions.permissions.items.length"
-                v-for="(item, index) in permissions.permissions.items" :key="index"
-                v-model="formData.permissions[item.id]"
-                @on-change="data => { handlePermissionsChange(item.id)(data) }">
+                v-for="(item, index) in permissions.permissions.items"
+                :key="index"
+                v-model="formData.permissions[item.code]"
+                @on-change="data => { handlePermissionsChange(item.code)(data) }">
                 {{ item.name }}
               </Checkbox>
               <div v-else>
@@ -129,10 +130,10 @@
             width: 300,
             render: (h, params) => {
               const { items } = this.permissions.permissions
-              const permissions = params.row.permissions.split(',').reverse().map(id => {
-                const item = helpers.getItemById(items, id)
+              const permissions = params.row.permissions.split(',').reverse().map(code => {
+                const item = helpers.getItem(items, 'code', code)
                 return item.name || ''
-              }).filter(item => item !== '').join(',')
+              }).filter(item => item !== '').join('、')
 
               return h('span', null, permissions)
             }
@@ -272,7 +273,9 @@
       },
       handlePermissionsChange (val) {
         return data => {
-          this.formData.permissions[val] = data
+          if (data) {
+            this.formData.permissions[val] = data
+          }
         }
       }
     },
@@ -286,7 +289,9 @@
           this.$set(this.formData, 'permissions', {})
 
           permissions.split(',').forEach(key => {
-            this.$set(this.formData.permissions, key, true)
+            if (key) {
+              this.$set(this.formData.permissions, key, true)
+            }
           })
         }
       }

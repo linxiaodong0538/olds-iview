@@ -21,12 +21,12 @@
             </Col>
           </Row>
         </Form-item>
-        <Form-item label="开车时间" prop="start">
+        <Form-item label="发车时间" prop="start">
           <Row>
             <Col span="20">
-              <DatePicker v-model="formValidate.start_date" type="date" placeholder="请选择开车日期"
+              <DatePicker v-model="formValidate.start_date" type="date" placeholder="请选择发车日期"
                           style="width: 220px"></DatePicker>
-              <TimePicker v-model="formValidate.start_time" format="HH:mm:ss" placeholder="请选择开车时间点"
+              <TimePicker v-model="formValidate.start_time" format="HH:mm:ss" placeholder="请选择发车时间点"
                           style="width: 220px"></TimePicker>
             </Col>
           </Row>
@@ -109,7 +109,7 @@
             width: 120
           },
           {
-            title: '开车时间',
+            title: '发车时间',
             key: 'time',
             width: 150,
             render (h, params) {
