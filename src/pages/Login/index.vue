@@ -2,8 +2,8 @@
   <Card class="login" dis-hover>
     <p slot="title">后台管理系统</p>
     <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60" label-position="left">
-      <Form-item label="用户" prop="telephone">
-        <Input size="large" v-model="formValidate.telephone" placeholder="请输入用户" @on-enter="handleLogin"></Input>
+      <Form-item label="账号" prop="telephone">
+        <Input size="large" v-model="formValidate.telephone" placeholder="请输入手机号" @on-enter="handleLogin"></Input>
       </Form-item>
       <Form-item label="密码" prop="password">
         <Input size="large" type="password" v-model="formValidate.password" placeholder="请输入密码"
@@ -25,14 +25,14 @@
     data () {
       return {
         formValidate: {
-          telephone: '13950442340',
-          password: '123456'
+          telephone: '',
+          password: ''
         },
         ruleValidate: {
           telephone: [
             {
               required: true,
-              message: '用户不能为空'
+              message: '手机号不能为空'
             }
           ],
           password: [

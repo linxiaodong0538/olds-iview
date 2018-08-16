@@ -134,7 +134,7 @@ export default [
       {
         icon: 'android-warning',
         name: 'company-app/notices',
-        title: '报警',
+        title: '告警',
         children: [
           {
             title: '车辆',
