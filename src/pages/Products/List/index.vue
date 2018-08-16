@@ -186,7 +186,7 @@
                       this.qrcode.id = params.row.id
                       this.qrcode.title = params.row.title
                       this.qrcode.download = `${this.getCategoryTitle(params.row.category_id)} - ${params.row.id} - ${params.row.title}.png`
-                      this.qrcode.imgSrc = await QRCode.toDataURL('abc', {
+                      this.qrcode.imgSrc = await QRCode.toDataURL(`products/${params.row.id}`, {
                         margin: 1,
                         width: 300
                       })

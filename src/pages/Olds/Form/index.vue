@@ -40,7 +40,7 @@
                    @click-name="id => { handleClickPerson('families', id) }"
                    v-model="formData.families"></Persons>
         </Form-item>
-        <Form-item label="护理员" prop="carer">
+        <Form-item label="护工" prop="carer">
           <Persons key="1" :get="handleGetPersons('carers')"
                    @change="val => { handlePersonChange('carer', val) }"
                    @click-name="id => { handleClickPerson('carers', id) }"
@@ -119,7 +119,6 @@
   import Persons from '@/components/Persons'
   import StaffsModel from '@/models/staffs'
   import FamiliesModel from '@/models/families'
-  import RelationsModel from '@/models/relations'
 
   export default {
     name: 'form',
@@ -196,7 +195,7 @@
       async putRelation (id) {
         const { families, carer } = this.formData
 
-        await this.$store.dispatch('putRelation', {
+        families && await this.$store.dispatch('putRelation', {
           body: {
             resource1_id: id,
             resource2_ids: families,
@@ -204,7 +203,7 @@
           }
         })
 
-        await this.$store.dispatch('putRelation', {
+        carer && await this.$store.dispatch('putRelation', {
           body: {
             resource1_id: id,
             resource2_ids: carer,
