@@ -16,10 +16,10 @@ const DEV = 'DEV'
 const PROD = 'PROD'
 
 // 当前环境
-const ENV = HOST === 'localhost:8080' ? DEV : PROD
+const ENV = HOST === 'localhost:8081' ? DEV : PROD
 
 // 基础地址
-const BASE_URL = 'http://localhost:3002'
+const BASE_URL = ENV === DEV ? 'http://localhost:3002' : 'https://www.rjwb.cn'
 
 // 接口地址
 const API_URL = BASE_URL + '/apis/v1'

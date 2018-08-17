@@ -22,7 +22,7 @@
       this.notices.notices = {}
 
       this.routePrefix = helpers.getRoutePrefix(to.params)
-      this.alias = to.params.alias
+      this.where.alias = to.params.alias
 
       this.getItems()
 
@@ -32,7 +32,7 @@
       this.notices.notices = {}
 
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
-      this.alias = this.$route.params.alias
+      this.where.alias = this.$route.params.alias
 
       this.getItems()
     },
@@ -45,25 +45,19 @@
       return {
         consts,
         routePrefix: '',
-        alias: '',
+        where: {
+          alias: ''
+        },
         del: {
           modal: false,
           id: 0
         },
         columns: [
           {
-            title: '告警对象',
-            key: 'resource_name',
-            width: 120,
-            render (h, params) {
-              return h('span', null, params.row.resource_name)
-            }
-          },
-          {
             title: '告警内容',
-            key: 'title',
+            key: 'content',
             render (h, params) {
-              return h('span', null, `${params.row.resource_name}的${consts.NOTICE_COLUMNS[params.row.resource_column]}将于 3 天后到期，请注意处理。`)
+              return h('span', null, params.row.content)
             }
           },
           {
@@ -86,7 +80,13 @@
                   },
                   on: {
                     click: () => {
-                      window.open(`/#/company-app/cars/cars/cars/index/form/${params.row.resource_id}`)
+                      switch (this.where.alias) {
+                        case 'cars':
+                          window.open(`/#/company-app/cars/cars/cars/index/form/${params.row.resource_id}`)
+                          break
+                        default:
+                          window.open(`/#/company-app/medicines/${this.where.alias}/products/index/form/${params.row.resource_id}`)
+                      }
                     }
                   }
                 }, '查看对象')
@@ -107,7 +107,7 @@
           query: {
             offset: (current - 1) * consts.PAGE_SIZE,
             limit: consts.PAGE_SIZE,
-            where: { ...this.where, alias: this.alias }
+            where: this.where
           }
         })
       },

@@ -141,8 +141,16 @@ export default [
             route: '/company-app/notices/cars/notices/index'
           },
           {
-            title: '库存',
-            route: '/company-app/notices/products/notices/index'
+            title: '医疗库存',
+            route: '/company-app/notices/medicines/notices/index'
+          },
+          {
+            title: '食堂库存',
+            route: '/company-app/notices/foods/notices/index'
+          },
+          {
+            title: '日用品库存',
+            route: '/company-app/notices/supplies/notices/index'
           }
         ]
       },
