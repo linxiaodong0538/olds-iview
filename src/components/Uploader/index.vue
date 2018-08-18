@@ -2,14 +2,13 @@
   <div>
     <Upload
       ref="upload"
-      :default-file-list="defaultList"
+      :default-file-list="defaultFileList"
       :show-upload-list="false"
       :on-success="handleSuccess"
-      :format="['jpg', 'jpeg', 'png']"
-      :max-size="2048"
+      :format="format"
+      :max-size="maxSize"
       :on-format-error="handleFormatError"
-      :on-exceeded-size="handleMaxSize"
-      :before-upload="handleBeforeUpload"
+      :on-exceeded-size="handleExceededSize"
       :headers="headers"
       :action="`${consts.API_URL}/files`">
       <Button
@@ -54,6 +53,14 @@
       value: {
         type: [String, Number],
         default: 0
+      },
+      format: {
+        type: String,
+        default: ['jpg', 'jpeg', 'png']
+      },
+      maxSize: {
+        type: Number,
+        default: 2048
       }
     },
     data () {
@@ -66,7 +73,7 @@
       headers () {
         return restHelpers.getHeaders()
       },
-      defaultList () {
+      defaultFileList () {
         return this.value ? [{
           'name': '',
           'url': helpers.getImageURLById(this.value)
@@ -100,15 +107,8 @@
       handleFormatError () {
         this.$Message.error('文件格式不正确')
       },
-      handleMaxSize () {
-        this.$Message.error('文件不能超过 2M')
-      },
-      handleBeforeUpload () {
-        const check = this.uploadList.length < 2
-        if (!check) {
-          this.$Message.error('删除已有图片后再上传')
-        }
-        return check
+      handleExceededSize () {
+        this.$Message.error(`文件不能超过 ${this.maxSize / 1024}M`)
       }
     },
     mounted () {
