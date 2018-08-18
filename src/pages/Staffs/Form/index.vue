@@ -11,7 +11,7 @@
         <Form-item label="照片" prop="picture">
           <Uploader
             ref="uploader"
-            :has-default-list="!!id"
+            :has-default-file="!!id"
             v-model="formValidate.picture"
             @change="handleUploaderChange"
           />
