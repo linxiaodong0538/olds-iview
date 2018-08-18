@@ -17,27 +17,9 @@
           prop="picture"
         >
           <CUploader
-            key="0"
-            v-if="id && !formValidate.picture"
-            ref="uploader"
-            @change="handleUploaderChange"
-          />
-          <CUploader
-            key="1"
-            v-if="id && formValidate.picture"
             ref="uploader"
             v-model="formValidate.picture"
             @change="handleUploaderChange"
-          />
-          <CUploader
-            key="2"
-            v-if="!id"
-            ref="uploader"
-            @change="handleUploaderChange"
-          />
-          <Input
-            v-model="formValidate.picture"
-            style="display: none;"
           />
           （尺寸：1150x647）
         </Form-item>

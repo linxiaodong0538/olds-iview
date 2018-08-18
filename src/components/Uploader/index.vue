@@ -4,6 +4,8 @@
       key="0"
       v-if="hasDefaultFile && !value"
       ref="uploader"
+      :max-size="maxSize"
+      :format="format"
       @change="handleUploaderChange"
     />
     <CChildUploader
@@ -11,12 +13,16 @@
       v-if="hasDefaultFile && value"
       ref="uploader"
       :value="value"
+      :max-size="maxSize"
+      :format="format"
       @change="handleUploaderChange"
     />
     <CChildUploader
       key="2"
       v-if="!hasDefaultFile"
       ref="uploader"
+      :max-size="maxSize"
+      :format="format"
       @change="handleUploaderChange"
     />
     <Input
@@ -58,7 +64,7 @@
       handleUploaderChange (file) {
         this.$emit('change', file)
       },
-      remove (file) {
+      remove () {
         this.$refs.uploader.remove()
       }
     }
