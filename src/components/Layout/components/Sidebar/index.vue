@@ -1,24 +1,45 @@
 <template>
   <div class="sidebar">
-    <div class="logo" @click="$router.push('/')">
+    <div
+      class="logo"
+      @click="$router.push('/')"
+    >
       <div class="logo-icon">
-        <I type="cube"></I>
+        <CIcon type="cube" />
       </div>
       后台管理系统
     </div>
-    <Menu ref="menu" theme="dark" :active-name="activeName" width="auto" :open-names="openNames"
-          @on-select="handleSelect">
-      <Submenu v-for="(menu1, index1) in consts.MENUS" :key="index1" :name="menu1.name">
+    <Menu
+      ref="menu"
+      theme="dark"
+      :active-name="activeName"
+      width="auto"
+      :open-names="openNames"
+      @on-select="handleSelect"
+    >
+      <Submenu
+        v-for="(menu1, index1) in consts.MENUS"
+        :key="index1"
+        :name="menu1.name"
+      >
         <template slot="title">
-          <Icon :type="menu1.icon"></Icon>
+          <Icon :type="menu1.icon" />
           {{ menu1.title }}
         </template>
-        <Submenu v-for="(menu2, index2) in menu1.children" :key="index2" :name="menu2.name">
+        <Submenu
+          v-for="(menu2, index2) in menu1.children"
+          :key="index2"
+          :name="menu2.name"
+        >
           <template slot="title">
-            <Icon :type="menu2.icon"></Icon>
+            <Icon :type="menu2.icon" />
             {{ menu2.title }}
           </template>
-          <MenuItem v-for="(menu3, index3) in menu2.children" :key="index3" :name="menu3.route">
+          <MenuItem
+            v-for="(menu3, index3) in menu2.children"
+            :key="index3"
+            :name="menu3.route"
+          >
             {{ menu3.title }}
           </MenuItem>
         </Submenu>
@@ -29,12 +50,12 @@
 
 <script>
   import consts from '@/utils/consts'
-  import I from '@/components/I'
+  import CIcon from '@/components/Icon'
 
   export default {
-    name: 'sidebar',
+    name: 'TheSidebar',
     components: {
-      I
+      CIcon
     },
     data () {
       return {

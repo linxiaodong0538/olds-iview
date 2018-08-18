@@ -1,10 +1,10 @@
 <template>
-  <i class="iconfont" :class="'icon-' + type"></i>
+  <i class="iconfont" :class="'icon-' + type" />
 </template>
 
 <script>
   export default {
-    name: 'i',
+    name: 'CIcon',
     props: {
       type: {
         type: String,

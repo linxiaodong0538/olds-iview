@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import auth from '@/utils/auth'
-import Layout from '@/components/Layout'
+import TheLayout from '@/components/Layout'
 import Root from '@/pages/Root'
 import notFound from './routes/notFound'
 import home from './routes/home'
@@ -29,7 +29,7 @@ const router = new Router({
       children: [
         {
           path: '/',
-          component: Layout,
+          component: TheLayout,
           children: [
             home,
             articles,

@@ -12,20 +12,43 @@
       :before-upload="handleBeforeUpload"
       :headers="headers"
       :action="`${consts.API_URL}/files`">
-      <Button type="ghost" icon="ios-cloud-upload-outline" style="width: 220px;">上传文件</Button>
+      <Button
+        type="ghost"
+        icon="ios-cloud-upload-outline"
+        style="width: 220px;"
+      >
+        上传文件
+      </Button>
     </Upload>
-    <Modal title="查看图片" v-model="visible">
-      <img :src="imageURL" v-if="visible" style="width: 100%">
+    <Modal
+      title="查看图片"
+      v-model="visible"
+    >
+      <img
+        :src="imageURL"
+        v-if="visible"
+        style="width: 100%"
+      >
     </Modal>
-    <div class="demo-upload-list" v-for="item in uploadList">
+    <div
+      class="demo-upload-list"
+      v-for="item in uploadList"
+    >
       <template v-if="item.status === 'finished'">
         <img :src="item.url">
         <div class="demo-upload-list-cover">
-          <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+          <Icon
+            type="ios-trash-outline"
+            @click.native="handleRemove(item)"
+          />
         </div>
       </template>
       <template v-else>
-        <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
+        <Progress
+          v-if="item.showProgress"
+          :percent="item.percentage"
+          hide-info
+        />
       </template>
     </div>
   </div>
@@ -36,6 +59,7 @@
   import restHelpers from '@/utils/helpers/restHelpers'
 
   export default {
+    name: 'CUploader',
     props: {
       value: {
         type: [String, Number],
