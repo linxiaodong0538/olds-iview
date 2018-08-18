@@ -13,12 +13,12 @@
           <Categories :alias="alias" v-model="formValidate.category_id" @on-change="handleCategoryChange"></Categories>
         </Form-item>
         <Form-item label="封面" prop="picture">
-          <Uploader key="0" v-if="id && !formValidate.picture" ref="uploader" @change="handleUploaderChange"></Uploader>
-          <Uploader key="1" v-if="id && formValidate.picture" ref="uploader" v-model="formValidate.picture"
-                    @change="handleUploaderChange"></Uploader>
-          <Uploader key="2" v-if="!id" ref="uploader" @change="handleUploaderChange"></Uploader>
-          <Input v-model="formValidate.picture" style="display: none;"></Input>
-          （尺寸：1150x647）
+          <Uploader
+            ref="uploader"
+            :has-default-file="!!id"
+            v-model="formValidate.picture"
+            @change="handleUploaderChange"
+          />
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>

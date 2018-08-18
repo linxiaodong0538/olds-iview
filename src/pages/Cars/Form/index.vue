@@ -9,12 +9,12 @@
           <Input v-model="formValidate.owner" placeholder="请输入车主"></Input>
         </Form-item>
         <Form-item label="图片" prop="picture">
-          <Uploader key="0" v-if="id && !formValidate.picture" ref="uploader"
-                    @change="handleUploaderChange"></Uploader>
-          <Uploader key="1" v-if="id && formValidate.picture" ref="uploader" v-model="formValidate.picture"
-                    @change="handleUploaderChange"></Uploader>
-          <Uploader key="2" v-if="!id" ref="uploader" @change="handleUploaderChange"></Uploader>
-          <Input v-model="formValidate.picture" style="display: none;"></Input>
+          <Uploader
+            ref="uploader"
+            :has-default-file="!!id"
+            v-model="formValidate.picture"
+            @change="handleUploaderChange"
+          />
           （尺寸：1150x647）
         </Form-item>
         <Form-item label="年检时间" prop="mot_time">

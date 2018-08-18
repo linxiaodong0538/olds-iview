@@ -9,21 +9,21 @@
           <Categories :alias="alias" v-model="formValidate.category_id" @on-change="handleCategoryChange"></Categories>
         </Form-item>
         <Form-item label="图片 1" prop="picture1">
-          <Uploader key="0" v-if="id && !formValidate.picture1" ref="uploader1"
-                    @change="handleUploader1Change"></Uploader>
-          <Uploader key="1" v-if="id && formValidate.picture1" ref="uploader1" v-model="formValidate.picture1"
-                    @change="handleUploader1Change"></Uploader>
-          <Uploader key="2" v-if="!id" ref="uploader1" @change="handleUploader1Change"></Uploader>
-          <Input v-model="formValidate.picture1" style="display: none;"></Input>
+          <Uploader
+            ref="uploader1"
+            :has-default-file="!!id"
+            v-model="formValidate.picture1"
+            @change="handleUploader1Change"
+          />
           （尺寸：1150x647）
         </Form-item>
         <Form-item label="图片 2" prop="picture2">
-          <Uploader key="3" v-if="id && !formValidate.picture2" ref="uploader2"
-                    @change="handleUploader2Change"></Uploader>
-          <Uploader key="4" v-if="id && formValidate.picture2" ref="uploader2" v-model="formValidate.picture2"
-                    @change="handleUploader2Change"></Uploader>
-          <Uploader key="5" v-if="!id" ref="uploader2" @change="handleUploader2Change"></Uploader>
-          <Input v-model="formValidate.picture2" style="display: none;"></Input>
+          <Uploader
+            ref="uploader2"
+            :has-default-file="!!id"
+            v-model="formValidate.picture2"
+            @change="handleUploader2Change"
+          />
           （尺寸：1150x647）
         </Form-item>
         <Form-item label="价格" prop="price">

@@ -62,23 +62,22 @@
           <Form-item label="图片 1" prop="picture1">
             <Row>
               <Col span="20">
-                <Uploader key="0" v-if="put.id && !formValidate.picture1" @change="handleUploader1Change"></Uploader>
-                <Uploader key="1" v-if="put.id && formValidate.picture1" v-model="formValidate.picture1"
-                          @change="handleUploader1Change"></Uploader>
-                <Uploader key="2" v-if="!put.id" @change="handleUploader1Change"></Uploader>
-                <Input v-model="formValidate.picture1" style="display: none;"></Input>
+                <Uploader
+                  :has-default-file="!!put.id"
+                  v-model="formValidate.picture1"
+                  @change="handleUploader1Change"
+                />
               </Col>
             </Row>
           </Form-item>
           <Form-item label="图片 2" prop="picture2">
             <Row>
               <Col span="20">
-                <Uploader key="3" v-if="put.id && !formValidate.picture2"
-                          @change="handleUploader2Change"></Uploader>
-                <Uploader key="4" v-if="put.id && formValidate.picture2" v-model="formValidate.picture2"
-                          @change="handleUploader2Change"></Uploader>
-                <Uploader key="5" v-if="!put.id" @change="handleUploader2Change"></Uploader>
-                <Input v-model="formValidate.picture2" style="display: none;"></Input>
+                <Uploader
+                  :has-default-file="!!put.id"
+                  v-model="formValidate.picture2"
+                  @change="handleUploader2Change"
+                />
               </Col>
             </Row>
           </Form-item>

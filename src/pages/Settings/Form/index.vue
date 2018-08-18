@@ -24,20 +24,19 @@
           <Input v-model="formValidate.icp" placeholder="请输入备案号"></Input>
         </Form-item>
         <Form-item label="公众号二维码" prop="oa_qrcode">
-          <Uploader key="0" v-if="id && !formValidate.oa_qrcode" @change="handleOAUploaderChange"></Uploader>
-          <Uploader key="1" v-if="id && formValidate.oa_qrcode" v-model="formValidate.oa_qrcode"
-                    @change="handleOAUploaderChange"></Uploader>
-          <Uploader key="2" v-if="!id" @change="handleOAUploaderChange"></Uploader>
-          <Input v-model="formValidate.oa_qrcode" style="display: none;"></Input>
+          <Uploader
+            :has-default-file="!!id"
+            v-model="formValidate.oa_qrcode"
+            @change="handleOAUploaderChange"
+          />
           （尺寸：184x184）
         </Form-item>
         <Form-item label="App 二维码" prop="app_qrcode">
-          <Uploader key="3" v-if="id && !formValidate.app_qrcode"
-                    @change="handleAppUploaderChange"></Uploader>
-          <Uploader key="4" v-if="id && formValidate.app_qrcode" v-model="formValidate.app_qrcode"
-                    @change="handleAppUploaderChange"></Uploader>
-          <Uploader key="5" v-if="!id" @change="handleAppUploaderChange"></Uploader>
-          <Input v-model="formValidate.app_qrcode" style="display: none;"></Input>
+          <Uploader
+            :has-default-file="!!id"
+            v-model="formValidate.app_qrcode"
+            @change="handleAppUploaderChange"
+          />
           （尺寸：184x184）
         </Form-item>
         <Form-item>
