@@ -1,4 +1,4 @@
-import storage from 'apples/libs/storage'
+import storage from 'jt-storage'
 
 const USER = 'user'
 const TOKEN = 'token'
