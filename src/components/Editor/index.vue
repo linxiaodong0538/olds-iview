@@ -85,6 +85,7 @@
     },
     data () {
       return {
+        id: 0,
         formValidate: {
           picture: ''
         },
@@ -120,7 +121,7 @@
         this.editor.html(html)
       },
       handleImageFormOk () {
-        this.editor.insertHtml(`<img src="${helpers.getImageURL({ id: this.formValidate.picture })}" />`)
+        this.editor.insertHtml(`<img src="${helpers.getImageURLById(this.formValidate.picture)}" />`)
         this.$refs.uploader.remove()
         this.picture.modal = false
       },

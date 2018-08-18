@@ -20,16 +20,6 @@
         上传文件
       </Button>
     </Upload>
-    <Modal
-      title="查看图片"
-      v-model="visible"
-    >
-      <img
-        :src="imageURL"
-        v-if="visible"
-        style="width: 100%"
-      >
-    </Modal>
     <div
       class="demo-upload-list"
       v-for="item in uploadList"
@@ -69,8 +59,6 @@
     data () {
       return {
         consts,
-        imageURL: '',
-        visible: false,
         uploadList: []
       }
     },
@@ -81,15 +69,11 @@
       defaultList () {
         return this.value ? [{
           'name': '',
-          'url': helpers.getImageURL({ id: this.value })
+          'url': helpers.getImageURLById(this.value)
         }] : []
       }
     },
     methods: {
-      handleView (url) {
-        this.imageURL = url
-        this.visible = true
-      },
       remove (file) {
         const fileList = this.$refs.upload.fileList
 
@@ -104,7 +88,7 @@
         this.$emit('change', null)
       },
       handleSuccess (res, file) {
-        file.url = helpers.getImageURL({ id: res.data.id })
+        file.url = helpers.getImageURLById(res.data.id)
         file.name = res.data.title
 
         if (this.uploadList.length > 1) {

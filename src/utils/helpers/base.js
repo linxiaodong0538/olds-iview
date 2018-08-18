@@ -6,7 +6,7 @@ export default {
   /**
    * 获取图片地址
    */
-  getImageURL ({ id }) {
+  getImageURLById (id) {
     return `${consts.BASE_URL}/apis/v1/files/${id}`
   },
   getRoutePrefix (params) {

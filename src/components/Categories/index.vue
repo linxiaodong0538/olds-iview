@@ -23,11 +23,11 @@
     name: 'categories',
     props: {
       alias: {
-        type: [Number, String],
+        type: String,
         default: ''
       },
       value: {
-        type: Number,
+        type: [String, Number],
         default: 0
       }
     },
