@@ -43,5 +43,9 @@ export default {
    */
   delArticle ({ commit }, { id }) {
     return new Model().DELETE({ id })
+  },
+
+  postArticleAction ({ commit }, { id, query, body }) {
+    return new Model().addPath('actions').POST({ id, query, body })
   }
 }

@@ -18,7 +18,7 @@
               </Select>
             </Form-item>
             <Form-item prop="category_id">
-              <Categories :alias="alias" v-model="where.category_id.$eq" @on-change="handleCategoryChange"></Categories>
+              <Categories :alias="where.alias" v-model="where.category_id.$eq" @on-change="handleCategoryChange"></Categories>
             </Form-item>
             <Form-item prop="title">
               <Input type="text" placeholder="请输入标题" v-model="where.title.$like" style="width: 220px;"></Input>
@@ -44,7 +44,6 @@
   import consts from '@/utils/consts'
   import helpers from '@/utils/helpers/base'
   import time from 'apples/libs/time'
-  import ArticleModal from '../../../models/articles'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
   import Categories from '@/components/Categories'
 
@@ -55,7 +54,7 @@
       this.articles.articles = {}
 
       this.routePrefix = helpers.getRoutePrefix(to.params)
-      this.alias = to.params.alias
+      this.where.alias = to.params.alias
 
       await this.getCategoryItems()
       this.getItems()
@@ -67,7 +66,7 @@
       this.articles.articles = {}
 
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
-      this.alias = this.$route.params.alias
+      this.where.alias = this.$route.params.alias
 
       await this.getCategoryItems()
       this.getItems()
@@ -83,7 +82,6 @@
       return {
         consts,
         routePrefix: '',
-        alias: '',
         attr: {
           search: {
             which: ''
@@ -110,6 +108,7 @@
           id: 0
         },
         where: {
+          alias: '',
           category_id: {
             $eq: ''
           },
@@ -143,7 +142,7 @@
           {
             title: '操作',
             key: 'action',
-            width: 410,
+            width: 520,
             render: (h, params) => {
               const isHomeAd = params.row.is_home_ad === 1
               const isCategoryTop = params.row.is_category_top === 1
@@ -169,6 +168,48 @@
                     }
                   }
                 }, '删除'),
+                h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: async () => {
+                      await this.$store.dispatch('postArticleAction', {
+                        query: {
+                          where: this.where
+                        },
+                        body: {
+                          type: 'TO_PREV',
+                          id: params.row.id,
+                          where: this.where
+                        }
+                      })
+
+                      this.getItems()
+                    }
+                  }
+                }, '上移'),
+                h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: async () => {
+                      await this.$store.dispatch('postArticleAction', {
+                        query: {
+                          where: this.where
+                        },
+                        body: {
+                          type: 'TO_NEXT',
+                          id: params.row.id,
+                          where: this.where
+                        }
+                      })
+
+                      this.getItems()
+                    }
+                  }
+                }, '下移'),
                 h('Button', {
                   props: {
                     type: 'ghost'
@@ -227,7 +268,7 @@
             ? 'SET_HOME_AD'
             : 'CANCEL_HOME_AD'
 
-        await new ArticleModal().addPath('actions').POST({
+        await this.$store.dispatch('postArticleAction', {
           body: {
             type: actionType,
             id: this.attr.setting.id
@@ -249,7 +290,7 @@
           query: {
             offset: (current - 1) * consts.PAGE_SIZE,
             limit: consts.PAGE_SIZE,
-            where: { ...this.where, ...attrWhere, alias: this.alias }
+            where: { ...this.where, ...attrWhere }
           }
         })
       },
@@ -261,7 +302,7 @@
       getCategoryItems () {
         return this.$store.dispatch('getCategories', {
           query: {
-            where: { alias: this.alias }
+            where: { alias: this.where.alias }
           }
         })
       },

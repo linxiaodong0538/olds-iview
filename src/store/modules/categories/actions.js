@@ -43,5 +43,9 @@ export default {
    */
   delCategory ({ commit }, { id }) {
     return new Model().DELETE({ id })
+  },
+
+  postCategoryAction ({ commit }, { id, query, body }) {
+    return new Model().addPath('actions').POST({ id, query, body })
   }
 }

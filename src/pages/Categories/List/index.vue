@@ -53,13 +53,6 @@
             </Col>
           </Row>
         </Form-item>
-        <Form-item label="排序" prop="order">
-          <Row>
-            <Col span="20">
-              <InputNumber :min="0" :max="100" v-model="formValidate.order"></InputNumber>
-            </Col>
-          </Row>
-        </Form-item>
       </Form>
       <div slot="footer">
         <Button type="text" size="large" @click="formModal = false">取消</Button>
@@ -78,7 +71,7 @@
     name: 'list',
     async beforeRouteUpdate (to, from, next) {
       this.categories.categories = {}
-      this.alias = to.params.alias
+      this.where.alias = to.params.alias
 
       this.getItems()
 
@@ -86,7 +79,7 @@
     },
     created () {
       this.categories.categories = {}
-      this.alias = this.$route.params.alias
+      this.where.alias = this.$route.params.alias
 
       this.getItems()
     },
@@ -101,7 +94,6 @@
       return {
         a: 3,
         consts,
-        alias: '',
         parents: [],
         formModal: false,
         formValidate: {},
@@ -125,6 +117,7 @@
           id: 0
         },
         where: {
+          alias: '',
           parent_id: {
             $eq: 0
           },
@@ -139,17 +132,9 @@
             key: 'title'
           },
           {
-            title: '排序',
-            key: 'created_at',
-            width: 180,
-            render (h, params) {
-              return h('span', null, params.row.order)
-            }
-          },
-          {
             title: '操作',
             key: 'action',
-            width: 240,
+            width: 360,
             render: (h, params) => {
               return h('ButtonGroup', [
                 h('Button', {
@@ -172,6 +157,48 @@
                     }
                   }
                 }, '删除'),
+                h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: async () => {
+                      await this.$store.dispatch('postCategoryAction', {
+                        query: {
+                          where: this.where
+                        },
+                        body: {
+                          type: 'TO_PREV',
+                          id: params.row.id,
+                          where: this.where
+                        }
+                      })
+
+                      this.getItems()
+                    }
+                  }
+                }, '上移'),
+                h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: async () => {
+                      await this.$store.dispatch('postCategoryAction', {
+                        query: {
+                          where: this.where
+                        },
+                        body: {
+                          type: 'TO_NEXT',
+                          id: params.row.id,
+                          where: this.where
+                        }
+                      })
+
+                      this.getItems()
+                    }
+                  }
+                }, '下移'),
                 h('Button', {
                   props: {
                     type: 'ghost'
@@ -208,7 +235,7 @@
           query: {
             offset: (current - 1) * consts.PAGE_SIZE,
             limit: consts.PAGE_SIZE,
-            where: { ...this.where, alias: this.alias }
+            where: this.where
           }
         })
       },
@@ -263,7 +290,7 @@
               id: this.put.id,
               body: {
                 ...this.formValidate,
-                alias: this.alias,
+                alias: this.where.alias,
                 parent_id: this.where.parent_id.$eq
               }
             })
