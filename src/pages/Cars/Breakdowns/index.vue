@@ -187,7 +187,7 @@
                   props: {
                     shape: 'square',
                     size: 'large',
-                    src: helpers.getImageURLById(params.row.picture1)
+                    src: helpers.getFileURLById(params.row.picture1)
                   }
                 }, null)
               )
@@ -197,7 +197,7 @@
                   props: {
                     shape: 'square',
                     size: 'large',
-                    src: helpers.getImageURLById(params.row.picture2)
+                    src: helpers.getFileURLById(params.row.picture2)
                   }
                 }, null)
               )

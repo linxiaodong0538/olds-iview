@@ -5,6 +5,7 @@
       v-if="hasDefaultFile && !value"
       ref="uploader"
       :max-size="maxSize"
+      :preview-icon="previewIcon"
       :format="format"
       @change="handleUploaderChange"
     />
@@ -14,6 +15,7 @@
       ref="uploader"
       :value="value"
       :max-size="maxSize"
+      :preview-icon="previewIcon"
       :format="format"
       @change="handleUploaderChange"
     />
@@ -22,6 +24,7 @@
       v-if="!hasDefaultFile"
       ref="uploader"
       :max-size="maxSize"
+      :preview-icon="previewIcon"
       :format="format"
       @change="handleUploaderChange"
     />
@@ -48,6 +51,10 @@
       value: {
         type: [String, Number],
         default: 0
+      },
+      previewIcon: {
+        type: String,
+        default: ''
       },
       format: {
         type: Array,

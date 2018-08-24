@@ -3,69 +3,47 @@
     <textarea ref="content">{{ value }}</textarea>
     <Modal
       width="400"
-      v-model="image.modal"
-      title="插入图片">
+      v-model="form.modal"
+      :title="form.is === 'image' ? '插入图片' : '插入视频'">
       <Form
         ref="formValidate"
         :model="formValidate"
         :rules="ruleValidate"
         :label-width="80">
         <Form-item
+          v-if="form.is === 'image'"
           label="图片"
           prop="image">
           <CUploader
-            ref="imageUploader"
+            ref="uploader"
             :max-size="1024 * 4"
             v-model="formValidate.image"
-            @change="handleImageUploaderChange" />
+            @change="handleUploaderChange" />
         </Form-item>
-      </Form>
-      <div slot="footer">
-        <Button
-          type="text"
-          size="large"
-          @click="image.modal = false">
-          取消
-        </Button>
-        <Button
-          type="primary"
-          size="large"
-          @click="handleImageFormOk">
-          确定
-        </Button>
-      </div>
-    </Modal>
-    <Modal
-      width="400"
-      v-model="media.modal"
-      title="插入视频">
-      <Form
-        ref="formValidate1"
-        :model="formValidate1"
-        :rules="ruleValidate1"
-        :label-width="80">
         <Form-item
+          v-else
           label="视频"
-          prop="image">
+          prop="media">
           <CUploader
-            ref="mediaUploader"
+            ref="uploader"
             :max-size="1024 * 50"
+            :preview-icon="`${consts.BASE_URL}/images/video.png`"
             :format="['mp4']"
-            v-model="formValidate1.media"
-            @change="handleMediaUploaderChange" />
+            v-model="formValidate.media"
+            @change="handleUploaderChange" />
         </Form-item>
       </Form>
       <div slot="footer">
         <Button
           type="text"
           size="large"
-          @click="media.modal = false">
+          @click="form.modal = false">
           取消
         </Button>
         <Button
           type="primary"
           size="large"
-          @click="handleMediaFormOk">
+          @click="handleFormOk">
           确定
         </Button>
       </div>
@@ -98,12 +76,11 @@
       return {
         id: 0,
         form: {
-          is: 'image'
+          is: 'image',
+          modal: false
         },
         formValidate: {
-          image: ''
-        },
-        formValidate1: {
+          image: '',
           media: ''
         },
         ruleValidate: {
@@ -112,21 +89,13 @@
               required: true,
               message: '请上传图片'
             }
-          ]
-        },
-        ruleValidate1: {
+          ],
           media: [
             {
               required: true,
               message: '请上传视频'
             }
           ]
-        },
-        image: {
-          modal: false
-        },
-        media: {
-          modal: false
         }
       }
     },
@@ -149,41 +118,43 @@
       })
 
       _helpers.overrideImagePlugin(() => {
-        this.image.modal = true
+        this.form.is = 'image'
+        this.form.modal = true
       })
 
       _helpers.overrideMediaPlugin(() => {
-        this.media.modal = true
+        this.form.is = 'media'
+        this.form.modal = true
       })
     },
     methods: {
       html (html) {
         this.editor.html(html)
       },
-      handleImageFormOk () {
+      handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            this.editor.insertHtml(`<img src="${helpers.getImageURLById(this.formValidate.image)}" />`)
-            this.$refs.imageUploader.remove()
-            this.image.modal = false
+            if (this.form.is === 'image') {
+              this.editor.insertHtml(`<img src="${helpers.getFileURLById(this.formValidate[this.form.is])}" />`)
+            } else {
+              this.editor.insertHtml(`<video class="video-js vjs-big-play-centered" controls preload="auto" data-setup="{}">
+                <source src="${helpers.getFileURLById(this.formValidate[this.form.is])}" type='video/mp4'>
+              </>`)
+            }
+            this.$refs.uploader.remove()
+            this.form.modal = false
           }
         })
       },
-      handleImageUploaderChange (file) {
-        this.formValidate.image = file ? file.id : ''
-      },
-      handleMediaFormOk () {
-        console.log(this.formValidate1)
-        this.$refs.formValidate1.validate(async valid => {
-          if (valid) {
-            this.editor.insertHtml(`<img src="${this.consts.BASE_URL}" />`)
-            this.$refs.mediaUploader.remove()
-            this.media.modal = false
-          }
-        })
-      },
-      handleMediaUploaderChange (file) {
-        this.formValidate.media = file ? file.id : ''
+      handleUploaderChange (file) {
+        this.formValidate[this.form.is] = file ? file.id : ''
+      }
+    },
+    watch: {
+      'form.modal': {
+        handler (newVal) {
+          !newVal && this.$refs.formValidate.resetFields()
+        }
       }
     }
   }
