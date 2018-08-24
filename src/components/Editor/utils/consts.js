@@ -22,7 +22,7 @@ const ITEMS = [
   'fontsize',
   'forecolor', 'hilitecolor', 'bold',
   'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat',
-  'image'
+  'image', 'media'
 ]
 
 export default {
