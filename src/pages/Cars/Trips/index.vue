@@ -58,24 +58,24 @@
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="停靠点 1" prop="stop1">
+          <Form-item label="停靠点" prop="stop1">
             <Row>
               <Col span="20">
-                <Input v-model="formValidate.stop1" placeholder="请输入停靠点 1"></Input>
+                <Input v-model="formValidate.stop1" placeholder="请输入停靠点"></Input>
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="停靠点 2" prop="stop2">
+          <Form-item label="停靠点" prop="stop2">
             <Row>
               <Col span="20">
-                <Input v-model="formValidate.stop2" placeholder="请输入停靠点 2"></Input>
+                <Input v-model="formValidate.stop2" placeholder="请输入停靠点"></Input>
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="停靠点 3" prop="stop3">
+          <Form-item label="停靠点" prop="stop3">
             <Row>
               <Col span="20">
-                <Input v-model="formValidate.stop3" placeholder="请输入停靠点 3"></Input>
+                <Input v-model="formValidate.stop3" placeholder="请输入停靠点"></Input>
               </Col>
             </Row>
           </Form-item>

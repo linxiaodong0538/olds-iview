@@ -34,6 +34,12 @@
         <Form-item label="联系电话" prop="telephone">
           <Input v-model="formValidate.telephone" placeholder="请输入联系电话"></Input>
         </Form-item>
+        <Form-item label="单位" prop="company">
+          <Input v-model="formValidate.company" placeholder="请输入单位"></Input>
+        </Form-item>
+        <Form-item label="职位" prop="job">
+          <Input v-model="formValidate.job" placeholder="请输入职位"></Input>
+        </Form-item>
         <Form-item label="老人入院编号" prop="olds">
           <p class="person-item" v-for="item in myOlds">
             <Button type="ghost" :key="item.id" title="点击查看详情" @click="handleClickOld(item.id)">

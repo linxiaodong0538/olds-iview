@@ -44,9 +44,15 @@
         <Form-item label="商家电话" prop="seller_telephone">
           <Input v-model="formValidate.seller_telephone" placeholder="请输入商家电话"></Input>
         </Form-item>
+        <Form-item label="厂家信息" prop="manufacturer_info">
+          <Input type="textarea" :rows="3" v-model="formValidate.manufacturer_info" placeholder="请输入厂家信息"></Input>
+        </Form-item>
         <Form-item label="详情" prop="content">
           <Editor ref="editor" v-model="formValidate.content" @change="handleEditorChange"></Editor>
           <Input v-model="formValidate.content" style="display: none;"></Input>
+        </Form-item>
+        <Form-item label="备注" prop="remark">
+          <Input type="textarea" :rows="3" v-model="formValidate.remark" placeholder="请输入备注"></Input>
         </Form-item>
         <Form-item>
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
@@ -96,6 +102,7 @@
           stock: 0,
           purchase_address: '',
           seller_telephone: '',
+          manufacturer_info: '',
           content: ''
         },
         ruleValidate: {

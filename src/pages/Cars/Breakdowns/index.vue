@@ -52,6 +52,13 @@
               </Col>
             </Row>
           </Form-item>
+          <Form-item label="是否开票" prop="has_receipt">
+            <Select v-model="formValidate.has_receipt" placeholder="请选择是否开票" style="width: 220px">
+              <Option v-for="item in ['1', '0']" :value="item" :key="item">
+                {{ item === '1' ? '是' : '否' }}
+              </Option>
+            </Select>
+          </Form-item>
           <Form-item label="故障原因" prop="reason">
             <Row>
               <Col span="20">
