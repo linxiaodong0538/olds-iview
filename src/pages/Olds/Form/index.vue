@@ -243,8 +243,6 @@
             query: { offset: 0, limit: 1000, where: { alias } }
           })
 
-          console.log(getRes.data.items)
-
           return getRes.data.items.length
             ? getRes.data.items.map(item => ({ label: item.name, value: item.id, is_guardian: item.is_guardian }))
             : []

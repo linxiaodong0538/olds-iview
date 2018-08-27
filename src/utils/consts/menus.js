@@ -68,6 +68,21 @@ export default [
         ]
       },
       {
+        icon: 'ios-briefcase',
+        name: 'company-app/cares',
+        title: '护理消耗品仓库',
+        children: [
+          {
+            title: '分类列表',
+            route: '/company-app/cares/cares/products/categories'
+          },
+          {
+            title: '产品列表',
+            route: '/company-app/cares/cares/products/index'
+          }
+        ]
+      },
+      {
         icon: 'android-restaurant',
         name: 'company-app/foods',
         title: '食堂仓库',
@@ -94,6 +109,21 @@ export default [
           {
             title: '产品列表',
             route: '/company-app/supplies/supplies/products/index'
+          }
+        ]
+      },
+      {
+        icon: 'android-restaurant',
+        name: 'company-app/electricals',
+        title: '电器仓库',
+        children: [
+          {
+            title: '分类列表',
+            route: '/company-app/electricals/electricals/products/categories'
+          },
+          {
+            title: '产品列表',
+            route: '/company-app/electricals/electricals/products/index'
           }
         ]
       },
@@ -145,12 +175,20 @@ export default [
             route: '/company-app/notices/medicines/notices/index'
           },
           {
+            title: '护理消耗品库存',
+            route: '/company-app/notices/cares/notices/index'
+          },
+          {
             title: '食堂库存',
             route: '/company-app/notices/foods/notices/index'
           },
           {
             title: '日用品库存',
             route: '/company-app/notices/supplies/notices/index'
+          },
+          {
+            title: '电器库存',
+            route: '/company-app/notices/electricals/notices/index'
           }
         ]
       },
