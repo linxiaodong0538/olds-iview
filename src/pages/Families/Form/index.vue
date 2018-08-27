@@ -45,6 +45,13 @@
         <Form-item label="与老人关系" prop="relation">
           <Input v-model="formValidate.relation" placeholder="请输入与老人关系"></Input>
         </Form-item>
+        <Form-item label="是否监护人" prop="gender">
+          <Select v-model="formValidate.is_guardian" placeholder="请选择是否监护人" :defaultValue="0" style="width: 220px">
+            <Option v-for="item in [1, 0]" :value="item" :key="item">
+              {{ item === 1 ? '是' : '否' }}
+            </Option>
+          </Select>
+        </Form-item>
         <Form-item label="不良记录" prop="bad_record">
           <Input type="textarea" :rows="3" v-model="formValidate.bad_record" placeholder="请输入不良记录"></Input>
         </Form-item>
@@ -87,7 +94,9 @@
         routePrefix: '',
         alias: '',
         id: '',
-        formValidate: {},
+        formValidate: {
+          is_guardian: 0
+        },
         formData: {},
         myOlds: [],
         ruleValidate: {

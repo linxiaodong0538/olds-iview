@@ -13,7 +13,7 @@
       <p>确认删除？</p>
     </Modal>
     <Modal width="500" v-model="formModal" :title="put.id ? '编辑' : '新增'">
-      <div style="height: 500px; overflow-y: auto;">
+      <div>
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
           <Form-item label="司机" prop="driver">
             <Row>
@@ -56,28 +56,6 @@
             <Row>
               <Col span="20">
                 <Input v-model="formValidate.reason" type="textarea" :rows="3" placeholder="请输入故障原因"></Input>
-              </Col>
-            </Row>
-          </Form-item>
-          <Form-item label="图片 1" prop="picture1">
-            <Row>
-              <Col span="20">
-                <Uploader
-                  :has-default-file="!!put.id"
-                  v-model="formValidate.picture1"
-                  @change="handleUploader1Change"
-                />
-              </Col>
-            </Row>
-          </Form-item>
-          <Form-item label="图片 2" prop="picture2">
-            <Row>
-              <Col span="20">
-                <Uploader
-                  :has-default-file="!!put.id"
-                  v-model="formValidate.picture2"
-                  @change="handleUploader2Change"
-                />
               </Col>
             </Row>
           </Form-item>
@@ -174,35 +152,6 @@
             key: 'reason',
             render (h, params) {
               return h('span', null, `${params.row.reason || ''}`)
-            }
-          },
-          {
-            title: '备案图片',
-            key: 'pictures',
-            render (h, params) {
-              let pictures = []
-
-              params.row.picture1 && pictures.push(
-                h('Avatar', {
-                  props: {
-                    shape: 'square',
-                    size: 'large',
-                    src: helpers.getFileURLById(params.row.picture1)
-                  }
-                }, null)
-              )
-
-              params.row.picture2 && pictures.push(
-                h('Avatar', {
-                  props: {
-                    shape: 'square',
-                    size: 'large',
-                    src: helpers.getFileURLById(params.row.picture2)
-                  }
-                }, null)
-              )
-
-              return h('span', null, [pictures])
             }
           },
           {

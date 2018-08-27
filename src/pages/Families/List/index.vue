@@ -75,7 +75,10 @@
         columns: [
           {
             title: '姓名',
-            key: 'name'
+            key: 'name',
+            render (h, params) {
+              return h('span', null, params.row.name + (params.row.is_guardian ? '（监护人）' : ''))
+            }
           },
           {
             title: '身份证',

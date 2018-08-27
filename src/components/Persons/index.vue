@@ -2,7 +2,9 @@
   <div class="persons">
     <p class="person-item" v-for="(item, index) in values" :key="index">
       <ButtonGroup>
-        <Button type="ghost" title="点击查看详情" @click="$emit('click-name', item)">{{ getLabel(item) }}</Button>
+        <Button type="ghost" title="点击查看详情" @click="$emit('click-name', item)">
+          {{ getOption(item)['label'] + (getOption(item)['is_guardian'] ? '（监护人）' : '') }}
+        </Button>
         <Button type="ghost" icon="android-close" @click="values.splice(index, 1)"></Button>
       </ButtonGroup>
     </p>
@@ -13,7 +15,9 @@
       :placeholder="placeholder"
       @on-change="change"
       style="width: 220px">
-      <Option v-for="(option, index) in options" :value="option.value" :key="index">{{ option.label }}</Option>
+      <Option v-for="(option, index) in options" :value="option.value" :key="index">
+        {{ option.label + (option.is_guardian ? '（监护人）' : '') }}
+      </Option>
     </Select>
   </div>
 </template>
@@ -68,9 +72,9 @@
 
         this.$refs.select.clearSingleSelect()
       },
-      getLabel (value) {
+      getOption (value) {
         const filteredOptions = this.options.filter(item => item.value === +value)
-        return filteredOptions.length ? filteredOptions[0].label : ''
+        return filteredOptions.length ? filteredOptions[0] : {}
       }
     },
     watch: {

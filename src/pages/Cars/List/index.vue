@@ -97,7 +97,7 @@
           {
             title: '操作',
             key: 'action',
-            width: 340,
+            width: 360,
             render: (h, params) => {
               return h('ButtonGroup', [
                 h('Button', {
@@ -129,7 +129,7 @@
                       this.$router.push(`${this.routePrefix}/cars/index/breakdowns/${params.row.id}`)
                     }
                   }
-                }, '查看维修记录'),
+                }, '查看维修保养记录'),
                 h('Button', {
                   props: {
                     type: 'ghost'
