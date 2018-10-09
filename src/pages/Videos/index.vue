@@ -3,7 +3,5 @@
 </template>
 
 <script>
-  export default {
-    name: 'categories'
-  }
+  export default {}
 </script>

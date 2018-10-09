@@ -26,7 +26,7 @@
     </Modal>
 
     <Modal
-      width="400"
+      width="500"
       v-model="cForm.modal"
       :title="cForm.id ? '编辑' : '新增'">
       <Form
@@ -42,6 +42,45 @@
               <Input
                 v-model="cForm.formValidate.title"
                 placeholder="请输入标题" />
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item
+          label="描述"
+          prop="description">
+          <Row>
+            <Col span="20">
+              <Input
+                v-model="cForm.formValidate.description"
+                type="textarea"
+                :rows="3"
+                placeholder="请输入描述" />
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item
+          label="拍摄地点"
+          prop="title">
+          <Row>
+            <Col span="20">
+              <Input
+                v-model="cForm.formValidate.address"
+                placeholder="请输入拍摄地点" />
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item
+          label="拍摄地点"
+          prop="title">
+          <Row>
+            <Col span="20">
+              <Uploader
+                :max-size="1024 * 50"
+                :preview-icon="`${consts.BASE_URL}/images/video.png`"
+                :format="['mp4']"
+                :has-default-file="!!cForm.formValidate.file"
+                v-model="cForm.formValidate.file"
+                @change="handleUploaderChange" />
             </Col>
           </Row>
         </Form-item>
@@ -67,6 +106,7 @@
 <script>
   import { mapState } from 'vuex'
   import List, { ListHeader, ListOperations } from '@/components/List'
+  import Uploader from '@/components/Uploader'
 
   const module = 'videos'
 
@@ -74,7 +114,8 @@
     components: {
       List,
       ListHeader,
-      ListOperations
+      ListOperations,
+      Uploader
     },
     data () {
       return {
@@ -153,6 +194,9 @@
       list: state => state[module].list
     }),
     methods: {
+      handleUploaderChange (file) {
+        this.cForm.formValidate.file = file ? file.id : ''
+      },
       getList (current = 1) {
         this.cList.cPage.current = current
 
@@ -173,7 +217,7 @@
       },
       handlePut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', { title: detail.title })
+        this.$set(this.cForm, 'formValidate', detail)
         this.cForm.modal = true
       },
       handleDel (id) {
@@ -192,7 +236,7 @@
               this.cForm.id ? `${module}/put` : `${module}/post`,
               {
                 id: this.cForm.id || '0',
-                body: { title: this.cForm.formValidate.title }
+                body: this.cForm.formValidate
               }
             )
 
@@ -209,7 +253,6 @@
       }
     },
     created () {
-      console.log(33)
       this.getList()
     }
   }
