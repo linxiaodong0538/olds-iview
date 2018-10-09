@@ -49,161 +49,217 @@ export default [
   },
   {
     icon: 'android-phone-portrait',
-    name: 'company-app',
+    name: 'xhh-app',
     title: '企业 App',
     children: [
       {
         icon: 'ios-briefcase',
-        name: 'company-app/medicines',
+        name: 'xhh-app/medicines',
         title: '医疗仓库',
         children: [
           {
             title: '分类列表',
-            route: '/company-app/medicines/medicines/products/categories'
+            route: '/xhh-app/medicines/medicines/products/categories'
           },
           {
             title: '产品列表',
-            route: '/company-app/medicines/medicines/products/index'
+            route: '/xhh-app/medicines/medicines/products/index'
           }
         ]
       },
       {
         icon: 'ios-briefcase',
-        name: 'company-app/cares',
+        name: 'xhh-app/cares',
         title: '护理消耗品仓库',
         children: [
           {
             title: '分类列表',
-            route: '/company-app/cares/cares/products/categories'
+            route: '/xhh-app/cares/cares/products/categories'
           },
           {
             title: '产品列表',
-            route: '/company-app/cares/cares/products/index'
+            route: '/xhh-app/cares/cares/products/index'
           }
         ]
       },
       {
         icon: 'android-restaurant',
-        name: 'company-app/foods',
+        name: 'xhh-app/foods',
         title: '食堂仓库',
         children: [
           {
             title: '分类列表',
-            route: '/company-app/foods/foods/products/categories'
+            route: '/xhh-app/foods/foods/products/categories'
           },
           {
             title: '产品列表',
-            route: '/company-app/foods/foods/products/index'
+            route: '/xhh-app/foods/foods/products/index'
           }
         ]
       },
       {
         icon: 'android-restaurant',
-        name: 'company-app/supplies',
+        name: 'xhh-app/supplies',
         title: '日用品仓库',
         children: [
           {
             title: '分类列表',
-            route: '/company-app/supplies/supplies/products/categories'
+            route: '/xhh-app/supplies/supplies/products/categories'
           },
           {
             title: '产品列表',
-            route: '/company-app/supplies/supplies/products/index'
+            route: '/xhh-app/supplies/supplies/products/index'
           }
         ]
       },
       {
         icon: 'android-restaurant',
-        name: 'company-app/electricals',
+        name: 'xhh-app/electricals',
         title: '电器仓库',
         children: [
           {
             title: '分类列表',
-            route: '/company-app/electricals/electricals/products/categories'
+            route: '/xhh-app/electricals/electricals/products/categories'
           },
           {
             title: '产品列表',
-            route: '/company-app/electricals/electricals/products/index'
+            route: '/xhh-app/electricals/electricals/products/index'
           }
         ]
       },
       {
         icon: 'android-car',
-        name: 'company-app/cars',
+        name: 'xhh-app/cars',
         title: '车辆',
         children: [
           {
             title: '车辆列表',
-            route: '/company-app/cars/cars/cars/index'
+            route: '/xhh-app/cars/cars/cars/index'
           }
         ]
       },
       {
         icon: 'person',
-        name: 'company-app/persons',
+        name: 'xhh-app/persons',
         title: '人员',
         children: [
           {
             title: '员工',
-            route: '/company-app/persons/staffs/staffs/index'
+            route: '/xhh-app/persons/staffs/staffs/index'
           },
           {
             title: '老人',
-            route: '/company-app/persons/olds/olds/index'
+            route: '/xhh-app/persons/olds/olds/index'
           },
           {
             title: '家属',
-            route: '/company-app/persons/families/families/index'
+            route: '/xhh-app/persons/families/families/index'
           },
           {
             title: '护工',
-            route: '/company-app/persons/carers/staffs/index'
+            route: '/xhh-app/persons/carers/staffs/index'
           }
         ]
       },
       {
         icon: 'android-warning',
-        name: 'company-app/notices',
+        name: 'xhh-app/notices',
         title: '告警',
         children: [
           {
             title: '车辆',
-            route: '/company-app/notices/cars/notices/index'
+            route: '/xhh-app/notices/cars/notices/index'
           },
           {
             title: '医疗库存',
-            route: '/company-app/notices/medicines/notices/index'
+            route: '/xhh-app/notices/medicines/notices/index'
           },
           {
             title: '护理消耗品库存',
-            route: '/company-app/notices/cares/notices/index'
+            route: '/xhh-app/notices/cares/notices/index'
           },
           {
             title: '食堂库存',
-            route: '/company-app/notices/foods/notices/index'
+            route: '/xhh-app/notices/foods/notices/index'
           },
           {
             title: '日用品库存',
-            route: '/company-app/notices/supplies/notices/index'
+            route: '/xhh-app/notices/supplies/notices/index'
           },
           {
             title: '电器库存',
-            route: '/company-app/notices/electricals/notices/index'
+            route: '/xhh-app/notices/electricals/notices/index'
           }
         ]
       },
       {
         icon: 'android-warning',
-        name: 'company-app/roles',
+        name: 'xhh-app/roles',
         title: '角色权限',
         children: [
           {
             title: '角色列表',
-            route: '/company-app/roles/roles/roles/index'
+            route: '/xhh-app/roles/roles/roles/index'
           },
           {
             title: '权限列表',
-            route: '/company-app/roles/permissions/permissions/index'
+            route: '/xhh-app/roles/permissions/permissions/index'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    icon: 'android-phone-portrait',
+    name: 'xd-app',
+    title: '孝道 App',
+    children: [
+      {
+        icon: 'ios-briefcase',
+        name: 'xd-app/news',
+        title: '重阳画映',
+        children: [
+          {
+            title: '短视频列表',
+            route: '/xd-app/news/news/videos/index'
+          }
+        ]
+      },
+      {
+        icon: 'ios-briefcase',
+        name: 'xd-app/olds',
+        title: '老人',
+        children: [
+          {
+            title: '老人列表',
+            route: '/xd-app/olds/olds/olds/index'
+          }
+        ]
+      },
+      {
+        icon: 'ios-briefcase',
+        name: 'xd-app/my',
+        title: '我的',
+        children: [
+          {
+            title: '家属列表',
+            route: '/xd-app/my/families/families/index'
+          },
+          {
+            title: '我的消息',
+            route: '/website/news/news/articles/index'
+          },
+          {
+            title: '我的评论',
+            route: '/website/news/news/articles/index'
+          },
+          {
+            title: '意见反馈',
+            route: ''
+          },
+          {
+            title: '联系我们',
+            route: ''
           }
         ]
       }

@@ -15,6 +15,7 @@ import notices from './routes/notices'
 import roles from './routes/roles'
 import permissions from './routes/permissions'
 import settings from './routes/settings'
+import videos from './routes/videos'
 import login from './routes/login'
 import logout from './routes/logout'
 import iView from 'iview'
@@ -41,7 +42,8 @@ const router = new Router({
             notices,
             roles,
             permissions,
-            settings
+            settings,
+            videos
           ],
           meta: {
             requiresAuth: true
