@@ -18,6 +18,7 @@ import permissions from './modules/permissions'
 import categories from './modules/categories'
 import settings from './modules/settings'
 import relations from './modules/relations'
+import videos from './modules/videos'
 
 Vue.use(Vuex)
 
@@ -43,6 +44,7 @@ export default new Vuex.Store({
     permissions,
     categories,
     settings,
-    relations
+    relations,
+    videos
   }
 })

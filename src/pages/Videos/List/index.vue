@@ -1,62 +1,64 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="categories.categories.items" :total="categories.categories.total"
-          @on-change="handlePageChange">
+    <List
+      :columns="cList.columns"
+      :data="list.items"
+      :total="list.total"
+      :current="cList.cPage.current"
+      @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary" @click="handlePost">新增</Button>
-          <Button class="margin-right-sm" type="ghost" @click="handleBack" v-if="parents.length">返回上一级</Button>
+          <Button
+            type="primary"
+            @click="handlePost">
+            新增
+          </Button>
         </ListOperations>
-        <ListSearch>
-          <Form inline @submit.native.prevent="handleSearch">
-            <Form-item prop="title">
-              <Input type="text" placeholder="请输入标题" v-model="where.title.$like" style="width: 220px;"></Input>
-            </Form-item>
-            <Form-item>
-              <Button type="primary" @click="handleSearch">查询</Button>
-            </Form-item>
-          </Form>
-        </ListSearch>
       </ListHeader>
-      <ListNavigation>
-        <Alert v-if="parents.length">
-          <b>{{ parents[parents.length - 1].title }}</b> 的子分类：
-        </Alert>
-        <Alert v-else>
-          <b>顶级分类</b> 的子分类
-        </Alert>
-      </ListNavigation>
     </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+
+    <Modal
+      width="280"
+      v-model="cDel.modal"
+      title="请确认"
+      @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    <Modal width="500" v-model="formModal" :title="put.id ? '编辑' : '新增'">
-      <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-        <Form-item label="父类" prop="title">
+
+    <Modal
+      width="400"
+      v-model="cForm.modal"
+      :title="cForm.id ? '编辑' : '新增'">
+      <Form
+        ref="formValidate"
+        :model="cForm.formValidate"
+        :rules="cForm.ruleValidate"
+        :label-width="80">
+        <Form-item
+          label="标题"
+          prop="title">
           <Row>
             <Col span="20">
-              {{ parents.length ? parents[parents.length - 1].title : '顶级分类'}}
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item label="标题" prop="title">
-          <Row>
-            <Col span="20">
-              <Input v-model="formValidate.title" placeholder="请输入标题"></Input>
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item label="描述" prop="description">
-          <Row>
-            <Col span="20">
-              <Input v-model="formValidate.description" type="textarea" :rows="3" placeholder="请输入描述"></Input>
+              <Input
+                v-model="cForm.formValidate.title"
+                placeholder="请输入标题" />
             </Col>
           </Row>
         </Form-item>
       </Form>
       <div slot="footer">
-        <Button type="text" size="large" @click="formModal = false">取消</Button>
-        <Button type="primary" size="large" @click="handleFormOk">确定</Button>
+        <Button
+          type="text"
+          size="large"
+          @click="cForm.modal = false">
+          取消
+        </Button>
+        <Button
+          type="primary"
+          size="large"
+          @click="handleFormOk">
+          确定
+        </Button>
       </div>
     </Modal>
   </div>
@@ -64,258 +66,154 @@
 
 <script>
   import { mapState } from 'vuex'
-  import consts from '@/utils/consts'
-  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
+  import List, { ListHeader, ListOperations } from '@/components/List'
+
+  const module = 'videos'
 
   export default {
-    name: 'list',
-    async beforeRouteUpdate (to, from, next) {
-      this.categories.categories = {}
-      this.where.alias = to.params.alias
-
-      this.getItems()
-
-      next()
-    },
-    created () {
-      this.categories.categories = {}
-      this.where.alias = this.$route.params.alias
-
-      this.getItems()
-    },
     components: {
       List,
       ListHeader,
-      ListOperations,
-      ListSearch,
-      ListNavigation
+      ListOperations
     },
     data () {
       return {
-        a: 3,
-        consts,
-        parents: [],
-        formModal: false,
-        formValidate: {},
-        ruleValidate: {
-          title: [
+        cList: {
+          columns: [
             {
-              required: true,
-              message: '标题不能为空'
+              title: '标题',
+              key: 'title'
             },
             {
-              max: 100,
-              message: '标题不能多于 100 个字'
+              title: '操作',
+              key: 'action',
+              width: 150,
+              render: (h, params) => {
+                return h('ButtonGroup', [
+                  h(
+                    'Button',
+                    {
+                      props: {
+                        type: 'ghost'
+                      },
+                      on: {
+                        click: () => {
+                          this.handlePut(params.row)
+                        }
+                      }
+                    },
+                    '编辑'
+                  ),
+                  h(
+                    'Button',
+                    {
+                      props: {
+                        type: 'ghost'
+                      },
+                      on: {
+                        click: () => {
+                          this.handleDel(params.row.id)
+                        }
+                      }
+                    },
+                    '删除'
+                  )
+                ])
+              }
             }
-          ]
+          ],
+          cPage: {
+            current: 1
+          }
         },
-        del: {
+        cDel: {
+          id: 0,
+          modal: false
+        },
+        cForm: {
+          id: 0,
           modal: false,
-          id: 0
-        },
-        put: {
-          id: 0
-        },
-        where: {
-          alias: '',
-          parent_id: {
-            $eq: 0
-          },
-          title: {
-            $like: ''
+          formValidate: {},
+          ruleValidate: {
+            title: [
+              {
+                required: true,
+                message: '标题不能为空'
+              },
+              {
+                max: 100,
+                message: '标题不能多于 100 个字'
+              }
+            ]
           }
-        },
-        current: 1,
-        columns: [
-          {
-            title: '标题',
-            key: 'title'
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 360,
-            render: (h, params) => {
-              return h('ButtonGroup', [
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.handlePut(params.row.id)
-                    }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.handleDel(params.row.id)
-                    }
-                  }
-                }, '删除'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: async () => {
-                      await this.$store.dispatch('postCategoryAction', {
-                        query: {
-                          where: this.where
-                        },
-                        body: {
-                          type: 'TO_PREV',
-                          id: params.row.id,
-                          where: this.where
-                        }
-                      })
-
-                      this.getItems()
-                    }
-                  }
-                }, '上移'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: async () => {
-                      await this.$store.dispatch('postCategoryAction', {
-                        query: {
-                          where: this.where
-                        },
-                        body: {
-                          type: 'TO_NEXT',
-                          id: params.row.id,
-                          where: this.where
-                        }
-                      })
-
-                      this.getItems()
-                    }
-                  }
-                }, '下移'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      const { id, title } = params.row
-
-                      this.resetSearch()
-                      this.where.parent_id.$eq = id
-                      this.parents.push({ id, title })
-                      this.getItems()
-                    }
-                  }
-                }, '管理子分类')
-              ])
-            }
-          }
-        ]
+        }
       }
     },
-    computed: mapState([
-      'categories'
-    ]),
+    computed: mapState({
+      list: state => state[module].list
+    }),
     methods: {
-      resetSearch () {
-        this.current = 1
-        this.where.title.$like = ''
-      },
-      getItems (current = 1) {
-        this.current = current
+      getList (current = 1) {
+        this.cList.cPage.current = current
 
-        return this.$store.dispatch('getCategories', {
+        return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * consts.PAGE_SIZE,
-            limit: consts.PAGE_SIZE,
-            where: this.where
+            offset: (current - 1) * this.consts.PAGE_SIZE,
+            limit: this.consts.PAGE_SIZE
           }
         })
       },
-      getDetails () {
-        return this.$store.dispatch('getCategory', { id: this.put.id })
-      },
-      handleBack () {
-        this.resetSearch()
-        this.parents.pop()
-        this.where.parent_id.$eq = this.parents.length
-          ? this.parents[this.parents.length - 1].id
-          : 0
-
-        this.getItems()
-      },
       handlePageChange (current) {
-        this.getItems(current)
-      },
-      handleSearch () {
-        this.current = 1
-        this.getItems()
+        this.getList(current)
       },
       handlePost () {
-        this.formModal = true
-        this.put.id = 0
+        this.cForm.modal = true
+        this.cForm.id = 0
         this.resetFields()
       },
-      handlePut (id) {
-        this.put.id = id
-        this.formModal = true
-        this.getDetails()
+      handlePut (detail) {
+        this.cForm.id = detail.id
+        this.$set(this.cForm, 'formValidate', { title: detail.title })
+        this.cForm.modal = true
       },
       handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch('delCategory', {
-          id: this.del.id
-        })
+        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
-        // await helpers.sleep(500)
-        this.getItems()
+        this.getList()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            const action = this.put.id ? 'putCategory' : 'postCategory'
-
-            await this.$store.dispatch(action, {
-              id: this.put.id,
-              body: {
-                ...this.formValidate,
-                alias: this.where.alias,
-                parent_id: this.where.parent_id.$eq
+            await this.$store.dispatch(
+              this.cForm.id ? `${module}/put` : `${module}/post`,
+              {
+                id: this.cForm.id || '0',
+                body: { title: this.cForm.formValidate.title }
               }
-            })
+            )
 
-            this.formModal = false
-
-            this.$Message.success((this.put.id ? '编辑' : '新增') + '成功！')
-            !this.put.id && this.resetFields()
-            this.resetSearch()
-            this.getItems()
+            this.cForm.modal = false
+            this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
+            !this.cForm.id && this.resetFields()
+            this.getList()
           }
         })
       },
       resetFields () {
         this.$refs.formValidate.resetFields()
-        this.$set(this, 'formValidate', {})
+        this.$set(this.cForm, 'formValidate', {})
       }
     },
-    watch: {
-      'categories.category': {
-        handler (newVal) {
-          const { id, ...others } = newVal
-          this.$set(this, 'formValidate', others)
-        }
-      }
+    created () {
+      console.log(33)
+      this.getList()
     }
   }
 </script>
+<style>
+</style>
+

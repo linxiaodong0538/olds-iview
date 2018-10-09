@@ -1,6 +1,6 @@
 import helpers from 'jt-helpers'
 
-export default helpers.keyMirror({
-  GET_VIDEO_LIST: null,
-  GET_VIDEO_DETAIL: null
-})
+export default {
+  GET_LIST: 'videos/GET_LIST',
+  GET_DETAIL: 'videos/GET_DETAIL'
+}
