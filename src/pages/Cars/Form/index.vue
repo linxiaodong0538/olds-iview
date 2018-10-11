@@ -69,7 +69,7 @@
             v-model="formValidate.remark"
             placeholder="请输入备注" />
         </Form-item>
-        <Form-item>
+        <Form-item class="save">
           <Button
             type="primary"
             @click="handleSave"

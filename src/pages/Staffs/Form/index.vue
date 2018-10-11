@@ -110,7 +110,7 @@
         <Form-item label="备注" prop="remark">
           <Input type="textarea" :rows="3" v-model="formValidate.remark" placeholder="请输入备注"></Input>
         </Form-item>
-        <Form-item>
+        <Form-item class="save">
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
           <Button type="ghost" @click="$router.push(`${routePrefix}/staffs/index`)">返回</Button>
         </Form-item>

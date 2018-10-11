@@ -39,7 +39,7 @@
           />
           （尺寸：184x184）
         </Form-item>
-        <Form-item>
+        <Form-item class="save">
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
         </Form-item>
       </Form>

@@ -20,7 +20,7 @@
             @change="handleUploaderChange"
           />
         </Form-item>
-        <Form-item>
+        <Form-item class="save">
           <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
           <Button type="ghost" @click="$router.push(`${routePrefix}/articles/index`)">返回</Button>
         </Form-item>
