@@ -264,7 +264,9 @@
       'olds.olds': {
         handler (newVal) {
           const items = newVal.items || []
-          this.myOlds = this.formData.olds.split(',').map(id => helpers.getItemById(items, id))
+          this.myOlds = this.formData.olds
+            ? this.formData.olds.split(',').map(id => helpers.getItemById(items, id))
+            : []
         }
       }
     }

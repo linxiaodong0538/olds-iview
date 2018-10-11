@@ -1,81 +1,79 @@
 <template>
-  <div>
-    <div class="limit-width">
-      <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
-        <Form-item label="姓名" prop="name">
-          <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
-        </Form-item>
-        <Form-item label="照片" prop="picture">
-          <Uploader
-            ref="uploader"
-            :has-default-file="!!id"
-            v-model="formValidate.picture"
-            @change="handleUploaderChange"
-          />
-          （尺寸：1150x647）
-        </Form-item>
-        <Form-item label="身份证" prop="id_card">
-          <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
-        </Form-item>
-        <Form-item
-          label="生日"
-          prop="birthday">
-          {{ birthday }}
-        </Form-item>
-        <Form-item
-          label="年龄"
-          prop="age">
-          {{ age }}
-        </Form-item>
-        <Form-item label="性别" prop="gender">
-          <Select v-model="formValidate.gender" placeholder="请选择性别" style="width: 220px">
-            <Option v-for="key in Object.keys(consts.GENDERS)" :value="key" :key="key">
-              {{ consts.GENDERS[key] }}
-            </Option>
-          </Select>
-        </Form-item>
-        <Form-item label="住址" prop="address">
-          <Input v-model="formValidate.address" placeholder="请输入住址"></Input>
-        </Form-item>
-        <Form-item label="联系电话" prop="telephone">
-          <Input v-model="formValidate.telephone" placeholder="请输入联系电话"></Input>
-        </Form-item>
-        <Form-item label="单位" prop="company">
-          <Input v-model="formValidate.company" placeholder="请输入单位"></Input>
-        </Form-item>
-        <Form-item label="职位" prop="job">
-          <Input v-model="formValidate.job" placeholder="请输入职位"></Input>
-        </Form-item>
-        <Form-item label="老人入院编号" prop="olds">
-          <p class="person-item" v-for="item in myOlds">
-            <Button type="ghost" :key="item.id" title="点击查看详情" @click="handleClickOld(item.id)">
-              {{ `${item.num}（${item.name}）` }}
-            </Button>
-          </p>
-          （请在老人详情处设置关联。）
-        </Form-item>
-        <Form-item label="与老人关系" prop="relation">
-          <Input v-model="formValidate.relation" placeholder="请输入与老人关系"></Input>
-        </Form-item>
-        <Form-item label="是否监护人" prop="gender">
-          <Select v-model="formValidate.is_guardian" placeholder="请选择是否监护人" :defaultValue="0" style="width: 220px">
-            <Option v-for="item in [1, 0]" :value="item" :key="item">
-              {{ item === 1 ? '是' : '否' }}
-            </Option>
-          </Select>
-        </Form-item>
-        <Form-item label="不良记录" prop="bad_record">
-          <Input type="textarea" :rows="3" v-model="formValidate.bad_record" placeholder="请输入不良记录"></Input>
-        </Form-item>
-        <Form-item label="备注" prop="remark">
-          <Input type="textarea" :rows="3" v-model="formValidate.remark" placeholder="请输入备注"></Input>
-        </Form-item>
-        <Form-item>
-          <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
-          <Button type="ghost" @click="$router.push(`${routePrefix}/families/index`)">返回</Button>
-        </Form-item>
-      </Form>
-    </div>
+  <div class="limit-width">
+    <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
+      <Form-item label="姓名" prop="name">
+        <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
+      </Form-item>
+      <Form-item label="照片" prop="picture">
+        <Uploader
+          ref="uploader"
+          :has-default-file="!!id"
+          v-model="formValidate.picture"
+          @change="handleUploaderChange"
+        />
+        （尺寸：1150x647）
+      </Form-item>
+      <Form-item label="身份证" prop="id_card">
+        <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
+      </Form-item>
+      <Form-item
+        label="生日"
+        prop="birthday">
+        {{ birthday }}
+      </Form-item>
+      <Form-item
+        label="年龄"
+        prop="age">
+        {{ age }}
+      </Form-item>
+      <Form-item label="性别" prop="gender">
+        <Select v-model="formValidate.gender" placeholder="请选择性别" style="width: 220px">
+          <Option v-for="key in Object.keys(consts.GENDERS)" :value="key" :key="key">
+            {{ consts.GENDERS[key] }}
+          </Option>
+        </Select>
+      </Form-item>
+      <Form-item label="住址" prop="address">
+        <Input v-model="formValidate.address" placeholder="请输入住址"></Input>
+      </Form-item>
+      <Form-item label="联系电话" prop="telephone">
+        <Input v-model="formValidate.telephone" placeholder="请输入联系电话"></Input>
+      </Form-item>
+      <Form-item label="单位" prop="company">
+        <Input v-model="formValidate.company" placeholder="请输入单位"></Input>
+      </Form-item>
+      <Form-item label="职位" prop="job">
+        <Input v-model="formValidate.job" placeholder="请输入职位"></Input>
+      </Form-item>
+      <Form-item label="老人入院编号" prop="olds">
+        <p class="person-item" v-for="item in myOlds">
+          <Button type="ghost" :key="item.id" title="点击查看详情" @click="handleClickOld(item.id)">
+            {{ `${item.num}（${item.name}）` }}
+          </Button>
+        </p>
+        （请在老人详情处设置关联。）
+      </Form-item>
+      <Form-item label="与老人关系" prop="relation">
+        <Input v-model="formValidate.relation" placeholder="请输入与老人关系"></Input>
+      </Form-item>
+      <Form-item label="是否监护人" prop="gender">
+        <Select v-model="formValidate.is_guardian" placeholder="请选择是否监护人" :defaultValue="0" style="width: 220px">
+          <Option v-for="item in [1, 0]" :value="item" :key="item">
+            {{ item === 1 ? '是' : '否' }}
+          </Option>
+        </Select>
+      </Form-item>
+      <Form-item label="不良记录" prop="bad_record">
+        <Input type="textarea" :rows="3" v-model="formValidate.bad_record" placeholder="请输入不良记录"></Input>
+      </Form-item>
+      <Form-item label="备注" prop="remark">
+        <Input type="textarea" :rows="3" v-model="formValidate.remark" placeholder="请输入备注"></Input>
+      </Form-item>
+      <Form-item class="save">
+        <Button type="primary" @click="handleSave" class="margin-right-sm">保存</Button>
+        <Button type="ghost" @click="$router.push(`${routePrefix}/families/index`)">返回</Button>
+      </Form-item>
+    </Form>
   </div>
 </template>
 
@@ -222,7 +220,9 @@
       'olds.olds': {
         handler (newVal) {
           const items = newVal.items || []
-          this.myOlds = this.formData.olds.split(',').map(id => helpers.getItemById(items, id))
+          this.myOlds = this.formData.olds
+            ? this.formData.olds.split(',').map(id => helpers.getItemById(items, id))
+            : []
         }
       }
     }
