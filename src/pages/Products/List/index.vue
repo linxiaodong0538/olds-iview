@@ -227,7 +227,8 @@
       getCategoryItems () {
         return this.$store.dispatch('getCategories', {
           query: {
-            where: { alias: this.alias }
+            where: { alias: this.alias },
+            limit: 1000
           }
         })
       },
