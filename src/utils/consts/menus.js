@@ -208,7 +208,7 @@ export default [
         ]
       }
     ]
-  },
+  }/*,
   {
     icon: 'android-phone-portrait',
     name: 'xd-app',
@@ -264,5 +264,5 @@ export default [
         ]
       }
     ]
-  }
+  }*/
 ]
