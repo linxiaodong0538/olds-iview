@@ -5,9 +5,6 @@
         <Form-item label="姓名" prop="name">
           <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
         </Form-item>
-        <Form-item label="身份证" prop="id_card">
-          <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
-        </Form-item>
         <Form-item label="照片" prop="picture">
           <Uploader
             ref="uploader"
@@ -17,16 +14,25 @@
           />
           （尺寸：1150x647）
         </Form-item>
+        <Form-item label="身份证" prop="id_card">
+          <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
+        </Form-item>
+        <Form-item
+          label="生日"
+          prop="birthday">
+          {{ birthday }}
+        </Form-item>
+        <Form-item
+          label="年龄"
+          prop="age">
+          {{ age }}
+        </Form-item>
         <Form-item label="性别" prop="gender">
           <Select v-model="formValidate.gender" placeholder="请选择性别" style="width: 220px">
             <Option v-for="key in Object.keys(consts.GENDERS)" :value="key" :key="key">
               {{ consts.GENDERS[key] }}
             </Option>
           </Select>
-        </Form-item>
-        <Form-item label="生日" prop="birthday">
-          <DatePicker v-model="formValidate.birthday" type="date" placeholder="请选择生日"
-                      style="width: 220px"></DatePicker>
         </Form-item>
         <Form-item label="住址" prop="address">
           <Input v-model="formValidate.address" placeholder="请输入住址"></Input>
@@ -181,10 +187,37 @@
         window.open(`/#/company-app/persons/olds/olds/index/form/${id}`)
       }
     },
-    computed: mapState([
-      'families',
-      'olds'
-    ]),
+    computed: {
+      ...mapState([
+        'families',
+        'olds'
+      ]),
+      birthday () {
+        const idCard = this.formValidate.id_card
+
+        if (idCard && idCard.length === 18) {
+          const year = idCard.charAt(6) + idCard.charAt(7) + idCard.charAt(8) + idCard.charAt(9)
+          const month = idCard.charAt(10) + idCard.charAt(11)
+          const date = idCard.charAt(12) + idCard.charAt(13)
+
+          return `${year}-${month}-${date}`
+        } else {
+          return '-'
+        }
+      },
+      age () {
+        const idCard = this.formValidate.id_card
+
+        if (idCard && idCard.length === 18) {
+          const year = idCard.charAt(6) + idCard.charAt(7) + idCard.charAt(8) + idCard.charAt(9)
+          const currentYear = new Date().getFullYear()
+
+          return currentYear - year
+        } else {
+          return '-'
+        }
+      }
+    },
     watch: {
       'families.family': {
         handler (newVal) {

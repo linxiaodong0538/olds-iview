@@ -5,9 +5,6 @@
         <Form-item label="姓名" prop="name">
           <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
         </Form-item>
-        <Form-item label="身份证" prop="id_card">
-          <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
-        </Form-item>
         <Form-item label="照片" prop="picture">
           <Uploader
             ref="uploader"
@@ -17,16 +14,25 @@
           />
           （尺寸：1150x647）
         </Form-item>
+        <Form-item label="身份证" prop="id_card">
+          <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
+        </Form-item>
+        <Form-item
+          label="生日"
+          prop="birthday">
+          {{ birthday }}
+        </Form-item>
+        <Form-item
+          label="年龄"
+          prop="age">
+          {{ age }}
+        </Form-item>
         <Form-item label="性别" prop="gender">
           <Select v-model="formValidate.gender" placeholder="请选择性别" style="width: 220px">
             <Option v-for="key in Object.keys(consts.GENDERS)" :value="key" :key="key">
               {{ consts.GENDERS[key] }}
             </Option>
           </Select>
-        </Form-item>
-        <Form-item label="生日" prop="birthday">
-          <DatePicker v-model="formValidate.birthday" type="date" placeholder="请选择生日"
-                      style="width: 220px"></DatePicker>
         </Form-item>
         <Form-item label="入院编号" prop="num">
           <Input v-model="formValidate.num" placeholder="请输入入院编号"></Input>
@@ -50,8 +56,12 @@
           <Input type="textarea" :rows="3" v-model="formValidate.medical_history" placeholder="请输入既往病史"></Input>
         </Form-item>
         <Form-item label="入住时间" prop="stay_in_time">
-          <DatePicker v-model="formValidate.stay_in_time" type="date" placeholder="请选择入住时间"
-                      style="width: 220px"></DatePicker>
+          <DatePicker
+            :value="formValidate.stay_in_time"
+            type="date"
+            placeholder="请选择入住时间"
+            style="width: 220px"
+            @on-change="value => { handleDatePickerChange('stay_in_time', value) }" />
         </Form-item>
         <Form-item label="入住房间" prop="stay_in_room">
           <Input v-model="formValidate.stay_in_room" placeholder="请输入入住房间"></Input>
@@ -87,8 +97,12 @@
           <Input type="textarea" :rows="3" v-model="formValidate.allergic_history" placeholder="请输入过敏史"></Input>
         </Form-item>
         <Form-item label="出院时间" prop="leave_hospital_time">
-          <DatePicker v-model="formValidate.leave_hospital_time" type="date" placeholder="请选择出院时间"
-                      style="width: 220px"></DatePicker>
+          <DatePicker
+            :value="formValidate.leave_hospital_time"
+            type="date"
+            placeholder="请选择出院时间"
+            @on-change="value => { handleDatePickerChange('leave_hospital_time', value) }"
+            style="width: 220px" />
         </Form-item>
         <Form-item label="出院原由" prop="leave_hospital_reason">
           <Input type="textarea" :rows="3" v-model="formValidate.leave_hospital_reason" placeholder="请输入出院原由"></Input>
@@ -177,6 +191,9 @@
       }
     },
     methods: {
+      handleDatePickerChange (key, value) {
+        this.formValidate[key] = value
+      },
       getDetails (id) {
         return this.$store.dispatch('getOld', { id })
       },
@@ -257,10 +274,37 @@
           : `/#/company-app/persons/carers/staffs/index/form/${id}`)
       }
     },
-    computed: mapState([
-      'olds',
-      'relations'
-    ]),
+    computed: {
+      ...mapState([
+        'olds',
+        'relations'
+      ]),
+      birthday () {
+        const idCard = this.formValidate.id_card
+
+        if (idCard && idCard.length === 18) {
+          const year = idCard.charAt(6) + idCard.charAt(7) + idCard.charAt(8) + idCard.charAt(9)
+          const month = idCard.charAt(10) + idCard.charAt(11)
+          const date = idCard.charAt(12) + idCard.charAt(13)
+
+          return `${year}-${month}-${date}`
+        } else {
+          return '-'
+        }
+      },
+      age () {
+        const idCard = this.formValidate.id_card
+
+        if (idCard && idCard.length === 18) {
+          const year = idCard.charAt(6) + idCard.charAt(7) + idCard.charAt(8) + idCard.charAt(9)
+          const currentYear = new Date().getFullYear()
+
+          return currentYear - year
+        } else {
+          return '-'
+        }
+      }
+    },
     watch: {
       'olds.old': {
         handler (newVal) {

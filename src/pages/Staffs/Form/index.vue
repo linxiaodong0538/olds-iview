@@ -5,9 +5,6 @@
         <Form-item label="姓名" prop="name">
           <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
         </Form-item>
-        <Form-item label="身份证" prop="id_card">
-          <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
-        </Form-item>
         <Form-item label="照片" prop="picture">
           <Uploader
             ref="uploader"
@@ -17,16 +14,25 @@
           />
           （尺寸：1150x647）
         </Form-item>
+        <Form-item label="身份证" prop="id_card">
+          <Input v-model="formValidate.id_card" placeholder="请输入身份证"></Input>
+        </Form-item>
+        <Form-item
+          label="生日"
+          prop="birthday">
+          {{ birthday }}
+        </Form-item>
+        <Form-item
+          label="年龄"
+          prop="age">
+          {{ age }}
+        </Form-item>
         <Form-item label="性别" prop="gender">
           <Select v-model="formValidate.gender" placeholder="请选择性别" style="width: 220px">
             <Option v-for="key in Object.keys(consts.GENDERS)" :value="key" :key="key">
               {{ consts.GENDERS[key] }}
             </Option>
           </Select>
-        </Form-item>
-        <Form-item label="生日" prop="birthday">
-          <DatePicker v-model="formValidate.birthday" type="date" placeholder="请选择生日"
-                      style="width: 220px"></DatePicker>
         </Form-item>
         <Form-item label="文化程度" prop="education_degree">
           <Select v-model="formValidate.education_degree" placeholder="请选择文化程度" style="width: 220px">
@@ -50,13 +56,25 @@
         <Form-item label="从业经历" prop="employment_experience">
           <Input type="textarea" :rows="3" v-model="formValidate.employment_experience" placeholder="请输入从业经历"></Input>
         </Form-item>
-        <Form-item label="上岗时间" prop="start_time">
-          <DatePicker v-model="formValidate.start_time" type="date" placeholder="请选择上岗时间"
-                      style="width: 220px"></DatePicker>
+        <Form-item
+          label="上岗时间"
+          prop="start_time">
+          <DatePicker
+            :value="formValidate.start_time"
+            type="date"
+            placeholder="请选择上岗时间"
+            style="width: 220px"
+            @on-change="value => { handleDatePickerChange('start_time', value) }" />
         </Form-item>
-        <Form-item label="离岗时间" prop="release_time">
-          <DatePicker v-model="formValidate.release_time" type="date" placeholder="请选择离岗时间"
-                      style="width: 220px"></DatePicker>
+        <Form-item
+          label="离岗时间"
+          prop="release_time">
+          <DatePicker
+            :value="formValidate.release_time"
+            type="date"
+            placeholder="请选择离岗时间"
+            style="width: 220px"
+            @on-change="value => { handleDatePickerChange('release_time', value) }" />
         </Form-item>
         <Form-item label="薪资待遇" prop="salary">
           <InputNumber :min="0" :max="1000000" v-model="formValidate.salary" style="width: 220px;"></InputNumber>
@@ -164,6 +182,9 @@
       }
     },
     methods: {
+      handleDatePickerChange (key, value) {
+        this.formValidate[key] = value
+      },
       getDetails (id) {
         return this.$store.dispatch('getStaff', { id })
       },
@@ -212,7 +233,32 @@
       ...mapState([
         'staffs',
         'olds'
-      ])
+      ]),
+      birthday () {
+        const idCard = this.formValidate.id_card
+
+        if (idCard && idCard.length === 18) {
+          const year = idCard.charAt(6) + idCard.charAt(7) + idCard.charAt(8) + idCard.charAt(9)
+          const month = idCard.charAt(10) + idCard.charAt(11)
+          const date = idCard.charAt(12) + idCard.charAt(13)
+
+          return `${year}-${month}-${date}`
+        } else {
+          return '-'
+        }
+      },
+      age () {
+        const idCard = this.formValidate.id_card
+
+        if (idCard && idCard.length === 18) {
+          const year = idCard.charAt(6) + idCard.charAt(7) + idCard.charAt(8) + idCard.charAt(9)
+          const currentYear = new Date().getFullYear()
+
+          return currentYear - year
+        } else {
+          return '-'
+        }
+      }
     },
     watch: {
       'staffs.staff': {
