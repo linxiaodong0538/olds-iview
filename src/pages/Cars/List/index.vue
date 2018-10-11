@@ -1,16 +1,27 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="cars.cars.items" :total="cars.cars.total"
-          @on-change="handlePageChange">
+    <List
+      :current="current"
+      :columns="columns"
+      :data="cars.cars.items"
+      :total="cars.cars.total"
+      @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary"
-                  @click="$router.push(`${routePrefix}/cars/index/form`)">新增
+          <Button
+            class="margin-right-sm"
+            type="primary"
+            @click="$router.push(`${routePrefix}/cars/index/form`)">
+            新增
           </Button>
         </ListOperations>
       </ListHeader>
     </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+    <Modal
+      width="280"
+      v-model="del.modal"
+      title="请确认"
+      @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
   </div>
@@ -73,26 +84,17 @@
           {
             title: '年检时间',
             key: 'mot_time',
-            width: 120,
-            render (h, params) {
-              return h('span', null, time.getDate(params.row.mot_time))
-            }
+            width: 120
           },
           {
             title: '保险到期时间',
             key: 'insurance_time',
-            width: 120,
-            render (h, params) {
-              return h('span', null, time.getDate(params.row.insurance_time))
-            }
+            width: 120
           },
           {
             title: '购买日期',
             key: 'buy_time',
-            width: 120,
-            render (h, params) {
-              return h('span', null, time.getDate(params.row.insurance_time))
-            }
+            width: 120
           },
           {
             title: '操作',
