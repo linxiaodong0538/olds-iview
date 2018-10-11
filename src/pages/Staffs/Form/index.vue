@@ -171,12 +171,6 @@
               max: 18,
               message: '身份证格式错误'
             }
-          ],
-          picture: [
-            {
-              required: true,
-              message: '请上传照片'
-            }
           ]
         }
       }
