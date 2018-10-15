@@ -10,7 +10,7 @@
         <ListOperations>
           <Button
             type="primary"
-            @click="handlePost">
+            @click="handleShowPost">
             新增
           </Button>
         </ListOperations>
@@ -46,6 +46,21 @@
           </Row>
         </Form-item>
         <Form-item
+          label="短视频"
+          prop="file">
+          <Row>
+            <Col span="20">
+              <Uploader
+                :max-size="1024 * 50"
+                :preview-icon="`${consts.BASE_URL}/images/video.png`"
+                :format="['mp4']"
+                :has-default-file="!!cForm.formValidate.file"
+                v-model="cForm.formValidate.file"
+                @change="handleUploaderChange" />
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item
           label="描述"
           prop="description">
           <Row>
@@ -60,27 +75,12 @@
         </Form-item>
         <Form-item
           label="拍摄地点"
-          prop="title">
+          prop="address">
           <Row>
             <Col span="20">
               <Input
                 v-model="cForm.formValidate.address"
                 placeholder="请输入拍摄地点" />
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item
-          label="拍摄地点"
-          prop="title">
-          <Row>
-            <Col span="20">
-              <Uploader
-                :max-size="1024 * 50"
-                :preview-icon="`${consts.BASE_URL}/images/video.png`"
-                :format="['mp4']"
-                :has-default-file="!!cForm.formValidate.file"
-                v-model="cForm.formValidate.file"
-                @change="handleUploaderChange" />
             </Col>
           </Row>
         </Form-item>
@@ -139,7 +139,7 @@
                       },
                       on: {
                         click: () => {
-                          this.handlePut(params.row)
+                          this.handleShowPut(params.row)
                         }
                       }
                     },
@@ -153,7 +153,7 @@
                       },
                       on: {
                         click: () => {
-                          this.handleDel(params.row.id)
+                          this.handleShowDel(params.row.id)
                         }
                       }
                     },
@@ -185,6 +185,12 @@
                 max: 100,
                 message: '标题不能多于 100 个字'
               }
+            ],
+            file: [
+              {
+                required: true,
+                message: '短视频不能为空'
+              }
             ]
           }
         }
@@ -193,10 +199,10 @@
     computed: mapState({
       list: state => state[module].list
     }),
+    created () {
+      this.getList()
+    },
     methods: {
-      handleUploaderChange (file) {
-        this.cForm.formValidate.file = file ? file.id : ''
-      },
       getList (current = 1) {
         this.cList.cPage.current = current
 
@@ -207,20 +213,27 @@
           }
         })
       },
+      resetFields () {
+        this.$refs.formValidate.resetFields()
+        this.$set(this.cForm, 'formValidate', {})
+      },
+      handleUploaderChange (file) {
+        this.cForm.formValidate.file = file ? file.id : ''
+      },
       handlePageChange (current) {
         this.getList(current)
       },
-      handlePost () {
+      handleShowPost () {
         this.cForm.modal = true
         this.cForm.id = 0
         this.resetFields()
       },
-      handlePut (detail) {
+      handleShowPut (detail) {
         this.cForm.id = detail.id
         this.$set(this.cForm, 'formValidate', detail)
         this.cForm.modal = true
       },
-      handleDel (id) {
+      handleShowDel (id) {
         this.cDel.id = id
         this.cDel.modal = true
       },
@@ -246,14 +259,7 @@
             this.getList()
           }
         })
-      },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', {})
       }
-    },
-    created () {
-      this.getList()
     }
   }
 </script>
