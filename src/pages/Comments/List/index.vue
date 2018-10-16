@@ -133,7 +133,7 @@
           <Row>
             <Col span="20">
               <InputNumber
-                :min="1"
+                :min="0"
                 :max="10000"
                 style="width: 220px;"
                 v-model="cForm.formValidate.praisesNum" />
@@ -146,7 +146,7 @@
           <Row>
             <Col span="20">
               <InputNumber
-                :min="1"
+                :min="0"
                 :max="10000"
                 style="width: 220px;"
                 v-model="cForm.formValidate.commentsNum" />
@@ -354,8 +354,10 @@
         })
       },
       resetFields () {
+        const initValue = { praisesNum: 0, commentsNum: 0 }
+
         this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', {})
+        this.$set(this.cForm, 'formValidate', initValue)
       },
       handleSearch () {
         this.cList.cPage.current = 1
@@ -396,7 +398,6 @@
         this.getList()
       },
       handleFormOk () {
-        console.log(this.cForm.formValidate)
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             await this.$store.dispatch(
