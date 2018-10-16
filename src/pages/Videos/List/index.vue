@@ -45,6 +45,30 @@
     </Modal>
 
     <Modal
+      width="430"
+      v-model="cVideoViewer.modal"
+      title="查看短视频"
+      @on-visible-change="handleVideoViewerVisibleChange">
+      <video
+        v-if="cVideoViewer.id"
+        controls
+        preload="auto"
+        style="width: 400px; height: 300px;">
+        <source
+          :src="$consts.BASE_URL + '/apis/v1/files/' + cVideoViewer.id"
+          type="video/mp4" />
+      </video>
+      <div slot="footer">
+        <Button
+          type="primary"
+          size="large"
+          @click="cVideoViewer.modal = false">
+          确定
+        </Button>
+      </div>
+    </Modal>
+
+    <Modal
       width="500"
       v-model="cForm.modal"
       :title="cForm.id ? '编辑' : '新增'">
@@ -71,7 +95,7 @@
             <Col span="20">
               <Uploader
                 :max-size="1024 * 50"
-                :preview-icon="`${consts.BASE_URL}/images/video.png`"
+                :preview-icon="`${$consts.BASE_URL}/images/video.png`"
                 :format="['mp4']"
                 :has-default-file="!!cForm.formValidate.file"
                 v-model="cForm.formValidate.file"
@@ -146,11 +170,39 @@
               key: 'title'
             },
             {
+              title: '描述',
+              key: 'description',
+              width: 250
+            },
+            {
+              title: '拍摄地点',
+              key: 'address',
+              width: 250
+            },
+            {
+              title: '发布时间',
+              key: 'created_at',
+              width: 160,
+              render: (h, params) => {
+                return h('span', null, this.$time.getTime(params.row.created_at))
+              }
+            },
+            {
               title: '操作',
               key: 'action',
-              width: 150,
+              width: 250,
               render: (h, params) => {
                 return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowVideoViewer(params.row.file)
+                      }
+                    }
+                  }, '查看短视频'),
                   h(
                     'Button',
                     {
@@ -194,6 +246,10 @@
             current: 1
           }
         },
+        cVideoViewer: {
+          id: 0,
+          modal: false
+        },
         cDel: {
           id: 0,
           modal: false
@@ -235,8 +291,8 @@
 
         return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * this.consts.PAGE_SIZE,
-            limit: this.consts.PAGE_SIZE,
+            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE,
             where: this.cList.cSearch.where
           }
         })
@@ -268,6 +324,15 @@
       handleShowDel (id) {
         this.cDel.id = id
         this.cDel.modal = true
+      },
+      handleShowVideoViewer (file) {
+        this.cVideoViewer.id = file
+        this.cVideoViewer.modal = true
+      },
+      handleVideoViewerVisibleChange (visible) {
+        if (!visible) {
+          this.cVideoViewer.id = 0
+        }
       },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
