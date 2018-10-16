@@ -115,8 +115,8 @@
 
         return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * this.consts.PAGE_SIZE,
-            limit: this.consts.PAGE_SIZE
+            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE
           }
         })
       },
