@@ -1,4 +1,4 @@
-import helpers from 'jt-helpers'
+// import helpers from 'jt-helpers'
 
 export default {
   GET_LIST: 'videos/GET_LIST',
