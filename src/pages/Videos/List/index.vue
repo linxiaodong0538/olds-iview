@@ -14,6 +14,25 @@
             新增
           </Button>
         </ListOperations>
+        <ListSearch>
+          <Form
+            inline
+            @submit.native.prevent="handleSearch">
+            <Form-item prop="name">
+              <Input
+                placeholder="请输入标题"
+                style="width: 220px;"
+                v-model="cList.cSearch.where.title.$like" />
+            </Form-item>
+            <Form-item>
+              <Button
+                type="primary"
+                @click="handleSearch">
+                查询
+              </Button>
+            </Form-item>
+          </Form>
+        </ListSearch>
       </ListHeader>
     </List>
 
@@ -105,7 +124,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations } from '@/components/List'
+  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
   import Uploader from '@/components/Uploader'
 
   const module = 'videos'
@@ -115,6 +134,7 @@
       List,
       ListHeader,
       ListOperations,
+      ListSearch,
       Uploader
     },
     data () {
@@ -163,6 +183,13 @@
               }
             }
           ],
+          cSearch: {
+            where: {
+              title: {
+                $like: ''
+              }
+            }
+          },
           cPage: {
             current: 1
           }
@@ -209,7 +236,8 @@
         return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (current - 1) * this.consts.PAGE_SIZE,
-            limit: this.consts.PAGE_SIZE
+            limit: this.consts.PAGE_SIZE,
+            where: this.cList.cSearch.where
           }
         })
       },
@@ -217,8 +245,12 @@
         this.$refs.formValidate.resetFields()
         this.$set(this.cForm, 'formValidate', {})
       },
+      handleSearch () {
+        this.cList.cPage.current = 1
+        this.getList()
+      },
       handleUploaderChange (file) {
-        this.cForm.formValidate.file = file ? file.id : ''
+        this.$set(this.cForm.formValidate, 'file', file ? file.id : '')
       },
       handlePageChange (current) {
         this.getList(current)
@@ -230,7 +262,7 @@
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', detail)
+        this.$set(this.cForm, 'formValidate', Object.assign({}, detail))
         this.cForm.modal = true
       },
       handleShowDel (id) {
@@ -243,6 +275,7 @@
         this.getList()
       },
       handleFormOk () {
+        console.log(this.cForm.formValidate)
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             await this.$store.dispatch(
