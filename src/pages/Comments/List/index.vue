@@ -177,7 +177,7 @@
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
   import Uploader from '@/components/Uploader'
 
-  const module = 'videos'
+  const module = 'comments'
 
   export default {
     components: {
@@ -192,8 +192,8 @@
         cList: {
           columns: [
             {
-              title: '标题',
-              key: 'title'
+              title: '评论者',
+              key: 'fromUserId'
             },
             {
               title: '描述',
