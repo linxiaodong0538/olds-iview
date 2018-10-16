@@ -10,10 +10,29 @@
         <ListOperations>
           <Button
             type="primary"
-            @click="handlePost">
+            @click="handleShowPost">
             新增
           </Button>
         </ListOperations>
+        <ListSearch>
+          <Form
+            inline
+            @submit.native.prevent="handleSearch">
+            <Form-item prop="name">
+              <Input
+                placeholder="请输入标题"
+                style="width: 220px;"
+                v-model="cList.cSearch.where.title.$like" />
+            </Form-item>
+            <Form-item>
+              <Button
+                type="primary"
+                @click="handleSearch">
+                查询
+              </Button>
+            </Form-item>
+          </Form>
+        </ListSearch>
       </ListHeader>
     </List>
 
@@ -46,6 +65,21 @@
           </Row>
         </Form-item>
         <Form-item
+          label="短视频"
+          prop="file">
+          <Row>
+            <Col span="20">
+              <Uploader
+                :max-size="1024 * 50"
+                :preview-icon="`${consts.BASE_URL}/images/video.png`"
+                :format="['mp4', 'wmv']"
+                :has-default-file="!!cForm.formValidate.file"
+                v-model="cForm.formValidate.file"
+                @change="handleUploaderChange" />
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item
           label="描述"
           prop="description">
           <Row>
@@ -60,27 +94,12 @@
         </Form-item>
         <Form-item
           label="拍摄地点"
-          prop="title">
+          prop="address">
           <Row>
             <Col span="20">
               <Input
                 v-model="cForm.formValidate.address"
                 placeholder="请输入拍摄地点" />
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item
-          label="拍摄地点"
-          prop="title">
-          <Row>
-            <Col span="20">
-              <Uploader
-                :max-size="1024 * 50"
-                :preview-icon="`${consts.BASE_URL}/images/video.png`"
-                :format="['mp4']"
-                :has-default-file="!!cForm.formValidate.file"
-                v-model="cForm.formValidate.file"
-                @change="handleUploaderChange" />
             </Col>
           </Row>
         </Form-item>
@@ -105,7 +124,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations } from '@/components/List'
+  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
   import Uploader from '@/components/Uploader'
 
   const module = 'videos'
@@ -115,6 +134,7 @@
       List,
       ListHeader,
       ListOperations,
+      ListSearch,
       Uploader
     },
     data () {
@@ -139,7 +159,7 @@
                       },
                       on: {
                         click: () => {
-                          this.handlePut(params.row)
+                          this.handleShowPut(params.row)
                         }
                       }
                     },
@@ -153,7 +173,7 @@
                       },
                       on: {
                         click: () => {
-                          this.handleDel(params.row.id)
+                          this.handleShowDel(params.row.id)
                         }
                       }
                     },
@@ -163,6 +183,13 @@
               }
             }
           ],
+          cSearch: {
+            where: {
+              title: {
+                $like: ''
+              }
+            }
+          },
           cPage: {
             current: 1
           }
@@ -185,6 +212,12 @@
                 max: 100,
                 message: '标题不能多于 100 个字'
               }
+            ],
+            file: [
+              {
+                required: true,
+                message: '短视频不能为空'
+              }
             ]
           }
         }
@@ -193,34 +226,46 @@
     computed: mapState({
       list: state => state[module].list
     }),
+    created () {
+      this.getList()
+    },
     methods: {
-      handleUploaderChange (file) {
-        this.cForm.formValidate.file = file ? file.id : ''
-      },
       getList (current = 1) {
         this.cList.cPage.current = current
 
         return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (current - 1) * this.consts.PAGE_SIZE,
-            limit: this.consts.PAGE_SIZE
+            limit: this.consts.PAGE_SIZE,
+            where: this.cList.cSearch.where
           }
         })
+      },
+      resetFields () {
+        this.$refs.formValidate.resetFields()
+        this.$set(this.cForm, 'formValidate', {})
+      },
+      handleSearch () {
+        this.cList.cPage.current = 1
+        this.getList()
+      },
+      handleUploaderChange (file) {
+        this.$set(this.cForm.formValidate, 'file', file ? file.id : '')
       },
       handlePageChange (current) {
         this.getList(current)
       },
-      handlePost () {
+      handleShowPost () {
         this.cForm.modal = true
         this.cForm.id = 0
         this.resetFields()
       },
-      handlePut (detail) {
+      handleShowPut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', detail)
+        this.$set(this.cForm, 'formValidate', Object.assign({}, detail))
         this.cForm.modal = true
       },
-      handleDel (id) {
+      handleShowDel (id) {
         this.cDel.id = id
         this.cDel.modal = true
       },
@@ -230,6 +275,7 @@
         this.getList()
       },
       handleFormOk () {
+        console.log(this.cForm.formValidate)
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             await this.$store.dispatch(
@@ -246,14 +292,7 @@
             this.getList()
           }
         })
-      },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', {})
       }
-    },
-    created () {
-      this.getList()
     }
   }
 </script>
