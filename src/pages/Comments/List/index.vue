@@ -43,113 +43,32 @@
       @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-
-    <Modal
-      width="430"
-      v-model="cVideoViewer.modal"
-      title="查看短视频"
-      @on-visible-change="handleVideoViewerVisibleChange">
-      <video
-        v-if="cVideoViewer.id"
-        controls
-        preload="auto"
-        style="width: 400px; height: 300px;">
-        <source
-          :src="$consts.BASE_URL + '/apis/v1/files/' + cVideoViewer.id"
-          type="video/mp4" />
-      </video>
-      <div slot="footer">
-        <Button
-          type="primary"
-          size="large"
-          @click="cVideoViewer.modal = false">
-          确定
-        </Button>
-      </div>
-    </Modal>
-
     <Modal
       width="500"
       v-model="cForm.modal"
-      :title="cForm.id ? '编辑' : '新增'">
+      title="回复">
       <Form
         ref="formValidate"
         :model="cForm.formValidate"
         :rules="cForm.ruleValidate"
         :label-width="80">
         <Form-item
-          label="标题"
-          prop="title">
-          <Row>
-            <Col span="20">
-              <Input
-                v-model="cForm.formValidate.title"
-                placeholder="请输入标题" />
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item
-          label="短视频"
-          prop="file">
-          <Row>
-            <Col span="20">
-              <Uploader
-                :max-size="1024 * 50"
-                :preview-icon="`${$consts.BASE_URL}/images/video.png`"
-                :format="['mp4']"
-                :has-default-file="!!cForm.formValidate.file"
-                v-model="cForm.formValidate.file"
-                @change="handleUploaderChange" />
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item
-          label="描述"
+          label="@"
           prop="description">
           <Row>
+            <Col span="20">{{ cForm.formValidate.toUserId }}</Col>
+          </Row>
+        </Form-item>
+        <Form-item
+          label="内容"
+          prop="content">
+          <Row>
             <Col span="20">
               <Input
-                v-model="cForm.formValidate.description"
+                v-model="cForm.formValidate.content"
                 type="textarea"
                 :rows="3"
                 placeholder="请输入描述" />
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item
-          label="拍摄地点"
-          prop="address">
-          <Row>
-            <Col span="20">
-              <Input
-                v-model="cForm.formValidate.address"
-                placeholder="请输入拍摄地点" />
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item
-          label="点赞数"
-          prop="praisesNum">
-          <Row>
-            <Col span="20">
-              <InputNumber
-                :min="0"
-                :max="10000"
-                style="width: 220px;"
-                v-model="cForm.formValidate.praisesNum" />
-            </Col>
-          </Row>
-        </Form-item>
-        <Form-item
-          label="评论数"
-          prop="commentsNum">
-          <Row>
-            <Col span="20">
-              <InputNumber
-                :min="0"
-                :max="10000"
-                style="width: 220px;"
-                v-model="cForm.formValidate.commentsNum" />
             </Col>
           </Row>
         </Form-item>
@@ -192,31 +111,27 @@
         cList: {
           columns: [
             {
-              title: '评论者',
-              key: 'fromUserId'
+              title: '评论人',
+              key: 'fromUserId',
+              width: 120,
+              render: (h, params) => {
+                return h('span', null, params.row.fromUserId || '重阳养老')
+              }
             },
             {
-              title: '描述',
-              key: 'description',
-              width: 250
+              title: '@谁',
+              key: 'toUserId',
+              width: 120,
+              render: (h, params) => {
+                return h('span', null, '@' + (params.row.toUserId || '重阳养老'))
+              }
             },
             {
-              title: '拍摄地点',
-              key: 'address',
-              width: 250
+              title: '内容',
+              key: 'content'
             },
             {
-              title: '点赞数',
-              key: 'praisesNum',
-              width: 80
-            },
-            {
-              title: '评论数',
-              key: 'commentsNum',
-              width: 80
-            },
-            {
-              title: '发布时间',
+              title: '时间',
               key: 'created_at',
               width: 160,
               render: (h, params) => {
@@ -226,12 +141,13 @@
             {
               title: '操作',
               key: 'action',
-              width: 330,
+              width: 90,
               render: (h, params) => {
                 return h(
                   'ButtonGroup',
                   [
-                    h(
+                    params.row.fromUserId
+                      ? h(
                       'Button',
                       {
                         props: {
@@ -239,41 +155,15 @@
                         },
                         on: {
                           click: () => {
-                            this.handleShowVideoViewer(params.row.file)
+                            this.handleShowPost(params.row)
                           }
                         }
                       },
-                      '查看短视频'
-                    ),
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.$router.push('/')
-                          }
-                        }
-                      },
-                      '查看评论'
-                    ),
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowPut(params.row)
-                          }
-                        }
-                      },
-                      '编辑'
-                    ),
-                    h(
+                      '回复'
+                      )
+                      : null,
+                    !params.row.fromUserId
+                      ? h(
                       'Button',
                       {
                         props: {
@@ -286,7 +176,8 @@
                         }
                       },
                       '删除'
-                    )
+                      )
+                      : null
                   ])
               }
             }
@@ -302,33 +193,18 @@
             current: 1
           }
         },
-        cVideoViewer: {
-          id: 0,
-          modal: false
-        },
         cDel: {
           id: 0,
           modal: false
         },
         cForm: {
-          id: 0,
           modal: false,
           formValidate: {},
           ruleValidate: {
-            title: [
+            content: [
               {
                 required: true,
-                message: '标题不能为空'
-              },
-              {
-                max: 100,
-                message: '标题不能多于 100 个字'
-              }
-            ],
-            file: [
-              {
-                required: true,
-                message: '短视频不能为空'
+                message: '内容不能为空'
               }
             ]
           }
@@ -349,48 +225,29 @@
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.cList.cSearch.where
+            where: this.cList.cSearch.where,
+            // order: JSON.stringify([['id', 'ASC']])
           }
         })
       },
       resetFields () {
-        const initValue = { praisesNum: 0, commentsNum: 0 }
-
         this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', initValue)
+        this.$set(this.cForm, 'formValidate', {})
       },
       handleSearch () {
         this.cList.cPage.current = 1
         this.getList()
       },
-      handleUploaderChange (file) {
-        this.$set(this.cForm.formValidate, 'file', file ? file.id : '')
-      },
       handlePageChange (current) {
         this.getList(current)
       },
-      handleShowPost () {
-        this.cForm.modal = true
-        this.cForm.id = 0
-        this.resetFields()
-      },
-      handleShowPut (detail) {
-        this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', Object.assign({}, detail))
+      handleShowPost ({ fromUserId }) {
+        this.$set(this.cForm, 'formValidate', { toUserId: fromUserId })
         this.cForm.modal = true
       },
       handleShowDel (id) {
         this.cDel.id = id
         this.cDel.modal = true
-      },
-      handleShowVideoViewer (file) {
-        this.cVideoViewer.id = file
-        this.cVideoViewer.modal = true
-      },
-      handleVideoViewerVisibleChange (visible) {
-        if (!visible) {
-          this.cVideoViewer.id = 0
-        }
       },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
