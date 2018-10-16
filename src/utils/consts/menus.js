@@ -216,12 +216,12 @@ export default [
     children: [
       {
         icon: 'ios-briefcase',
-        name: 'xd-app/news',
+        name: 'xd-app/videos',
         title: '重阳画映',
         children: [
           {
             title: '短视频列表',
-            route: '/xd-app/news/news/videos/index'
+            route: '/xd-app/videos/videos/videos/index'
           }
         ]
       },

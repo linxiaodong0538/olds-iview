@@ -96,7 +96,7 @@
               <Uploader
                 :max-size="1024 * 50"
                 :preview-icon="`${$consts.BASE_URL}/images/video.png`"
-                :format="['mp4','wmv']"
+                :format="['mp4']"
                 :has-default-file="!!cForm.formValidate.file"
                 v-model="cForm.formValidate.file"
                 @change="handleUploaderChange" />

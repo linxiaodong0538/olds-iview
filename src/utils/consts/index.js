@@ -8,7 +8,7 @@ import NURSING_GRADES from './nursingGrades'
 import NOTICE_COLUMNS from './noticeColumns'
 
 // 基础地址
-const BASE_URL = 'https://www.rjwb.cn'
+const BASE_URL = 'https://www.rjwb.cn' // env.isDev() ? 'http://localhost:3002' : 'https://www.chongyangyanglao.com'
 
 // 接口地址
 const API_URL = BASE_URL + '/apis/v1'
