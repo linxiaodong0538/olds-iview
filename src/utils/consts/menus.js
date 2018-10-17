@@ -237,6 +237,10 @@ export default [
           {
             title: '老人列表',
             route: '/xd-app/olds/olds/olds/index'
+          },
+          {
+            title: '健康数据',
+            route: '/xd-app/olds/oldHealthRecords/oldHealthRecords/index'
           }
         ]
       },
