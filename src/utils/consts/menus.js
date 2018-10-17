@@ -238,28 +238,16 @@ export default [
       },
       {
         icon: 'ios-briefcase',
-        name: 'xd-app/my',
-        title: '我的',
+        name: 'xd-app/discover',
+        title: '发现',
         children: [
           {
             title: '家属列表',
-            route: '/xd-app/my/families/families/index'
+            route: '/xd-app/discover/families/families/index'
           },
           {
-            title: '我的消息',
-            route: '/website/news/news/articles/index'
-          },
-          {
-            title: '我的评论',
-            route: '/website/news/news/articles/index'
-          },
-          {
-            title: '意见反馈',
-            route: ''
-          },
-          {
-            title: '联系我们',
-            route: ''
+            title: '消息列表',
+            route: '/xd-app/discover/messages/messages/index'
           }
         ]
       }

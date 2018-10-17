@@ -11,6 +11,7 @@ import cars from './routes/cars'
 import staffs from './routes/staffs'
 import olds from './routes/olds'
 import families from './routes/families'
+import messages from './routes/messages'
 import notices from './routes/notices'
 import roles from './routes/roles'
 import permissions from './routes/permissions'
@@ -45,7 +46,8 @@ const router = new Router({
             permissions,
             settings,
             videos,
-            comments
+            comments,
+            messages
           ],
           meta: {
             requiresAuth: true

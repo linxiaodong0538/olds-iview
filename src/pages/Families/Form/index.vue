@@ -159,6 +159,7 @@
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             const { id, formValidate, alias } = this
+            console.log(this)
             const action = id ? 'putFamily' : 'postFamily'
 
             await this.$store.dispatch(action, {

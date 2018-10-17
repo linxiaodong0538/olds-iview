@@ -49,7 +49,7 @@
 
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.alias = this.$route.params.alias
-
+      console.log(1, this.$route.params)
       this.getItems()
     },
     components: {
