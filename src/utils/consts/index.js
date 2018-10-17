@@ -1,4 +1,4 @@
-import env from 'jt-env'
+// import env from 'jt-env'
 import MENUS from './menus'
 import ROLES from './roles'
 import ALIASES from './aliases'

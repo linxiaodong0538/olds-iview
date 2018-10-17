@@ -29,7 +29,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import time from '@/utils/time'
+  // import time from '@/utils/time'
   import consts from '@/utils/consts'
   import helpers from '@/utils/helpers/base'
   import List, { ListHeader, ListOperations } from '@/components/List'

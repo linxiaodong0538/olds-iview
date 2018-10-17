@@ -19,6 +19,7 @@ import categories from './modules/categories'
 import settings from './modules/settings'
 import relations from './modules/relations'
 import videos from './modules/videos'
+import messages from './modules/messages'
 
 Vue.use(Vuex)
 
@@ -45,6 +46,7 @@ export default new Vuex.Store({
     categories,
     settings,
     relations,
-    videos
+    videos,
+    messages
   }
 })
