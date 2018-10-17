@@ -7,19 +7,13 @@
       :current="cList.cPage.current"
       @on-change="handlePageChange">
       <ListHeader>
-        <ListOperations>
-          <Button
-            type="primary"
-            @click="handleShowPost">
-            新增
-          </Button>
-        </ListOperations>
         <ListSearch>
           <Form
             inline
             @submit.native.prevent="handleSearch">
             <Form-item prop="name">
               <PersonSelect
+                type="families"
                 placeholder="请选择评论人"
                 @change="handlePersonSelectChange" />
             </Form-item>
@@ -55,7 +49,12 @@
           label="@"
           prop="description">
           <Row>
-            <Col span="20">{{ cForm.formValidate.toUserId }}</Col>
+            <Col span="20">
+              <PersonLabel
+                :key="cForm.formValidate.toUserId"
+                type="families"
+                :id="cForm.formValidate.toUserId" />
+            </Col>
           </Row>
         </Form-item>
         <Form-item
@@ -92,8 +91,9 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import List, { ListHeader, ListSearch } from '@/components/List'
   import PersonSelect from '@/components/PersonSelect'
+  import PersonLabel from '@/components/PersonLabel'
 
   const module = 'comments'
 
@@ -101,9 +101,9 @@
     components: {
       List,
       ListHeader,
-      ListOperations,
       ListSearch,
-      PersonSelect
+      PersonSelect,
+      PersonLabel
     },
     data () {
       return {
@@ -114,7 +114,19 @@
               key: 'fromUserId',
               width: 120,
               render: (h, params) => {
-                return h('span', null, params.row.fromUserId || '重阳养老')
+                return h('span', null, [
+                  params.row.fromUserId
+                    ? h(
+                    PersonLabel,
+                    {
+                      props: {
+                        type: 'families',
+                        id: params.row.fromUserId
+                      }
+                    }
+                    )
+                    : '重阳养老'
+                ])
               }
             },
             {
@@ -122,7 +134,20 @@
               key: 'toUserId',
               width: 120,
               render: (h, params) => {
-                return h('span', null, '@' + (params.row.toUserId || '重阳养老'))
+                return h('span', null, [
+                  h('span', null, '@'),
+                  params.row.toUserId
+                    ? h(
+                    PersonLabel,
+                    {
+                      props: {
+                        type: 'families',
+                        id: params.row.toUserId
+                      }
+                    }
+                    )
+                    : '重阳养老'
+                ])
               }
             },
             {
@@ -222,8 +247,7 @@
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.cList.cSearch.where,
-            // order: JSON.stringify([['id', 'ASC']])
+            where: this.cList.cSearch.where
           }
         })
       },
