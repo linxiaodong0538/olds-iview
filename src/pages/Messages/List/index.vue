@@ -1,26 +1,44 @@
 <template>
   <div>
-    <List :current="cList.cPage.current" :data="list.items" :columns="cList.columns" :total="list.total" 
-          @on-change="handlePageChange">
+    <List 
+      :current="cList.cPage.current" 
+      :data="list.items" :columns="cList.columns" 
+      :total="list.total" 
+      @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary" @click="handleShowPost">
+          <Button 
+            class="margin-right-sm" 
+            type="primary" 
+            @click="handleShowPost">
             新增
           </Button>
         </ListOperations>
         <ListSearch>
-          <Form inline @submit.native.prevent="handleSearch">
+          <Form 
+            inline 
+            @submit.native.prevent="handleSearch">
             <Form-item prop="name">
-              <Input type="text" placeholder="请输入姓名" v-model="cList.cSearch.where.title.$like" style="width: 220px;"/></Input>
+              <Input 
+                type="text"
+                placeholder="请输入标题" 
+                v-model="cList.cSearch.where.title.$like" 
+                style="width: 220px;"/>
             </Form-item>
             <Form-item>
-              <Button type="primary" @click="handleSearch">查询</Button>
+              <Button 
+                type="primary" 
+                @click="handleSearch">查询</Button>
             </Form-item>
           </Form>
         </ListSearch>
       </ListHeader>
     </List>
-    <Modal width="280" v-model="cDel.modal" title="请确认" @on-ok="handleDelOk">
+    <Modal 
+      width="280" 
+      v-model="cDel.modal" 
+      title="请确认" 
+      @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
     
