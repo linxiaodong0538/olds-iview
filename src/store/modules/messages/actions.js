@@ -2,46 +2,35 @@ import types from './types'
 import Model from '../../../models/messages'
 
 export default {
-  /**
-   * 获取列表
-   */
-  getMessages ({ commit }, { query }) {
-    return new Model().GET({ query }).then((res) => {
-      commit(types.GET_MESSAGES, {
-        data: res.data
-      })
+  async getList ({ commit }, { query }) {
+    const res = await new Model().GET({ query })
+
+    commit(types.GET_LIST, {
+      data: res.data
     })
+
+    return res.data
   },
 
-  /**
-   * 获取详情
-   */
-  getMessage ({ commit }, { id }) {
-    return new Model().GET({ id }).then((res) => {
-      commit(types.GET_MESSAGE, {
-        data: res.data
-      })
+  async getDetail ({ commit }, { id }) {
+    const res = await new Model().GET({ id })
+
+    commit(types.GET_DETAIL, {
+      data: res.data
     })
+
+    return res.data
   },
 
-  /**
-   * 新增
-   */
-  postMessage ({ commit }, { body }) {
+  async post ({ commit }, { body }) {
     return new Model().POST({ body })
   },
 
-  /**
-   * 编辑
-   */
-  putMessage ({ commit }, { id, body }) {
+  async put ({ commit }, { id, body }) {
     return new Model().PUT({ id, body })
   },
 
-  /**
-   * 删除
-   */
-  delMessage ({ commit }, { id }) {
+  async del ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }

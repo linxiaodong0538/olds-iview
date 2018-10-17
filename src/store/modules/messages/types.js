@@ -1,6 +1,4 @@
-import helpers from 'jt-helpers'
-
-export default helpers.keyMirror({
-  GET_MESSAGES: null,
-  GET_MESSAGE: null
-})
+export default {
+  GET_LIST: 'messages/GET_LIST',
+  GET_DETAIL: 'messages/GET_DETAIL'
+}

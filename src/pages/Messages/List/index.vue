@@ -1,17 +1,17 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" 
+    <List :current="cList.cPage.current" :data="list.items" :columns="cList.columns" :total="list.total" 
           @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary">
+          <Button class="margin-right-sm" type="primary" @click="handleShowPost">
             新增
           </Button>
         </ListOperations>
         <ListSearch>
           <Form inline @submit.native.prevent="handleSearch">
             <Form-item prop="name">
-              <Input type="text" placeholder="请输入姓名" v-model="where.name.$like" style="width: 220px;"></Input>
+              <Input type="text" placeholder="请输入姓名" v-model="cList.cSearch.where.title.$like" style="width: 220px;"/></Input>
             </Form-item>
             <Form-item>
               <Button type="primary" @click="handleSearch">查询</Button>
@@ -20,23 +20,69 @@
         </ListSearch>
       </ListHeader>
     </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+    <Modal width="280" v-model="cDel.modal" title="请确认" @on-ok="handleDelOk">
       <p>确认删除？</p>
+    </Modal>
+    
+    <Modal
+      width="500"
+      v-model="cForm.modal"
+      :title="cForm.id ? '编辑' : '新增'">
+      <Form
+        ref="formValidate"
+        :model="cForm.formValidate"
+        :rules="cForm.ruleValidate"
+        :label-width="80">
+        <Form-item
+          label="标题"
+          prop="title">
+          <Row>
+            <Col span="20">
+              <Input
+                v-model="cForm.formValidate.title"
+                placeholder="请输入标题" />
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item
+          label="内容"
+          prop="content">
+          <Row>
+            <Col span="20">
+              <Input
+                v-model="cForm.formValidate.content"
+                type="textarea"
+                :rows="3"
+                placeholder="请输入内容" />
+            </Col>
+          </Row>
+        </Form-item>
+      </Form>
+      <div slot="footer">
+        <Button
+          type="text"
+          size="large"
+          @click="cForm.modal = false">
+          取消
+        </Button>
+        <Button
+          type="primary"
+          size="large"
+          @click="handleFormOk">
+          确定
+        </Button>
+      </div>
     </Modal>
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
-  import consts from '@/utils/consts'
-  import helpers from '@/utils/helpers/base'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
+  const module = 'messages'
+
   export default {
-    name: 'list',
-    async created () {
-      this.getItems()
-    },
     components: {
       List,
       ListHeader,
@@ -45,109 +91,169 @@
     },
     data () {
       return {
-        consts,
-        routePrefix: '',
-        alias: '',
-        del: {
+        cList: {
+          columns: [
+            {
+              title: '标题',
+              key: 'title'
+            },
+            {
+              title: '内容',
+              key: 'content',
+              width: 800
+            },
+            {
+              title: '推送时间',
+              key: 'pushTime',
+              width: 250
+            },
+            {
+              title: '操作',
+              key: 'action',
+              width: 200,
+              align: 'center',
+              render: (h, params) => {
+                return h(
+                  'ButtonGroup',
+                  [
+                    h(
+                      'Button',
+                      {
+                        props: {
+                          type: 'ghost'
+                        },
+                        on: {
+                          click: () => {
+                            console.log(params)
+                            this.handleShowPut(params.row)
+                          }
+                        }
+                      },
+                      '编辑'
+                    ),
+                    h(
+                      'Button',
+                      {
+                        props: {
+                          type: 'ghost'
+                        },
+                        on: {
+                          click: () => {
+                            this.handleShowDel(params.row.id)
+                          }
+                        }
+                      },
+                      '删除'
+                    )
+                  ])
+              }
+            }
+          ],
+          cSearch: {
+            where: {
+              title: {
+                $like: ''
+              }
+            }
+          },
+          cPage: {
+            current: 1
+          }
+        },
+        cDel: {
+          id: 0,
+          modal: false
+        },
+        cForm: {
+          id: 0,
           modal: false,
-          id: 0
-        },
-        where: {
-          name: {
-            $like: ''
+          formValidate: {},
+          ruleValidate: {
+            title: [
+              {
+                required: true,
+                message: '标题不能为空'
+              },
+              {
+                max: 100,
+                message: '标题不能多于 100 个字'
+              }
+            ],
+            content: [
+              {
+                required: true,
+                message: '内容不能为空'
+              }
+            ]
           }
-        },
-        columns: [
-          {
-            title: '标题',
-            key: 'title'
-          },
-          {
-            title: '内容',
-            key: 'content',
-            width: 800,
-            render (h, params) {
-              return h('span', null, params)
-            }
-          },
-          {
-            title: '推送时间',
-            key: 'pushTime',
-            width: 200,
-            render (h, params) {
-              return h('span', null, consts.GENDERS[params.row])
-            }
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 150,
-            render: (h, params) => {
-              return h('ButtonGroup', [
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      // this.$router.push(`${this.routePrefix}/olds/index/form/${params.row.id}`)
-                    }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.handleDel(params.row.id)
-                    }
-                  }
-                }, '删除')
-              ])
-            }
-          }
-        ]
+        }
       }
     },
-    computed: mapState([
-      'messages'
-    ]),
+    computed: mapState({
+      list: state => state[module].list
+    }),
+    created () {
+      this.getList()
+    },
     methods: {
-      getItems (current = 1) {
+      getList (current = 1) {
         this.current = current
-        return this.$store.dispatch('getMessages', {
+        return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * consts.PAGE_SIZE,
-            limit: consts.PAGE_SIZE,
-            where: { ...this.where, alias: this.alias }
+            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE,
+            where: this.cList.cSearch.where
           }
         })
       },
-      resetSearch () {
-        this.where.name.$like = ''
+      handleShowPost () {
+        this.cForm.modal = true
+        this.cForm.id = 0
+      },
+      handleShowPut (detail) {
+        this.cForm.id = detail.id
+        this.$set(this.cForm, 'formValidate', Object.assign({}, detail))
+        this.cForm.modal = true
+      },
+      handleShowDel (id) {
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       handlePageChange (current) {
-        this.getItems(current)
+        this.getList(current)
       },
       handleSearch () {
         this.current = 1
-        this.getItems()
+        this.getList()
       },
-      handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
+      resetFields () {
+        this.$refs.formValidate.resetFields()
       },
+
       async handleDelOk () {
-        await this.$store.dispatch('delOld', {
-          id: this.del.id
-        })
+        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
-        await helpers.sleep(500)
-        this.resetSearch()
-        this.getItems()
+        this.getList()
+      },
+      handleFormOk () {
+        this.$refs.formValidate.validate(async valid => {
+          if (valid) {
+            await this.$store.dispatch(
+              this.cForm.id ? `${module}/put` : `${module}/post`,
+              {
+                id: this.cForm.id || '0',
+                body: this.cForm.formValidate
+              }
+            )
+
+            this.cForm.modal = false
+            this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
+            !this.cForm.id && this.resetFields()
+            this.getList()
+          }
+        })
       }
+
     }
   }
 </script>
