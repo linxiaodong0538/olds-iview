@@ -1,18 +1,5 @@
 <template>
-  <Select
-    ref="select"
-    clearable
-    filterable
-    :placeholder="placeholder"
-    style="width: 220px"
-    @on-change="handleChange">
-    <Option
-      v-for="(item, index) in options"
-      :value="item.value"
-      :key="index">
-      {{ item.label }}
-    </Option>
-  </Select>
+  <span class="c-person-label">{{ label }}</span>
 </template>
 
 <script>
@@ -27,25 +14,25 @@
         type: String,
         default: 'olds'
       },
-      placeholder: {
-        type: String,
-        default: '请选择人员'
+      id: {
+        type: Number,
+        default: 0
       }
     },
     data () {
       return {
-        options: []
+        label: ''
       }
     },
     async created () {
-      await this.setOptions()
+      await this.setLabel()
     },
     methods: {
-      async setOptions () {
+      async setLabel () {
         const Model = ({ olds: OldsModel, families: FamiliesModel, staffs: StaffsModel })[this.type] || OldsModel
-        const getRes = await new Model().GET({ offset: 0, limit: 10000 })
+        const getRes = await new Model().GET({ id: this.id })
 
-        this.options = getRes.data.items.map(item => ({ value: item.id, label: item.name }))
+        this.label = getRes.data.name
       },
       handleChange (value) {
         this.$emit('change', value)
@@ -53,3 +40,8 @@
     }
   }
 </script>
+
+<style
+  lang="scss"
+  src="./styles/index.scss">
+</style>
