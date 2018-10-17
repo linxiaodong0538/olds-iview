@@ -207,6 +207,9 @@
             }
           ],
           cSearch: {
+            cache: {
+              where: {}
+            },
             where: {}
           },
           cPage: {
@@ -257,6 +260,7 @@
       },
       handleSearch () {
         this.cList.cPage.current = 1
+        this.cList.cSearch.where = Object.assign({}, this.cList.cSearch.cache.where)
         this.getList()
       },
       handlePageChange (current) {
@@ -288,7 +292,7 @@
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
             this.resetFields()
 
-            this.cList.cSearch.where = {
+            this.cList.cSearch.cache.where = {
               $or: [
                 {
                   fromUserId: toUserId,
@@ -306,7 +310,7 @@
         })
       },
       handlePersonSelectChange (value) {
-        this.cList.cSearch.where = {
+        this.cList.cSearch.cache.where = {
           $or: [
             {
               fromUserId: value,
