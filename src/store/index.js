@@ -20,6 +20,7 @@ import settings from './modules/settings'
 import relations from './modules/relations'
 import videos from './modules/videos'
 import messages from './modules/messages'
+import comments from './modules/comments'
 
 Vue.use(Vuex)
 
@@ -47,6 +48,7 @@ export default new Vuex.Store({
     settings,
     relations,
     videos,
-    messages
+    messages,
+    comments
   }
 })

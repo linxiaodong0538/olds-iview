@@ -222,6 +222,10 @@ export default [
           {
             title: '短视频列表',
             route: '/xd-app/videos/videos/videos/index'
+          },
+          {
+            title: '评论列表',
+            route: '/xd-app/videos/videos/comments/index'
           }
         ]
       },

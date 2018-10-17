@@ -19,10 +19,9 @@
             inline
             @submit.native.prevent="handleSearch">
             <Form-item prop="name">
-              <Input
-                placeholder="请输入标题"
-                style="width: 220px;"
-                v-model="cList.cSearch.where.title.$like" />
+              <PersonSelect
+                placeholder="请选择评论人"
+                @change="handlePersonSelectChange" />
             </Form-item>
             <Form-item>
               <Button
@@ -94,7 +93,7 @@
 <script>
   import { mapState } from 'vuex'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
-  import Uploader from '@/components/Uploader'
+  import PersonSelect from '@/components/PersonSelect'
 
   const module = 'comments'
 
@@ -104,7 +103,7 @@
       ListHeader,
       ListOperations,
       ListSearch,
-      Uploader
+      PersonSelect
     },
     data () {
       return {
@@ -147,7 +146,7 @@
                   'ButtonGroup',
                   [
                     params.row.fromUserId
-                    ? h(
+                      ? h(
                       'Button',
                       {
                         props: {
@@ -165,16 +164,16 @@
                     !params.row.fromUserId
                       ? h(
                       'Button',
-                        {
-                          props: {
-                            type: 'ghost'
-                          },
-                          on: {
-                            click: () => {
-                              this.handleShowDel(params.row.id)
-                            }
-                          }
+                      {
+                        props: {
+                          type: 'ghost'
                         },
+                        on: {
+                          click: () => {
+                            this.handleShowDel(params.row.id)
+                          }
+                        }
+                      },
                       '删除'
                       )
                       : null
@@ -183,11 +182,7 @@
             }
           ],
           cSearch: {
-            where: {
-              title: {
-                $like: ''
-              }
-            }
+            where: {}
           },
           cPage: {
             current: 1
@@ -199,7 +194,9 @@
         },
         cForm: {
           modal: false,
-          formValidate: {},
+          formValidate: {
+            fromUserId: 25
+          },
           ruleValidate: {
             content: [
               {
@@ -225,7 +222,7 @@
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.cList.cSearch.where
+            where: this.cList.cSearch.where,
             // order: JSON.stringify([['id', 'ASC']])
           }
         })
@@ -257,20 +254,46 @@
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            await this.$store.dispatch(
-              this.cForm.id ? `${module}/put` : `${module}/post`,
-              {
-                id: this.cForm.id || '0',
-                body: this.cForm.formValidate
-              }
-            )
+            const { toUserId, content } = this.cForm.formValidate
+
+            await this.$store.dispatch(`${module}/post`, {
+              body: { toUserId, content }
+            })
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            !this.cForm.id && this.resetFields()
+            this.resetFields()
+
+            this.cList.cSearch.where = {
+              $or: [
+                {
+                  fromUserId: toUserId,
+                  toUserId: null
+                },
+                {
+                  fromUserId: null,
+                  toUserId: toUserId
+                }
+              ]
+            }
+
             this.getList()
           }
         })
+      },
+      handlePersonSelectChange (value) {
+        this.cList.cSearch.where = {
+          $or: [
+            {
+              fromUserId: value,
+              toUserId: null
+            },
+            {
+              fromUserId: null,
+              toUserId: value
+            }
+          ]
+        }
       }
     }
   }

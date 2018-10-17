@@ -1,5 +1,5 @@
 import types from './types'
-import Model from '../../../models/videos'
+import Model from '../../../models/comments'
 
 export default {
   async getList ({ commit }, { query }) {
