@@ -1,18 +1,38 @@
 <template>
-  <Select
-    ref="select"
-    clearable
-    filterable
-    :placeholder="placeholder"
-    style="width: 220px"
-    @on-change="handleChange">
-    <Option
-      v-for="(item, index) in options"
-      :value="item.value"
-      :key="index">
-      {{ item.label }}
-    </Option>
-  </Select>
+  <span class="c-person-select">
+    <p
+      v-if="hasSelected && !!items.length"
+      v-for="(item, index) in selectedIds"
+      :key="index"
+      class="c-person-select__selected-item">
+      <ButtonGroup>
+        <Button
+          type="ghost"
+          title="点击查看详情"
+          @click="handleClickItem(item)">
+          {{ items | getItemById(item) | getValueByKey('name') }}
+        </Button>
+        <Button
+          type="ghost"
+          icon="android-close"
+          @click="handleClickRemoveItem(index)" />
+      </ButtonGroup>
+    </p>
+    <Select
+      ref="select"
+      clearable
+      filterable
+      :placeholder="placeholder"
+      style="width: 220px"
+      @on-change="handleChange">
+      <Option
+        v-for="(item, index) in items"
+        :value="item.id"
+        :key="index">
+        {{ item.name }}
+      </Option>
+    </Select>
+  </span>
 </template>
 
 <script>
@@ -27,29 +47,82 @@
         type: String,
         default: 'olds'
       },
+      alias: {
+        type: String,
+        default: 'olds'
+      },
       placeholder: {
         type: String,
         default: '请选择人员'
+      },
+      multiple: {
+        type: Boolean,
+        default: false
+      },
+      selected: {
+        type: Array,
+        default: null
       }
     },
     data () {
       return {
-        options: []
+        items: [],
+        selectedIds: []
+      }
+    },
+    computed: {
+      hasSelected () {
+        return !!this.selected
+      }
+    },
+    watch: {
+      selected () {
+        this.selectedIds = [...this.selected]
       }
     },
     async created () {
-      await this.setOptions()
+      const getListRes = await this.getList()
+      this.items = getListRes.data.items
     },
     methods: {
-      async setOptions () {
+      async getList () {
         const Model = ({ olds: OldsModel, families: FamiliesModel, staffs: StaffsModel })[this.type] || OldsModel
-        const getRes = await new Model().GET({ offset: 0, limit: 10000 })
-
-        this.options = getRes.data.items.map(item => ({ value: item.id, label: item.name }))
+        return new Model().GET({ offset: 0, limit: 10000 })
+      },
+      handleClickItem (id) {
+        this.$emit('click-item', this.alias, id)
+      },
+      handleClickRemoveItem (index) {
+        this.selectedIds.splice(index, 1)
+        this.$emit('change', this.selectedIds)
       },
       handleChange (value) {
-        this.$emit('change', value)
+        if (!value) return
+
+        const valueString = value.toString()
+
+        if (this.hasSelected) {
+          if (this.selectedIds.indexOf(valueString) !== -1) {
+            this.$Message.error('重复添加')
+          } else {
+            if (this.multiple) {
+              this.selectedIds.push(valueString)
+            } else {
+              this.selectedIds = [valueString]
+            }
+          }
+
+          this.$emit('change', this.selectedIds)
+          this.$refs.select.clearSingleSelect()
+        } else {
+          this.$emit('change', value)
+        }
       }
     }
   }
 </script>
+
+<style
+  lang="scss"
+  src="./styles/index.scss">
+</style>

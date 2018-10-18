@@ -1,0 +1,8 @@
+@import "../../../styles/utils/index";
+
+@include c(person-select) {
+  @include e(selected-item) {
+    display: block;
+    margin-bottom: 10px;
+  }
+}
