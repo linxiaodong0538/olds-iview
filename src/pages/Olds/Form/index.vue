@@ -20,8 +20,7 @@
             ref="uploader"
             :has-default-file="!!id"
             v-model="formValidate.picture"
-            @change="handleUploaderChange"
-          />
+            @change="handleUploaderChange" />
           （尺寸：1150x647）
         </Form-item>
         <Form-item
@@ -73,23 +72,25 @@
         <Form-item
           label="家属"
           prop="families">
-          <Persons
-            key="0"
+          <PersonSelect
             multiple
-            :get="handleGetPersons('families')"
-            @change="val => { handlePersonChange('families', val) }"
-            @click-name="id => { handleClickPerson('families', id) }"
-            v-model="formData.families" />
+            type="families"
+            alias="families"
+            placeholder="请选择家属"
+            :selected="formData.families"
+            @click-item="handleClickPersonSelectItem"
+            @change="val => { handlePersonSelectChange('families', val) }" />
         </Form-item>
         <Form-item
           label="护工"
           prop="carer">
-          <Persons
-            key="1"
-            :get="handleGetPersons('carers')"
-            @change="val => { handlePersonChange('carer', val) }"
-            @click-name="id => { handleClickPerson('carers', id) }"
-            v-model="formData.carer" />
+          <PersonSelect
+            type="staffs"
+            alias="carers"
+            placeholder="请选择护工"
+            :selected="formData.carer"
+            @click-item="handleClickPersonSelectItem"
+            @change="val => { handlePersonSelectChange('carer', val) }" />
         </Form-item>
         <Form-item
           label="既往病史"
@@ -139,7 +140,7 @@
             :min="0"
             :max="1000000"
             v-model="formValidate.care_fee"
-            style="width: 220px;"></InputNumber>
+            style="width: 220px;" />
           元
         </Form-item>
         <Form-item
@@ -149,7 +150,7 @@
             :min="0"
             :max="1000000"
             v-model="formValidate.petty_cash"
-            style="width: 220px;"></InputNumber>
+            style="width: 220px;" />
           元
         </Form-item>
         <Form-item
@@ -159,7 +160,7 @@
             :min="0"
             :max="1000000"
             v-model="formValidate.purchase_cost"
-            style="width: 220px;"></InputNumber>
+            style="width: 220px;" />
           元
         </Form-item>
         <Form-item
@@ -169,7 +170,7 @@
             :min="0"
             :max="1000000"
             v-model="formValidate.extra_meal_fee"
-            style="width: 220px;"></InputNumber>
+            style="width: 220px;" />
           元
         </Form-item>
         <Form-item
@@ -256,27 +257,18 @@
 
 <script>
   import { mapState } from 'vuex'
-  import routePrefixMixin from '@/mixins/routePrefix'
+  import routeParamsMixin from '@/mixins/routeParams'
   import Uploader from '@/components/Uploader'
-  import Persons from '@/components/Persons'
-  import StaffsModel from '@/models/staffs'
-  import FamiliesModel from '@/models/families'
+  import PersonSelect from '@/components/PersonSelect'
 
   const module = 'olds'
 
   export default {
-    async created () {
-      this.id = this.$route.params.id
-
-      this.id && this.getDetail(this.id)
-      this.id && this.$set(this.formData, 'families', await this.getRelations('olds,families', this.id))
-      this.id && this.$set(this.formData, 'carer', await this.getRelations('olds,carer', this.id))
-    },
     components: {
       Uploader,
-      Persons
+      PersonSelect
     },
-    mixins: [routePrefixMixin],
+    mixins: [routeParamsMixin],
     data () {
       return {
         id: '',
@@ -308,40 +300,61 @@
         }
       }
     },
+    computed: mapState({
+      detail: state => state[module].detail
+    }),
+    watch: {
+      detail: {
+        handler (newVal) {
+          console.log(newVal, 333)
+          const { id, ...others } = newVal
+          this.$set(this, 'formValidate', others)
+        }
+      }
+    },
     methods: {
-      handleDatePickerChange (key, value) {
-        this.formValidate[key] = value
-      },
       getDetail (id) {
         return this.$store.dispatch(`${module}/getDetail`, { id })
+      },
+      handleDatePickerChange (key, value) {
+        this.formValidate[key] = value
       },
       handleUploaderChange (file) {
         this.$set(this.formValidate, 'picture', file ? file.id : '')
       },
-      async getRelations (between, id) {
-        const getRelationsRes = await this.$store.dispatch('getRelations', {
+      handleClickPersonSelectItem (alias, id) {
+        window.open(
+          alias === 'families'
+            ? `/#/company-app/persons/families/families/index/form/${id}`
+            : `/#/company-app/persons/carers/staffs/index/form/${id}`
+        )
+      },
+      async getRelationsList (between, id) {
+        const getRelationsRes = await this.$store.dispatch('relations/getList', {
           query: {
             where: { between, resource1_id: id }
           }
         })
 
-        return getRelationsRes.data.resource2_ids
+        const ids = getRelationsRes.resource2_ids
+
+        return ids ? ids.split(',') : []
       },
       async putRelation (id) {
         const { families, carer } = this.formData
 
-        families && await this.$store.dispatch('putRelation', {
+        families && await this.$store.dispatch('relations/put', {
           body: {
             resource1_id: id,
-            resource2_ids: families,
+            resource2_ids: families.join(','),
             between: 'olds,families'
           }
         })
 
-        carer && await this.$store.dispatch('putRelation', {
+        carer && await this.$store.dispatch('relations/put', {
           body: {
             resource1_id: id,
-            resource2_ids: carer,
+            resource2_ids: carer.join(','),
             between: 'olds,carer'
           }
         })
@@ -350,14 +363,12 @@
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             const { id, formValidate, alias } = this
-            const action = id ? 'putOld' : 'postOld'
-
-            const putOrPostOldRes = await this.$store.dispatch(action, {
+            const postOrPutOldRes = await this.$store.dispatch(`${module}/${id ? 'put' : 'post'}`, {
               id,
               body: { ...formValidate, alias }
             })
 
-            await this.putRelation(id || putOrPostOldRes.data.id)
+            await this.putRelation(id || postOrPutOldRes.data.id)
 
             this.$Message.success((this.id ? '编辑' : '新增') + '成功！')
             !id && this.resetFields()
@@ -369,21 +380,7 @@
         this.$refs.uploader.remove()
         this.$set(this, 'formData', {})
       },
-      handleGetPersons (alias) {
-        return async () => {
-          const model = alias === 'families'
-            ? new FamiliesModel()
-            : new StaffsModel()
-          const getRes = await model.GET({
-            query: { offset: 0, limit: 1000, where: { alias } }
-          })
-
-          return getRes.data.items.length
-            ? getRes.data.items.map(item => ({ label: item.name, value: item.id, is_guardian: item.is_guardian }))
-            : []
-        }
-      },
-      handlePersonChange (key, value) {
+      handlePersonSelectChange (key, value) {
         this.$set(this.formData, key, value)
       },
       handleClickPerson (alias, id) {
@@ -392,18 +389,11 @@
           : `/#/company-app/persons/carers/staffs/index/form/${id}`)
       }
     },
-    computed: {
-      ...mapState([
-        'olds',
-        'relations'
-      ])
-    },
-    watch: {
-      'olds.old': {
-        handler (newVal) {
-          const { id, ...others } = newVal
-          this.$set(this, 'formValidate', others)
-        }
+    async created () {
+      if (this.id) {
+        this.getDetail(this.id)
+        this.$set(this.formData, 'families', await this.getRelationsList('olds,families', this.id))
+        this.$set(this.formData, 'carer', await this.getRelationsList('olds,carer', this.id))
       }
     }
   }

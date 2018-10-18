@@ -49,7 +49,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import routePrefixMixin from '@/mixins/routePrefix'
+  import routeParamsMixin from '@/mixins/routeParams'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
   const module = 'olds'
@@ -61,7 +61,7 @@
       ListOperations,
       ListSearch
     },
-    mixins: [routePrefixMixin],
+    mixins: [routeParamsMixin],
     data () {
       return {
         cList: {
