@@ -13,5 +13,7 @@ export default {
     Vue.filter('date', val => time.getDate(val))
     Vue.filter('birthday', val => idCard.birthday(val))
     Vue.filter('age', val => idCard.age(val))
+    Vue.filter('getItemById', helpers.getItemById)
+    Vue.filter('getValueByKey', (item, key) => item[key])
   }
 }
