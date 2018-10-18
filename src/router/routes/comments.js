@@ -3,7 +3,7 @@ export default {
   component: resolve => require(['@/pages/Comments'], resolve),
   children: [
     {
-      path: 'index',
+      path: ':videoId',
       component: resolve => require(['@/pages/Comments/List'], resolve)
     }
   ]
