@@ -1,6 +1,7 @@
 import time from 'jt-time'
-import helpers from '../utils/helpers/base'
-import consts from '../utils/consts'
+import helpers from '@/utils/helpers/base'
+import idCard from '@/utils/idCard'
+import consts from '@/utils/consts'
 
 export default {
   install (Vue) {
@@ -10,5 +11,7 @@ export default {
 
     Vue.filter('time', val => time.getTime(val))
     Vue.filter('date', val => time.getDate(val))
+    Vue.filter('birthday', val => idCard.birthday(val))
+    Vue.filter('age', val => idCard.age(val))
   }
 }

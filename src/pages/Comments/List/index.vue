@@ -42,7 +42,7 @@
 
     <Modal
       width="280"
-      v-model="cDel.modal"
+      v-model="cList.cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
@@ -224,13 +224,13 @@
             },
             where: {}
           },
+          cDel: {
+            id: 0,
+            modal: false
+          },
           cPage: {
             current: 1
           }
-        },
-        cDel: {
-          id: 0,
-          modal: false
         },
         cForm: {
           modal: false,
@@ -297,11 +297,11 @@
         this.cForm.modal = true
       },
       handleShowDel (id) {
-        this.cDel.id = id
-        this.cDel.modal = true
+        this.cList.cDel.id = id
+        this.cList.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
+        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
         this.$Message.success('删除成功！')
         this.getList()
       },
