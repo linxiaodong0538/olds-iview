@@ -192,7 +192,7 @@
         this.cList.cDel.id = id
       },
       async handleDelOk () {
-        await this.$store.dispatch(`${module}/del`, { id: this.del.id })
+        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
         this.$Message.success('删除成功！')
         await this.$helpers.sleep(500)
         this.resetSearch()
