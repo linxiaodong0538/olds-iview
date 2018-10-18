@@ -12,6 +12,7 @@ import staffs from './routes/staffs'
 import olds from './routes/olds'
 import families from './routes/families'
 import messages from './routes/messages'
+import oldHealthRecords from './routes/oldHealthRecords'
 import notices from './routes/notices'
 import roles from './routes/roles'
 import permissions from './routes/permissions'
@@ -47,7 +48,8 @@ const router = new Router({
             settings,
             videos,
             comments,
-            messages
+            messages,
+            oldHealthRecords
           ],
           meta: {
             requiresAuth: true

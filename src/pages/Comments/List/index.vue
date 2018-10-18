@@ -147,33 +147,33 @@
                   [
                     params.row.fromUserId
                       ? h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowPost(params.row)
+                        'Button',
+                        {
+                          props: {
+                            type: 'ghost'
+                          },
+                          on: {
+                            click: () => {
+                              this.handleShowPost(params.row)
+                            }
                           }
-                        }
-                      },
+                        },
                       '回复'
                       )
                       : null,
                     !params.row.fromUserId
                       ? h(
                       'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowDel(params.row.id)
+                        {
+                          props: {
+                            type: 'ghost'
+                          },
+                          on: {
+                            click: () => {
+                              this.handleShowDel(params.row.id)
+                            }
                           }
-                        }
-                      },
+                        },
                       '删除'
                       )
                       : null
@@ -222,7 +222,7 @@
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.cList.cSearch.where,
+            where: this.cList.cSearch.where
             // order: JSON.stringify([['id', 'ASC']])
           }
         })

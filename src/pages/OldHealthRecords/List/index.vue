@@ -15,21 +15,32 @@
           </Button>
         </ListOperations>
         <ListSearch>
-          <Form 
-            inline 
-            @submit.native.prevent="handleSearch">
-            <Form-item prop="name">
-              <Input 
-                type="text"
-                placeholder="请输入标题" 
-                v-model="cList.cSearch.where.title.$like" 
-                style="width: 220px;"/>
+          <Form
+          inline
+          @submit.native.prevent="handleSearch">
+            <Form-item>
+              <Select
+                ref="select"
+                clearable
+                filterable
+                style="width: 220px"
+                placeholder="请选择指标"
+                @on-change="handleIndicatorSelectChange">
+                <Option
+                v-for="(item, index) in $consts.HEALTH_INDICATORS"
+                :value="item.name"
+                :key="index">
+                {{ item.name }}
+                </Option>
+              </Select>
             </Form-item>
             <Form-item>
-              <Button 
-                type="primary" 
-                @click="handleSearch">查询</Button>
-            </Form-item>
+              <Button
+                type="primary"
+                @click="handleSearch">
+                查询
+              </Button>
+            </Form-item>    
           </Form>
         </ListSearch>
       </ListHeader>
@@ -52,26 +63,31 @@
         :rules="cForm.ruleValidate"
         :label-width="80">
         <Form-item
-          label="标题"
-          prop="title">
+          label="选择"
+          prop="indicator">
           <Row>
             <Col span="20">
-              <Input
-                v-model="cForm.formValidate.title"
-                placeholder="请输入标题" />
+              <Select 
+                v-model="cForm.formValidate.indicator" 
+                style="width:200px">
+                <Option 
+                  v-for="(item, index) in $consts.HEALTH_INDICATORS" 
+                  :value="index" 
+                  :key="index">
+                  {{ item.name}}({{item.unit}})
+                </Option>
+              </Select>
             </Col>
           </Row>
         </Form-item>
         <Form-item
-          label="内容"
-          prop="content">
+          label="值"
+          prop="value">
           <Row>
             <Col span="20">
               <Input
-                v-model="cForm.formValidate.content"
-                type="textarea"
-                :rows="3"
-                placeholder="请输入内容" />
+                v-model="cForm.formValidate.value"
+                placeholder="请输入值" />
             </Col>
           </Row>
         </Form-item>
@@ -98,7 +114,7 @@
   import { mapState } from 'vuex'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
-  const module = 'messages'
+  const module = 'oldHealthRecords'
 
   export default {
     components: {
@@ -112,18 +128,17 @@
         cList: {
           columns: [
             {
-              title: '标题',
-              key: 'title'
+              title: '指标',
+              key: 'indicator',
+              render: (h, params) => {
+                return h('span', null, this.$consts.HEALTH_INDICATORS[params.row.indicator].name +
+                `(${this.$consts.HEALTH_INDICATORS[params.row.indicator].unit})`)
+              }
             },
             {
-              title: '内容',
-              key: 'content',
-              width: 800
-            },
-            {
-              title: '推送时间',
-              key: 'pushTime',
-              width: 250
+              title: '值',
+              key: 'value',
+              width: 700
             },
             {
               title: '操作',
@@ -142,7 +157,6 @@
                         },
                         on: {
                           click: () => {
-                            console.log(params)
                             this.handleShowPut(params.row)
                           }
                         }
@@ -168,11 +182,7 @@
             }
           ],
           cSearch: {
-            where: {
-              title: {
-                $like: ''
-              }
-            }
+            where: {}
           },
           cPage: {
             current: 1
@@ -187,20 +197,14 @@
           modal: false,
           formValidate: {},
           ruleValidate: {
-            title: [
+            indicator: {
+              required: true,
+              message: '选项不能为空'
+            },
+            value: [
               {
                 required: true,
-                message: '标题不能为空'
-              },
-              {
-                max: 100,
-                message: '标题不能多于 100 个字'
-              }
-            ],
-            content: [
-              {
-                required: true,
-                message: '内容不能为空'
+                message: '值不能为空'
               }
             ]
           }
@@ -238,16 +242,32 @@
         this.cDel.modal = true
       },
       handlePageChange (current) {
+        this.cList.cPage.current = current
         this.getList(current)
       },
       handleSearch () {
-        this.current = 1
+        this.cList.cPage.current = 1
         this.getList()
       },
       resetFields () {
         this.$refs.formValidate.resetFields()
       },
-
+      handleIndicatorSelectChange (value) {
+        console.log(value)
+        this.cList.cSearch.where = {
+          $or: [
+            {
+              fromUserId: value,
+              toUserId: null
+            },
+            {
+              fromUserId: null,
+              toUserId: value
+            }
+          ]
+        }
+        this.getList()
+      },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
@@ -263,6 +283,7 @@
                 body: this.cForm.formValidate
               }
             )
+
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
             !this.cForm.id && this.resetFields()
