@@ -311,7 +311,7 @@
             const { toUserId, content } = this.cForm.formValidate
 
             await this.$store.dispatch(`${module}/post`, {
-              body: { toUserId, content }
+              body: { toUserId, content, resourceId: this.videoId }
             })
 
             this.cForm.modal = false
