@@ -253,7 +253,7 @@
                         },
                         on: {
                           click: () => {
-                            this.$router.push('/')
+                            this.$router.push(`/xd-app/videos/videos/comments/${params.row.id}`)
                           }
                         }
                       },
