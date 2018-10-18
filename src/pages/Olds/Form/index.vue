@@ -73,6 +73,7 @@
           label="家属"
           prop="families">
           <PersonSelect
+            key="families"
             multiple
             type="families"
             alias="families"
@@ -85,6 +86,7 @@
           label="护工"
           prop="carer">
           <PersonSelect
+            key="staffs"
             type="staffs"
             alias="carers"
             placeholder="请选择护工"
@@ -271,7 +273,6 @@
     mixins: [routeParamsMixin],
     data () {
       return {
-        id: '',
         personOptions: [],
         formValidate: {},
         formData: {},
@@ -306,7 +307,6 @@
     watch: {
       detail: {
         handler (newVal) {
-          console.log(newVal, 333)
           const { id, ...others } = newVal
           this.$set(this, 'formValidate', others)
         }
@@ -378,7 +378,10 @@
       resetFields () {
         this.$refs.formValidate.resetFields()
         this.$refs.uploader.remove()
-        this.$set(this, 'formData', {})
+        this.$set(this, 'formData', {
+          families: [],
+          carer: []
+        })
       },
       handlePersonSelectChange (key, value) {
         this.$set(this.formData, key, value)
@@ -394,6 +397,9 @@
         this.getDetail(this.id)
         this.$set(this.formData, 'families', await this.getRelationsList('olds,families', this.id))
         this.$set(this.formData, 'carer', await this.getRelationsList('olds,carer', this.id))
+      } else {
+        this.$set(this.formData, 'families', [])
+        this.$set(this.formData, 'carer', [])
       }
     }
   }
