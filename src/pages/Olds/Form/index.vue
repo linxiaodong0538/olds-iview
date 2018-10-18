@@ -363,12 +363,12 @@
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             const { id, formValidate, alias } = this
-            const postOrPutOldRes = await this.$store.dispatch(`${module}/${id ? 'put' : 'post'}`, {
+            const postOrPutRes = await this.$store.dispatch(`${module}/${id ? 'put' : 'post'}`, {
               id,
               body: { ...formValidate, alias }
             })
 
-            await this.putRelation(id || postOrPutOldRes.data.id)
+            await this.putRelation(id || postOrPutRes.data.id)
 
             this.$Message.success((this.id ? '编辑' : '新增') + '成功！')
             !id && this.resetFields()
@@ -385,11 +385,6 @@
       },
       handlePersonSelectChange (key, value) {
         this.$set(this.formData, key, value)
-      },
-      handleClickPerson (alias, id) {
-        window.open(alias === 'families'
-          ? `/#/company-app/persons/families/families/index/form/${id}`
-          : `/#/company-app/persons/carers/staffs/index/form/${id}`)
       }
     },
     async created () {
