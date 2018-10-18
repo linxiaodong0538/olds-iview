@@ -289,10 +289,10 @@
             })
 
             this.cForm.modal = false
-            this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
+            this.$Message.success('回复成功！')
             this.resetFields()
 
-            this.cList.cSearch.cache.where = {
+            this.cList.cSearch.where = {
               $or: [
                 {
                   fromUserId: toUserId,
