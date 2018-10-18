@@ -7,6 +7,14 @@
       :current="cList.cPage.current"
       @on-change="handlePageChange">
       <ListHeader>
+        <ListOperations>
+          <Button
+            class="margin-right-sm"
+            type="ghost"
+            @click="handleGoBack">
+            返回
+          </Button>
+        </ListOperations>
         <ListSearch>
           <Form
             inline
@@ -27,6 +35,9 @@
           </Form>
         </ListSearch>
       </ListHeader>
+      <ListNavigation>
+        <Alert>“{{ videoDetail.title }}”的评论列表：</Alert>
+      </ListNavigation>
     </List>
 
     <Modal
@@ -91,7 +102,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListSearch } from '@/components/List'
+  import List, { ListHeader, ListSearch, ListNavigation } from '@/components/List'
   import PersonSelect from '@/components/PersonSelect'
   import PersonLabel from '@/components/PersonLabel'
 
@@ -103,7 +114,8 @@
       ListHeader,
       ListSearch,
       PersonSelect,
-      PersonLabel
+      PersonLabel,
+      ListNavigation
     },
     data () {
       return {
@@ -237,26 +249,40 @@
       }
     },
     computed: mapState({
+      videoDetail: state => state.videos.detail,
       list: state => state[module].list
     }),
     created () {
+      this.init()
+      this.getVideoDetail()
       this.getList()
     },
     methods: {
+      init () {
+        this.videoId = this.$route.params.videoId
+      },
+      getVideoDetail () {
+        return this.$store.dispatch('videos/getDetail', { id: this.videoId })
+      },
       getList (current = 1) {
+        const where = Object.assign({}, this.cList.cSearch.where, { resourceId: this.videoId })
+
         this.cList.cPage.current = current
 
         return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.cList.cSearch.where
+            where
           }
         })
       },
       resetFields () {
         this.$refs.formValidate.resetFields()
         this.$set(this.cForm, 'formValidate', {})
+      },
+      handleGoBack () {
+        window.history.go(-1)
       },
       handleSearch () {
         this.cList.cPage.current = 1
