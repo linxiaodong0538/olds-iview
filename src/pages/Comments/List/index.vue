@@ -36,7 +36,7 @@
         </ListSearch>
       </ListHeader>
       <ListNavigation>
-        <Alert>“{{ videoDetail.title }}”的评论列表：</Alert>
+        <Alert>“{{ videosDetail.title }}”的评论列表：</Alert>
       </ListNavigation>
     </List>
 
@@ -249,19 +249,19 @@
       }
     },
     computed: mapState({
-      videoDetail: state => state.videos.detail,
+      videosDetail: state => state.videos.detail,
       list: state => state[module].list
     }),
     created () {
       this.init()
-      this.getVideoDetail()
+      this.getVideosDetail()
       this.getList()
     },
     methods: {
       init () {
         this.videoId = this.$route.params.videoId
       },
-      getVideoDetail () {
+      getVideosDetail () {
         return this.$store.dispatch('videos/getDetail', { id: this.videoId })
       },
       getList (current = 1) {
