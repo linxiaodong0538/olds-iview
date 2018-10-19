@@ -1,6 +1,4 @@
-import helpers from 'jt-helpers'
-
-export default helpers.keyMirror({
-  GET_STAFFS: null,
-  GET_STAFF: null
-})
+export default {
+  GET_LIST: 'staffs/GET_LIST',
+  GET_DETAIL: 'staffs/GET_DETAIL'
+}

@@ -312,31 +312,28 @@
         }
       }
     },
+    async created () {
+      if (this.id) {
+        this.getDetail(this.id)
+        this.$set(this.formData, 'families', await this.getRelationsList('olds,families', this.id))
+        this.$set(this.formData, 'carer', await this.getRelationsList('olds,carer', this.id))
+      } else {
+        this.$set(this.formData, 'families', [])
+        this.$set(this.formData, 'carer', [])
+      }
+    },
     methods: {
       getDetail (id) {
         return this.$store.dispatch(`${module}/getDetail`, { id })
       },
-      handleDatePickerChange (key, value) {
-        this.formValidate[key] = value
-      },
-      handleUploaderChange (file) {
-        this.$set(this.formValidate, 'picture', file ? file.id : '')
-      },
-      handleClickPersonSelectItem (alias, id) {
-        window.open(
-          alias === 'families'
-            ? `/#/company-app/persons/families/families/index/form/${id}`
-            : `/#/company-app/persons/carers/staffs/index/form/${id}`
-        )
-      },
       async getRelationsList (between, id) {
-        const getRelationsRes = await this.$store.dispatch('relations/getList', {
+        const getRelationsListRes = await this.$store.dispatch('relations/getList', {
           query: {
             where: { between, resource1_id: id }
           }
         })
 
-        const ids = getRelationsRes.resource2_ids
+        const ids = getRelationsListRes.resource2_ids
 
         return ids ? ids.split(',') : []
       },
@@ -358,6 +355,19 @@
             between: 'olds,carer'
           }
         })
+      },
+      handleDatePickerChange (key, value) {
+        this.formValidate[key] = value
+      },
+      handleUploaderChange (file) {
+        this.$set(this.formValidate, 'picture', file ? file.id : '')
+      },
+      handleClickPersonSelectItem (alias, id) {
+        window.open(
+          alias === 'families'
+            ? `/#/company-app/persons/families/families/index/form/${id}`
+            : `/#/company-app/persons/carers/staffs/index/form/${id}`
+        )
       },
       handleSave () {
         this.$refs.formValidate.validate(async valid => {
@@ -385,16 +395,6 @@
       },
       handlePersonSelectChange (key, value) {
         this.$set(this.formData, key, value)
-      }
-    },
-    async created () {
-      if (this.id) {
-        this.getDetail(this.id)
-        this.$set(this.formData, 'families', await this.getRelationsList('olds,families', this.id))
-        this.$set(this.formData, 'carer', await this.getRelationsList('olds,carer', this.id))
-      } else {
-        this.$set(this.formData, 'families', [])
-        this.$set(this.formData, 'carer', [])
       }
     }
   }

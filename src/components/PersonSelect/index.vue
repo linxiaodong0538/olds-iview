@@ -86,7 +86,12 @@
     },
     methods: {
       async getList () {
-        const Model = ({ olds: OldsModel, families: FamiliesModel, staffs: StaffsModel })[this.type] || OldsModel
+        const Model = ({
+          olds: OldsModel,
+          families: FamiliesModel,
+          staffs: StaffsModel
+        })[this.type] || OldsModel
+
         return new Model().GET({ offset: 0, limit: 10000 })
       },
       handleClickItem (id) {
