@@ -128,7 +128,7 @@
               render: (h, params) => {
                 return h('span', null, [
                   params.row.fromUserId
-                    ? h(
+                  ? h(
                     PersonLabel,
                     {
                       props: {
@@ -149,7 +149,7 @@
                 return h('span', null, [
                   h('span', null, '@'),
                   params.row.toUserId
-                    ? h(
+                  ? h(
                     PersonLabel,
                     {
                       props: {

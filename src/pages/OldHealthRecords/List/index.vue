@@ -25,10 +25,10 @@
                 filterable
                 style="width: 220px"
                 placeholder="请选择指标"
-                @on-change="handleIndicatorSelectChange">
+                v-model="cList.cSearch.where.indicator.$like">
                 <Option
                 v-for="(item, index) in $consts.HEALTH_INDICATORS"
-                :value="item.name"
+                :value="index"
                 :key="index">
                 {{ item.name }}
                 </Option>
@@ -182,7 +182,11 @@
             }
           ],
           cSearch: {
-            where: {}
+            where: {
+              indicator: {
+                $like: ''
+              }
+            }
           },
           cPage: {
             current: 1
@@ -246,28 +250,16 @@
         this.getList(current)
       },
       handleSearch () {
+        console.log(this.cList.cSearch.where)
         this.cList.cPage.current = 1
         this.getList()
       },
       resetFields () {
         this.$refs.formValidate.resetFields()
       },
-      handleIndicatorSelectChange (value) {
-        console.log(value)
-        this.cList.cSearch.where = {
-          $or: [
-            {
-              fromUserId: value,
-              toUserId: null
-            },
-            {
-              fromUserId: null,
-              toUserId: value
-            }
-          ]
-        }
-        this.getList()
-      },
+      // handleIndicatorSelectChange (value) {
+      //   this.getList()
+      // },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
