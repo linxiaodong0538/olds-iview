@@ -38,7 +38,7 @@
 
     <Modal
       width="280"
-      v-model="cDel.modal"
+      v-model="cList.cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
@@ -228,66 +228,48 @@
               key: 'action',
               width: 330,
               render: (h, params) => {
-                return h(
-                  'ButtonGroup',
-                  [
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowVideoViewer(params.row.file)
-                          }
-                        }
-                      },
-                      '查看短视频'
-                    ),
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.$router.push(`/xd-app/videos/videos/comments/${params.row.id}`)
-                          }
-                        }
-                      },
-                      '查看评论'
-                    ),
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowPut(params.row)
-                          }
-                        }
-                      },
-                      '编辑'
-                    ),
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowDel(params.row.id)
-                          }
-                        }
-                      },
-                      '删除'
-                    )
-                  ])
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowVideoViewer(params.row.file)
+                      }
+                    }
+                  }, '查看短视频'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`/xd-app/videos/videos/comments/${params.row.id}`)
+                      }
+                    }
+                  }, '查看评论'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowPut(params.row)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowDel(params.row.id)
+                      }
+                    }
+                  }, '删除')
+                ])
               }
             }
           ],
@@ -298,15 +280,15 @@
               }
             }
           },
+          cDel: {
+            id: 0,
+            modal: false
+          },
           cPage: {
             current: 1
           }
         },
         cVideoViewer: {
-          id: 0,
-          modal: false
-        },
-        cDel: {
           id: 0,
           modal: false
         },
@@ -380,8 +362,8 @@
         this.cForm.modal = true
       },
       handleShowDel (id) {
-        this.cDel.id = id
-        this.cDel.modal = true
+        this.cList.cDel.id = id
+        this.cList.cDel.modal = true
       },
       handleShowVideoViewer (file) {
         this.cVideoViewer.id = file
@@ -393,20 +375,17 @@
         }
       },
       async handleDelOk () {
-        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
+        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
         this.$Message.success('删除成功！')
         this.getList()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            await this.$store.dispatch(
-              this.cForm.id ? `${module}/put` : `${module}/post`,
-              {
-                id: this.cForm.id || '0',
-                body: this.cForm.formValidate
-              }
-            )
+            await this.$store.dispatch(this.cForm.id ? `${module}/put` : `${module}/post`, {
+              id: this.cForm.id,
+              body: this.cForm.formValidate
+            })
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
