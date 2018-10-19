@@ -1,10 +1,10 @@
 import types from './types'
 
 export default {
-  [types.GET_ROLES] (state, payload) {
-    state.roles = payload.data
+  [types.GET_LIST] (state, payload) {
+    state.list = payload.data
   },
-  [types.GET_ROLE] (state, payload) {
-    state.role = payload.data
+  [types.GET_DETAIL] (state, payload) {
+    state.detail = payload.data
   }
 }

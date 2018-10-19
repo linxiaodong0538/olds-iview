@@ -1,43 +1,91 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="staffs.staffs.items" :total="staffs.staffs.total"
-          @on-change="handlePageChange">
+    <List
+      :columns="cList.columns"
+      :data="list.items"
+      :total="list.total"
+      :current="cList.cPage.current"
+      @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary"
-                  @click="$router.push(`${routePrefix}/staffs/index/form`)">新增
+          <Button
+            class="margin-right-sm"
+            type="primary"
+            @click="$router.push(`${routePrefix}/staffs/index/form`)">
+            新增
           </Button>
         </ListOperations>
         <ListSearch>
-          <Form inline @submit.native.prevent="handleSearch">
+          <Form
+            inline
+            @submit.native.prevent="handleSearch">
             <Form-item prop="name">
-              <Input type="text" placeholder="请输入姓名" v-model="where.name.$like" style="width: 220px;"></Input>
+              <Input
+                type="text"
+                placeholder="请输入姓名"
+                v-model="where.name.$like"
+                style="width: 220px;" />
             </Form-item>
             <Form-item>
-              <Button type="primary" @click="handleSearch">查询</Button>
+              <Button
+                type="primary"
+                @click="handleSearch">
+                查询
+              </Button>
             </Form-item>
           </Form>
         </ListSearch>
       </ListHeader>
     </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+    <Modal
+      width="280"
+      v-model="del.modal"
+      title="请确认"
+      @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    <Modal width="400" v-model="setRole.modal" title="设置角色">
-      <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-        <Form-item label="角色" prop="title">
+    <Modal
+      width="400"
+      v-model="setRole.modal"
+      title="设置角色">
+      <Form
+        ref="formValidate"
+        :model="formValidate"
+        :rules="ruleValidate"
+        :label-width="80">
+        <Form-item
+          label="角色"
+          prop="title">
           <Row>
             <Col span="20">
-              <Select placeholder="请选择角色" clearable v-model="formValidate.role" style="width:200px">
-                <Option v-for="item in roles.roles.items" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              <Select
+                placeholder="请选择角色"
+                clearable
+                v-model="formValidate.role"
+                style="width:200px">
+                <Option
+                  v-for="item in roles.roles.items"
+                  :value="item.id"
+                  :key="item.id">{{ item.name }}
+                </Option>
               </Select>
             </Col>
           </Row>
         </Form-item>
       </Form>
       <div slot="footer">
-        <Button type="text" size="large" @click="setRole.modal = false">取消</Button>
-        <Button type="primary" size="large" @click="handleFormOk">确定</Button>
+        <Button
+          type="text"
+          size="large"
+          @click="setRole.modal = false">
+          取消
+        </Button>
+        <Button
+          type="primary"
+          size="large"
+          @click="handleFormOk">
+          确定
+        </Button>
       </div>
     </Modal>
 
@@ -46,12 +94,10 @@
 
 <script>
   import { mapState } from 'vuex'
-  import consts from '@/utils/consts'
-  import helpers from '@/utils/helpers/base'
+  import routeParamsMixin from '@/mixins/routeParams'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
   export default {
-    name: 'list',
     async beforeRouteUpdate (to, from, next) {
       this.staffs.staffs = {}
       this.roles.roles = {}
@@ -80,10 +126,9 @@
       ListOperations,
       ListSearch
     },
+    mixins: [routeParamsMixin],
     data () {
       return {
-        consts,
-        routePrefix: '',
         setRole: {
           id: 0,
           modal: false
@@ -125,8 +170,8 @@
             title: '性别',
             key: 'gender',
             width: 80,
-            render (h, params) {
-              return h('span', null, consts.GENDERS[params.row.gender])
+            render: (h, params) => {
+              return h('span', null, this.$consts.GENDERS[params.row.gender])
             }
           },
           {
@@ -221,8 +266,8 @@
 
         return this.$store.dispatch('getStaffs', {
           query: {
-            offset: (current - 1) * consts.PAGE_SIZE,
-            limit: consts.PAGE_SIZE,
+            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE,
             where: this.where
           }
         })
