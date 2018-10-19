@@ -1,26 +1,46 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="families.families.items" :total="families.families.total"
-          @on-change="handlePageChange">
+    <List
+      :columns="cList.columns"
+      :data="list.items"
+      :total="list.total"
+      :current="cList.cPage.current"
+      @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary"
-                  @click="$router.push(`${routePrefix}/families/index/form`)">新增
+          <Button
+            class="margin-right-sm"
+            type="primary"
+            @click="$router.push(`${routePrefix}/families/index/form`)">
+            新增
           </Button>
         </ListOperations>
         <ListSearch>
-          <Form inline @submit.native.prevent="handleSearch">
+          <Form
+            inline
+            @submit.native.prevent="handleSearch">
             <Form-item prop="name">
-              <Input type="text" placeholder="请输入姓名" v-model="where.name.$like" style="width: 220px;"></Input>
+              <Input
+                type="text"
+                placeholder="请输入姓名"
+                v-model="cList.cSearch.cache.where.name.$like"
+                style="width: 220px;" />
             </Form-item>
             <Form-item>
-              <Button type="primary" @click="handleSearch">查询</Button>
+              <Button
+                type="primary"
+                @click="handleSearch">查询
+              </Button>
             </Form-item>
           </Form>
         </ListSearch>
       </ListHeader>
     </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+    <Modal
+      width="280"
+      v-model="cList.cDel.modal"
+      title="请确认"
+      @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
   </div>
@@ -28,168 +48,173 @@
 
 <script>
   import { mapState } from 'vuex'
-  import consts from '@/utils/consts'
-  import helpers from '@/utils/helpers/base'
+  import routeParamsMixin from '@/mixins/routeParams'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
+  const module = 'families'
+
   export default {
-    name: 'list',
-    async beforeRouteUpdate (to, from, next) {
-      this.families.families = {}
-
-      this.routePrefix = helpers.getRoutePrefix(to.params)
-      this.alias = to.params.alias
-
-      this.getItems()
-
-      next()
-    },
-    async created () {
-      this.families.families = {}
-
-      this.routePrefix = helpers.getRoutePrefix(this.$route.params)
-      this.alias = this.$route.params.alias
-
-      this.getItems()
-    },
     components: {
       List,
       ListHeader,
       ListOperations,
       ListSearch
     },
+    mixins: [routeParamsMixin],
     data () {
       return {
-        consts,
-        routePrefix: '',
-        alias: '',
-        del: {
-          modal: false,
-          id: 0
-        },
-        where: {
-          name: {
-            $like: ''
-          }
-        },
-        columns: [
-          {
-            title: '姓名',
-            key: 'name',
-            render (h, params) {
-              return h('span', null, params.row.name + (params.row.is_guardian ? '（监护人）' : ''))
-            }
-          },
-          {
-            title: '身份证',
-            key: 'card_id',
-            width: 160,
-            render (h, params) {
-              return h('span', null, params.row.id_card)
-            }
-          },
-          {
-            title: '性别',
-            key: 'gender',
-            width: 80,
-            render (h, params) {
-              return h('span', null, consts.GENDERS[params.row.gender])
-            }
-          },
-          {
-            title: '联系电话',
-            key: 'telephone',
-            width: 120,
-            render (h, params) {
-              return h('span', null, params.row.telephone)
-            }
-          },
-          {
-            title: '老人入院编号',
-            key: 'job',
-            width: 140,
-            render (h, params) {
-              return h('span', null, params.row.olds)
-            }
-          },
-          {
-            title: '与老人关系',
-            key: 'relation',
-            width: 120,
-            render (h, params) {
-              return h('span', null, params.row.relation)
-            }
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 150,
-            render: (h, params) => {
-              return h('ButtonGroup', [
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.$router.push(`${this.routePrefix}/families/index/form/${params.row.id}`)
+        cList:{
+          columns: [
+            {
+              title: '姓名',
+              key: 'name',
+              render (h, params) {
+                return h('span', null, params.row.name + (params.row.is_guardian ? '（监护人）' : ''))
+              }
+            },
+            {
+              title: '身份证',
+              key: 'card_id',
+              width: 160,
+              render (h, params) {
+                return h('span', null, params.row.id_card)
+              }
+            },
+            {
+              title: '性别',
+              key: 'gender',
+              width: 80,
+              render (h, params) {
+                return h('span', null, this.$consts.GENDERS[params.row.gender])
+              }
+            },
+            {
+              title: '联系电话',
+              key: 'telephone',
+              width: 120,
+              render (h, params) {
+                return h('span', null, params.row.telephone)
+              }
+            },
+            {
+              title: '老人入院编号',
+              key: 'job',
+              width: 140,
+              render (h, params) {
+                return h('span', null, params.row.olds)
+              }
+            },
+            {
+              title: '与老人关系',
+              key: 'relation',
+              width: 120,
+              render (h, params) {
+                return h('span', null, params.row.relation)
+              }
+            },
+            {
+              title: '操作',
+              key: 'action',
+              width: 150,
+              render: (h, params) => {
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`${this.routePrefix}/families/index/form/${params.row.id}`)
+                      }
                     }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.handleDel(params.row.id)
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowDel(params.row.id)
+                      }
                     }
-                  }
-                }, '删除')
-              ])
+                  }, '删除')
+                ])
+              }
             }
+          ],
+          cSearch: {
+            cache: {
+              where: {
+                name: {
+                  $like: ''
+                }
+              }
+            },
+            where: {
+              name: {
+                $like: ''
+              }
+            }
+          },
+          cDel: {
+            id: 0,
+            modal: false
+          },
+          cPage: {
+            current: 1
           }
-        ]
+        }
       }
     },
-    computed: mapState([
-      'families'
-    ]),
-    methods: {
-      getItems (current = 1) {
-        this.current = current
+    computed: mapState({
+      list: state => state[module].list
+    }),
+    async beforeRouteUpdate (to, from, next) {
+      this.list = {}
+      this.getList()
 
-        return this.$store.dispatch('getFamilies', {
+      next()
+    },
+    async created () {
+      this.list = {}
+      this.getList()
+    },
+    methods: {
+      getList (current = 1) {
+        this.cList.cPage.current = current
+
+        return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * consts.PAGE_SIZE,
-            limit: consts.PAGE_SIZE,
-            where: { ...this.where, alias: this.alias }
+            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE,
+            where: {
+              ...this.cList.cSearch.where,
+              alias: this.alias
+            }
           }
         })
       },
       resetSearch () {
-        this.where.name.$like = ''
+        this.cList.cSearch.where.name.$like = ''
       },
       handlePageChange (current) {
-        this.getItems(current)
+        this.getList(current)
       },
       handleSearch () {
-        this.current = 1
-        this.getItems()
+        this.cList.cPage.current = 1
+        this.cList.cSearch.where = Object.assign({}, this.cList.cSearch.cache.where)
+        this.getList()
       },
-      handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
+      handleShowDel (id) {
+        this.cList.cDel.modal = true
+        this.cList.cDel.id = id
       },
       async handleDelOk () {
-        await this.$store.dispatch('delFamily', {
-          id: this.del.id
-        })
+        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
         this.$Message.success('删除成功！')
-        // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
-        await helpers.sleep(500)
+        await this.$helpers.sleep(500)
         this.resetSearch()
-        this.getItems()
+        this.getList()
       }
     }
   }
