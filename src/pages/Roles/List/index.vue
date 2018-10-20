@@ -1,29 +1,59 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="roles.roles.items" :total="roles.roles.total"
-          @on-change="handlePageChange">
+    <List
+      :columns="cList.columns"
+      :data="list.items"
+      :total="list.total"
+      :current="cList.cPage.current"
+      @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button class="margin-right-sm" type="primary" @click="handlePost">新增</Button>
+          <Button
+            class="margin-right-sm"
+            type="primary"
+            @click="handlePost">
+            新增
+          </Button>
         </ListOperations>
       </ListHeader>
     </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+    <Modal
+      width="280"
+      v-model="cForm.cDel.modal"
+      title="请确认"
+      @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    <Modal width="500" v-model="formModal" :title="put.id ? '编辑' : '新增'">
-      <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-        <Form-item label="名称" prop="name">
+    <Modal
+      width="500"
+      v-model="formModal"
+      :title="put.id ? '编辑' : '新增'">
+      <Form
+        ref="formValidate"
+        :model="formValidate"
+        :rules="ruleValidate"
+        :label-width="80">
+        <Form-item
+          label="名称"
+          prop="name">
           <Row>
             <Col span="20">
-              <Input v-model="formValidate.name" placeholder="请输入名称"></Input>
+              <Input
+                v-model="formValidate.name"
+                placeholder="请输入名称" />
             </Col>
           </Row>
         </Form-item>
-        <Form-item label="描述" prop="description">
+        <Form-item
+          label="描述"
+          prop="description">
           <Row>
             <Col span="20">
-              <Input v-model="formValidate.description" type="textarea" :rows="3" placeholder="请输入描述"></Input>
+              <Input
+                v-model="formValidate.description"
+                type="textarea"
+                :rows="3"
+                placeholder="请输入描述" />
             </Col>
           </Row>
         </Form-item>
@@ -47,8 +77,18 @@
         </Form-item>
       </Form>
       <div slot="footer">
-        <Button type="text" size="large" @click="formModal = false">取消</Button>
-        <Button type="primary" size="large" @click="handleFormOk">确定</Button>
+        <Button
+          type="text"
+          size="large"
+          @click="formModal = false">
+          取消
+        </Button>
+        <Button
+          type="primary"
+          size="large"
+          @click="handleFormOk">
+          确定
+        </Button>
       </div>
     </Modal>
   </div>
@@ -56,156 +96,155 @@
 
 <script>
   import { mapState } from 'vuex'
-  import consts from '@/utils/consts'
-  import helpers from '@/utils/helpers/base'
+  import routeParamsMixin from '@/mixins/routeParams'
   import List, { ListHeader, ListOperations } from '@/components/List'
 
   export default {
-    name: 'list',
-    async beforeRouteUpdate (to, from, next) {
-      this.roles.roles = {}
-      this.permissions.permissions = {}
-
-      this.routePrefix = helpers.getRoutePrefix(to.params)
-      this.alias = to.params.alias
-
-      this.getItems()
-
-      next()
-    },
-    async created () {
-      this.roles.roles = {}
-      this.permissions.permissions = {}
-
-      this.routePrefix = helpers.getRoutePrefix(this.$route.params)
-      this.alias = this.$route.params.alias
-
-      await this.getPermissionItems()
-      await this.getItems()
-    },
     components: {
       List,
       ListHeader,
       ListOperations
     },
+    mixins: [routeParamsMixin],
     data () {
       return {
-        consts,
-        routePrefix: '',
-        alias: '',
-        formModal: false,
-        formValidate: {
-          name: '',
-          description: ''
-        },
-        formData: {
-          permissions: {}
-        },
-        ruleValidate: {
-          name: [
+        cList: {
+          columns: [
             {
-              required: true,
-              message: '名称不能为空'
+              title: '名称',
+              key: 'name'
             },
             {
-              max: 100,
-              message: '名称不能多于 100 个字'
-            }
-          ]
-        },
-        put: {
-          id: 0
-        },
-        del: {
-          modal: false,
-          id: 0
-        },
-        columns: [
-          {
-            title: '名称',
-            key: 'name'
-          },
-          {
-            title: '权限',
-            width: 300,
-            render: (h, params) => {
-              const { items } = this.permissions.permissions
-              const permissions = params.row.permissions.split(',').reverse().map(code => {
-                const item = helpers.getItem(items, 'code', code)
-                return item.name || ''
-              }).filter(item => item !== '').join('、')
+              title: '权限',
+              width: 300,
+              render: (h, params) => {
+                const { items } = this.permissions.permissions
+                const permissions = params.row.permissions.split(',').reverse().map(code => {
+                  const item = helpers.getItem(items, 'code', code)
+                  return item.name || ''
+                }).filter(item => item !== '').join('、')
 
-              return h('span', null, permissions)
+                return h('span', null, permissions)
+              }
+            },
+            {
+              title: '描述',
+              width: 300,
+              render (h, params) {
+                return h('span', null, params.row.description)
+              }
+            },
+            {
+              title: '操作',
+              key: 'action',
+              width: 150,
+              render: (h, params) => {
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handlePut(params.row.id)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleDel(params.row.id)
+                      }
+                    }
+                  }, '删除')
+                ])
+              }
+            }
+          ],
+          cSearch: {
+            where: {
+              title: {
+                $like: ''
+              }
             }
           },
-          {
-            title: '描述',
-            width: 300,
-            render (h, params) {
-              return h('span', null, params.row.description)
-            }
+          cDel: {
+            id: 0,
+            modal: false
           },
-          {
-            title: '操作',
-            key: 'action',
-            width: 150,
-            render: (h, params) => {
-              return h('ButtonGroup', [
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.handlePut(params.row.id)
-                    }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.handleDel(params.row.id)
-                    }
-                  }
-                }, '删除')
-              ])
-            }
+          cPage: {
+            current: 1
           }
-        ]
+        },
+
+        cForm: {
+          id: 0,
+          modal: false,
+          formValidate: {},
+          ruleValidate: {
+            name: [
+              {
+                required: true,
+                message: '名称不能为空'
+              },
+              {
+                max: 100,
+                message: '名称不能多于 100 个字'
+              }
+            ]
+          }
+        },
+
+        formData: {
+          permissions: {}
+        }
       }
     },
-    computed: mapState([
-      'roles',
-      'permissions'
-    ]),
-    methods: {
-      getItems (current = 1) {
-        this.current = current
+    computed: mapState({
+      list: state => state[module].list,
+      permissionsList: state => state.permissions.list
+    }),
+    async beforeRouteUpdate (to, from, next) {
+      this.list = {}
+      this.permissionslist = {}
 
-        return this.$store.dispatch('getRoles', {
+      await this.getPermissionsList()
+      await this.getList()
+
+      next()
+    },
+    async created () {
+      this.list = {}
+      this.permissionslist = {}
+
+      await this.getPermissionsList()
+      await this.getList()
+    },
+    methods: {
+      getList (current = 1) {
+        this.cList.cPage.current = current
+
+        return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * consts.PAGE_SIZE,
-            limit: consts.PAGE_SIZE,
+            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE,
             where: { alias: this.alias }
           }
         })
       },
-      getPermissionItems () {
-        return this.$store.dispatch('getPermissions', {
-          query: {
-            offset: 0,
-            limit: 1000
-          }
+      getPermissionsList () {
+        return this.$store.dispatch('permissions/getList', {
+          query: { offset: 0, limit: 1000 }
         })
       },
       getDetails () {
         return this.$store.dispatch('getRole', { id: this.put.id })
       },
       handlePageChange (current) {
-        this.getItems(current)
+        this.getList(current)
       },
       handlePost () {
         this.formModal = true
@@ -229,7 +268,7 @@
         this.$Message.success('删除成功！')
         // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
         await helpers.sleep(500)
-        this.getItems()
+        this.getList()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
@@ -267,7 +306,7 @@
 
             this.$Message.success((this.put.id ? '编辑' : '新增') + '成功！')
             !this.put.id && this.$refs.formValidate.resetFields()
-            this.getItems()
+            this.getList()
           }
         })
       },
