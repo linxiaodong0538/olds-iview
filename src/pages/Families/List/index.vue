@@ -63,7 +63,7 @@
     mixins: [routeParamsMixin],
     data () {
       return {
-        cList:{
+        cList: {
           columns: [
             {
               title: '姓名',
@@ -84,7 +84,7 @@
               title: '性别',
               key: 'gender',
               width: 80,
-              render (h, params) {
+              render: (h, params) => {
                 return h('span', null, this.$consts.GENDERS[params.row.gender])
               }
             },

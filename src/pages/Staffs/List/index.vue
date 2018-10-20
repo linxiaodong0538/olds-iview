@@ -1,7 +1,7 @@
 <template>
   <div>
     <List
-      :columns="cList.columns"
+      :columns="listColumns"
       :data="list.items"
       :total="list.total"
       :current="cList.cPage.current"
@@ -23,7 +23,7 @@
               <Input
                 type="text"
                 placeholder="请输入姓名"
-                v-model="where.name.$like"
+                v-model="cList.cSearch.where.name.$like"
                 style="width: 220px;" />
             </Form-item>
             <Form-item>
@@ -39,19 +39,19 @@
     </List>
     <Modal
       width="280"
-      v-model="del.modal"
+      v-model="cList.cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
     <Modal
       width="400"
-      v-model="setRole.modal"
+      v-model="cRoleForm.modal"
       title="设置角色">
       <Form
         ref="formValidate"
-        :model="formValidate"
-        :rules="ruleValidate"
+        :model="cRoleForm.formValidate"
+        :rules="cRoleForm.ruleValidate"
         :label-width="80">
         <Form-item
           label="角色"
@@ -61,12 +61,13 @@
               <Select
                 placeholder="请选择角色"
                 clearable
-                v-model="formValidate.role"
+                v-model="cRoleForm.formValidate.role"
                 style="width:200px">
                 <Option
-                  v-for="item in roles.roles.items"
+                  v-for="(item, index) in rolesList.items"
                   :value="item.id"
-                  :key="item.id">{{ item.name }}
+                  :key="index">
+                  {{ item.name }}
                 </Option>
               </Select>
             </Col>
@@ -77,13 +78,13 @@
         <Button
           type="text"
           size="large"
-          @click="setRole.modal = false">
+          @click="cRoleForm.modal = false">
           取消
         </Button>
         <Button
           type="primary"
           size="large"
-          @click="handleFormOk">
+          @click="handleRoleFormOk">
           确定
         </Button>
       </div>
@@ -97,29 +98,9 @@
   import routeParamsMixin from '@/mixins/routeParams'
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
+  const module = 'staffs'
+
   export default {
-    async beforeRouteUpdate (to, from, next) {
-      this.staffs.staffs = {}
-      this.roles.roles = {}
-
-      this.routePrefix = helpers.getRoutePrefix(to.params)
-      this.$set(this.where, 'alias', to.params.alias)
-
-      await this.getRoleItems()
-      this.getItems()
-
-      next()
-    },
-    async created () {
-      this.staffs.staffs = {}
-      this.roles.roles = {}
-
-      this.routePrefix = helpers.getRoutePrefix(this.$route.params)
-      this.$set(this.where, 'alias', this.$route.params.alias)
-
-      await this.getRoleItems()
-      this.getItems()
-    },
     components: {
       List,
       ListHeader,
@@ -129,30 +110,36 @@
     mixins: [routeParamsMixin],
     data () {
       return {
-        setRole: {
-          id: 0,
-          modal: false
-        },
-        formValidate: {},
-        ruleValidate: {},
-        del: {
-          modal: false,
-          id: 0
-        },
-        where: {
-          name: {
-            $like: ''
+        cList: {
+          cSearch: {
+            where: {
+              name: {
+                $like: ''
+              }
+            }
+          },
+          cDel: {
+            id: 0,
+            modal: false
+          },
+          cPage: {
+            current: 1
           }
         },
-        current: 1
+        cRoleForm: {
+          id: 0,
+          modal: false,
+          formValidate: {},
+          ruleValidate: {}
+        }
       }
     },
     computed: {
-      ...mapState([
-        'roles',
-        'staffs'
-      ]),
-      columns () {
+      ...mapState({
+        list: state => state[module].list,
+        rolesList: state => state.roles.list
+      }),
+      listColumns () {
         let columns = [
           {
             title: '姓名',
@@ -201,7 +188,7 @@
           {
             title: '操作',
             key: 'action',
-            width: this.where.alias === 'staffs' ? 230 : 150,
+            width: this.alias === 'staffs' ? 230 : 150,
             render: (h, params) => {
               let nodes = [
                 h('Button', {
@@ -220,22 +207,22 @@
                   },
                   on: {
                     click: () => {
-                      this.handleDel(params.row.id)
+                      this.handleShowDel(params.row.id)
                     }
                   }
                 }, '删除')
               ]
 
-              this.where.alias === 'staffs' && nodes.push(
+              this.alias === 'staffs' && nodes.push(
                 h('Button', {
                   props: {
                     type: 'ghost'
                   },
                   on: {
                     click: () => {
-                      this.setRole.modal = true
-                      this.setRole.id = params.row.id
-                      this.$set(this.formValidate, 'role', params.row.role)
+                      this.cRoleForm.modal = true
+                      this.cRoleForm.id = params.row.id
+                      this.$set(this.cRoleForm.formValidate, 'role', params.row.role)
                     }
                   }
                 }, '设置角色')
@@ -246,12 +233,12 @@
           }
         ]
 
-        this.where.alias === 'staffs' && columns.splice(6, 0, {
+        this.alias === 'staffs' && columns.splice(6, 0, {
           title: '角色',
           key: 'role',
           width: 120,
           render: (h, params) => {
-            const item = helpers.getItemById(this.roles.roles.items, params.row.role)
+            const item = this.$helpers.getItemById(this.rolesList.items, params.row.role)
 
             return h('span', null, item.name || '')
           }
@@ -260,66 +247,70 @@
         return columns
       }
     },
-    methods: {
-      getItems (current = 1) {
-        this.current = current
+    async beforeRouteUpdate (to, from, next) {
+      await this.getRolesList()
+      await this.getList()
 
-        return this.$store.dispatch('getStaffs', {
+      next()
+    },
+    async created () {
+      await this.getRolesList()
+      await this.getList()
+    },
+    methods: {
+      getList (current = 1) {
+        this.cList.cPage.current = current
+
+        return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.where
+            where: {
+              ...this.cList.cSearch.where,
+              alias: this.alias
+            }
           }
         })
       },
-      getRoleItems () {
-        return this.$store.dispatch('getRoles', {
-          query: {
-            offset: 0,
-            limit: 1000
-          }
+      getRolesList () {
+        return this.$store.dispatch('roles/getList', {
+          query: { offset: 0, limit: 1000 }
         })
       },
-      resetSearch () {
-        this.where.name.$like = ''
+      resetFields () {
+        this.$refs.formValidate.resetFields()
+        this.$set(this.cRoleForm, 'formValidate', {})
       },
       handlePageChange (current) {
-        this.getItems(current)
+        this.getList(current)
       },
       handleSearch () {
-        this.current = 1
-        this.getItems()
+        this.cList.cPage.current = 1
+        this.getList()
       },
-      handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
+      handleShowDel (id) {
+        this.cList.cDel.id = id
+        this.cList.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch('delStaff', {
-          id: this.del.id
-        })
+        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
         this.$Message.success('删除成功！')
-        // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
-        await helpers.sleep(500)
-        this.resetSearch()
-        this.getItems()
+        this.getList()
       },
-      handleFormOk () {
+      handleRoleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            const { formValidate } = this
-            const { id } = this.setRole
+            const { id, formValidate } = this.cRoleForm
 
-            await this.$store.dispatch('putStaff', {
+            await this.$store.dispatch(`${module}/put`, {
               id,
-              body: {
-                role: formValidate.role || 0
-              }
+              body: { role: formValidate.role || 0 }
             })
 
+            this.cRoleForm.modal = false
             this.$Message.success('设置成功')
-            this.setRole.modal = false
-            this.getItems()
+            !this.cRoleForm.id && this.resetFields()
+            this.getList()
           }
         })
       }

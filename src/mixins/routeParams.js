@@ -1,4 +1,11 @@
 export default {
+  data () {
+    return {
+      routePrefix: '',
+      alias: '',
+      id: 0
+    }
+  },
   async beforeRouteUpdate (to, from, next) {
     this.routePrefix = this.$helpers.getRoutePrefix(to.params)
     this.alias = to.params.alias
