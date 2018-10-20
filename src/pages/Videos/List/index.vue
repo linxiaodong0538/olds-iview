@@ -365,6 +365,11 @@
         this.cList.cDel.id = id
         this.cList.cDel.modal = true
       },
+      async handleDelOk () {
+        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
+        this.$Message.success('删除成功！')
+        this.getList()
+      },
       handleShowVideoViewer (file) {
         this.cVideoViewer.id = file
         this.cVideoViewer.modal = true
@@ -373,11 +378,6 @@
         if (!visible) {
           this.cVideoViewer.id = 0
         }
-      },
-      async handleDelOk () {
-        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
-        this.$Message.success('删除成功！')
-        this.getList()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {

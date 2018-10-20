@@ -19,19 +19,19 @@
     </List>
     <Modal
       width="280"
-      v-model="cForm.cDel.modal"
+      v-model="cList.cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
     <Modal
       width="500"
-      v-model="formModal"
-      :title="put.id ? '编辑' : '新增'">
+      v-model="cForm.modal"
+      :title="cForm.id ? '编辑' : '新增'">
       <Form
         ref="formValidate"
-        :model="formValidate"
-        :rules="ruleValidate"
+        :model="cForm.formValidate"
+        :rules="cForm.ruleValidate"
         :label-width="80">
         <Form-item
           label="名称"
@@ -39,7 +39,7 @@
           <Row>
             <Col span="20">
               <Input
-                v-model="formValidate.name"
+                v-model="cForm.formValidate.name"
                 placeholder="请输入名称" />
             </Col>
           </Row>
@@ -50,22 +50,24 @@
           <Row>
             <Col span="20">
               <Input
-                v-model="formValidate.description"
+                v-model="cForm.formValidate.description"
                 type="textarea"
                 :rows="3"
                 placeholder="请输入描述" />
             </Col>
           </Row>
         </Form-item>
-        <Form-item label="权限">
+        <Form-item
+          label="权限"
+          prop="permissions">
           <Row>
             <Col span="20">
               <Checkbox
-                v-if="permissions.permissions.items.length"
-                v-for="(item, index) in permissions.permissions.items"
+                v-if="!!permissionsList.items.length"
+                v-for="(item, index) in permissionsList.items"
                 :key="index"
-                v-model="formData.permissions[item.code]"
-                @on-change="data => { handlePermissionsChange(item.code)(data) }">
+                :value="cForm.formValidate.permissions && cForm.formValidate.permissions.split(',').indexOf(item.code) !== -1"
+                @on-change="checked => { handlePermissionsChange(item.code)(checked) }">
                 {{ item.name }}
               </Checkbox>
               <div v-else>
@@ -80,7 +82,7 @@
         <Button
           type="text"
           size="large"
-          @click="formModal = false">
+          @click="cForm.modal = false">
           取消
         </Button>
         <Button
@@ -98,6 +100,8 @@
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
   import List, { ListHeader, ListOperations } from '@/components/List'
+
+  const module = 'roles'
 
   export default {
     components: {
@@ -118,9 +122,9 @@
               title: '权限',
               width: 300,
               render: (h, params) => {
-                const { items } = this.permissions.permissions
+                const { items } = this.permissionsList
                 const permissions = params.row.permissions.split(',').reverse().map(code => {
-                  const item = helpers.getItem(items, 'code', code)
+                  const item = this.$helpers.getItem(items, 'code', code)
                   return item.name || ''
                 }).filter(item => item !== '').join('、')
 
@@ -146,7 +150,7 @@
                     },
                     on: {
                       click: () => {
-                        this.handlePut(params.row.id)
+                        this.handleShowPut(params.row)
                       }
                     }
                   }, '编辑'),
@@ -156,7 +160,7 @@
                     },
                     on: {
                       click: () => {
-                        this.handleDel(params.row.id)
+                        this.handleShowDel(params.row.id)
                       }
                     }
                   }, '删除')
@@ -164,13 +168,6 @@
               }
             }
           ],
-          cSearch: {
-            where: {
-              title: {
-                $like: ''
-              }
-            }
-          },
           cDel: {
             id: 0,
             modal: false
@@ -179,7 +176,6 @@
             current: 1
           }
         },
-
         cForm: {
           id: 0,
           modal: false,
@@ -194,12 +190,14 @@
                 max: 100,
                 message: '名称不能多于 100 个字'
               }
+            ],
+            permissions: [
+              {
+                required: true,
+                message: '权限不能为空'
+              }
             ]
           }
-        },
-
-        formData: {
-          permissions: {}
         }
       }
     },
@@ -209,7 +207,7 @@
     }),
     async beforeRouteUpdate (to, from, next) {
       this.list = {}
-      this.permissionslist = {}
+      this.permissionsList = {}
 
       await this.getPermissionsList()
       await this.getList()
@@ -218,7 +216,7 @@
     },
     async created () {
       this.list = {}
-      this.permissionslist = {}
+      this.permissionsList = {}
 
       await this.getPermissionsList()
       await this.getList()
@@ -240,98 +238,69 @@
           query: { offset: 0, limit: 1000 }
         })
       },
-      getDetails () {
-        return this.$store.dispatch('getRole', { id: this.put.id })
+      resetFields () {
+        this.$refs.formValidate.resetFields()
+        this.$set(this.cForm, 'formValidate', {})
       },
       handlePageChange (current) {
         this.getList(current)
       },
       handlePost () {
-        this.formModal = true
-        this.put.id = 0
-        this.$set(this.formData, 'permissions', {})
-        this.$refs.formValidate.resetFields()
+        this.cForm.modal = true
+        this.cForm.id = 0
+        this.resetFields()
       },
-      handlePut (id) {
-        this.put.id = id
-        this.formModal = true
-        this.getDetails()
+      handleShowPut (detail) {
+        this.cForm.id = detail.id
+        this.$set(this.cForm, 'formValidate', Object.assign({}, detail))
+        this.cForm.modal = true
       },
-      handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
+      handleShowDel (id) {
+        this.cList.cDel.id = id
+        this.cList.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch('delRole', {
-          id: this.del.id
-        })
+        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
         this.$Message.success('删除成功！')
-        // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
-        await helpers.sleep(500)
         this.getList()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            const action = this.put.id ? 'putRole' : 'postRole'
-            const permissions = (permissions => {
-              let ret = []
-
-              Object.keys(permissions).forEach(key => {
-                if (permissions[key]) {
-                  ret.push(key)
-                }
-
-                return ret
-              })
-
-              return ret.join(',')
-            })(this.formData.permissions)
-
-            if (!permissions) {
-              this.$Message.error('权限不能为空')
-              return
-            }
-
-            await this.$store.dispatch(action, {
-              id: this.put.id,
+            await this.$store.dispatch(this.cForm.id ? `${module}/put` : `${module}/post`, {
+              id: this.cForm.id,
               body: {
-                ...this.formValidate,
-                permissions,
+                ...this.cForm.formValidate,
                 alias: this.alias
               }
             })
 
-            this.formModal = false
-
-            this.$Message.success((this.put.id ? '编辑' : '新增') + '成功！')
-            !this.put.id && this.$refs.formValidate.resetFields()
+            this.cForm.modal = false
+            this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
+            !this.cForm.id && this.resetFields()
             this.getList()
           }
         })
       },
-      handlePermissionsChange (val) {
-        return data => {
-          if (data) {
-            this.formData.permissions[val] = data
-          }
-        }
-      }
-    },
-    watch: {
-      'roles.role': {
-        handler (newVal) {
-          const { id, permissions, ...others } = newVal
+      handlePermissionsChange (item) {
+        return checked => {
+          const { permissions } = this.cForm.formValidate
 
-          this.formValidate = others
+          let items = permissions ? permissions.split(',') : []
 
-          this.$set(this.formData, 'permissions', {})
+          const index = items.indexOf(item)
 
-          permissions.split(',').forEach(key => {
-            if (key) {
-              this.$set(this.formData.permissions, key, true)
+          if (checked) {
+            if (index === -1) {
+              items.push(item)
             }
-          })
+          } else {
+            if (index !== -1) {
+              items.splice(index, 1)
+            }
+          }
+
+          this.cForm.formValidate.permissions = items.join(',')
         }
       }
     }
