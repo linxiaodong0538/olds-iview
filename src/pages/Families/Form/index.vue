@@ -245,6 +245,10 @@
 
         return ids ? ids.split(',') : []
       },
+      resetFields () {
+        this.$refs.formValidate.resetFields()
+        this.$refs.uploader.remove()
+      },
       handleUploaderChange (file) {
         this.$set(this.formValidate, 'picture', file ? file.id : '')
       },
@@ -262,10 +266,6 @@
             !id && this.resetFields()
           }
         })
-      },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$refs.uploader.remove()
       },
       handleClickOld (id) {
         window.open(`/#/company-app/persons/olds/olds/index/form/${id}`)
