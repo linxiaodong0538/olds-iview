@@ -36,7 +36,7 @@
         </ListSearch>
       </ListHeader>
       <ListNavigation>
-        <Alert>“{{ videosDetail.title }}”的评论列表：</Alert>
+        <Alert>“{{ videosDetail.title }}”的评论：</Alert>
       </ListNavigation>
     </List>
 

@@ -3,7 +3,7 @@ export default {
   component: resolve => require(['@/pages/OldHealthRecords'], resolve),
   children: [
     {
-      path: 'index',
+      path: ':oldId',
       component: resolve => require(['@/pages/OldHealthRecords/List'], resolve)
     }
   ]

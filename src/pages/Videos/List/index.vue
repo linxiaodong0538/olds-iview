@@ -9,9 +9,17 @@
       <ListHeader>
         <ListOperations>
           <Button
+            class="margin-right-sm"
             type="primary"
             @click="handleShowPost">
             新增
+          </Button>
+          <Button
+            v-if="belongsToOld"
+            class="margin-right-sm"
+            type="ghost"
+            @click="handleGoBack">
+            返回
           </Button>
         </ListOperations>
         <ListSearch>
@@ -34,6 +42,9 @@
           </Form>
         </ListSearch>
       </ListHeader>
+      <ListNavigation>
+        <Alert v-if="belongsToOld">“{{ oldsDetail.name }}”的健康动态：</Alert>
+      </ListNavigation>
     </List>
 
     <Modal
@@ -174,7 +185,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
   import Uploader from '@/components/Uploader'
 
   const module = 'videos'
@@ -185,10 +196,12 @@
       ListHeader,
       ListOperations,
       ListSearch,
+      ListNavigation,
       Uploader
     },
     data () {
       return {
+        oldId: '0',
         cList: {
           columns: [
             {
@@ -226,7 +239,7 @@
             {
               title: '操作',
               key: 'action',
-              width: 330,
+              width: 320,
               render: (h, params) => {
                 return h('ButtonGroup', [
                   h('Button', {
@@ -245,7 +258,7 @@
                     },
                     on: {
                       click: () => {
-                        this.$router.push(`/xd-app/videos/videos/comments/${params.row.id}`)
+                        this.$router.push(`/xd-app/${this.belongsToOld ? 'videos' : 'olds'}/videos/comments/${params.row.id}`)
                       }
                     }
                   }, '查看评论'),
@@ -317,11 +330,26 @@
         }
       }
     },
-    computed: mapState({
-      list: state => state[module].list
-    }),
-    created () {
+    computed: {
+      ...mapState({
+        list: state => state[module].list,
+        oldsDetail: state => state.olds.detail
+      }),
+      belongsToOld () {
+        return this.oldId !== '0'
+      }
+    },
+    async beforeRouteUpdate (to, from, next) {
+      this.oldId = to.params.oldId
       this.getList()
+      next()
+    },
+    created () {
+      this.oldId = this.$route.params.oldId
+      this.getList()
+      if (this.oldId !== '0') {
+        this.getOldsDetail()
+      }
     },
     methods: {
       getList (current = 1) {
@@ -331,9 +359,18 @@
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.cList.cSearch.where
+            where: {
+              ...this.cList.cSearch.where,
+              oldId: this.oldId
+            }
           }
         })
+      },
+      getOldsDetail () {
+        return this.$store.dispatch('olds/getDetail', { id: this.oldId })
+      },
+      handleGoBack () {
+        window.history.go(-1)
       },
       resetFields () {
         const initValue = { praisesNum: 0, commentsNum: 0 }
@@ -384,7 +421,10 @@
           if (valid) {
             await this.$store.dispatch(this.cForm.id ? `${module}/put` : `${module}/post`, {
               id: this.cForm.id,
-              body: this.cForm.formValidate
+              body: {
+                ...this.cForm.formValidate,
+                oldId: this.oldId
+              }
             })
 
             this.cForm.modal = false

@@ -1,13 +1,13 @@
 <template>
   <div>
     <List
-      :columns="cList.columns"
+      :columns="listColumns"
       :data="list.items"
       :total="list.total"
       :current="cList.cPage.current"
       @on-change="handlePageChange">
       <ListHeader>
-        <ListOperations>
+        <ListOperations v-if="topLevelMenu !== 'xd-app'">
           <Button
             class="margin-right-sm"
             type="primary"
@@ -64,66 +64,9 @@
     mixins: [routeParamsMixin],
     data () {
       return {
+        topLevelMenu: '',
         cList: {
-          columns: [
-            {
-              title: '姓名',
-              key: 'name'
-            },
-            {
-              title: '身份证',
-              key: 'card_id',
-              width: 160,
-              render (h, params) {
-                return h('span', null, params.row.id_card)
-              }
-            },
-            {
-              title: '性别',
-              key: 'gender',
-              width: 80,
-              render: (h, params) => {
-                return h('span', null, this.$consts.GENDERS[params.row.gender])
-              }
-            },
-            {
-              title: '入院编号',
-              key: 'num',
-              width: 120,
-              render (h, params) {
-                return h('span', null, params.row.num)
-              }
-            },
-            {
-              title: '操作',
-              key: 'action',
-              width: 150,
-              render: (h, params) => {
-                return h('ButtonGroup', [
-                  h('Button', {
-                    props: {
-                      type: 'ghost'
-                    },
-                    on: {
-                      click: () => {
-                        this.$router.push(`${this.routePrefix}/olds/index/form/${params.row.id}`)
-                      }
-                    }
-                  }, '编辑'),
-                  h('Button', {
-                    props: {
-                      type: 'ghost'
-                    },
-                    on: {
-                      click: () => {
-                        this.handleShowDel(params.row.id)
-                      }
-                    }
-                  }, '删除')
-                ])
-              }
-            }
-          ],
+          columns: [],
           cSearch: {
             cache: {
               where: {
@@ -148,17 +91,105 @@
         }
       }
     },
-    computed: mapState({
-      list: state => state[module].list
-    }),
+    computed: {
+      ...mapState({
+        list: state => state[module].list
+      }),
+      listColumns () {
+        return [
+          {
+            title: '姓名',
+            key: 'name'
+          },
+          {
+            title: '身份证',
+            key: 'card_id',
+            width: 160,
+            render (h, params) {
+              return h('span', null, params.row.id_card)
+            }
+          },
+          {
+            title: '性别',
+            key: 'gender',
+            width: 80,
+            render: (h, params) => {
+              return h('span', null, this.$consts.GENDERS[params.row.gender])
+            }
+          },
+          {
+            title: '入院编号',
+            key: 'num',
+            width: 120,
+            render (h, params) {
+              return h('span', null, params.row.num)
+            }
+          },
+          {
+            title: '操作',
+            key: 'action',
+            width: this.topLevelMenu === 'xd-app' ? 250 : 150,
+            render: (h, params) => {
+              if (this.topLevelMenu === 'xd-app') {
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`/xd-app/olds/videos/videos/${params.row.id}`)
+                      }
+                    }
+                  }, '管理健康动态'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`/xd-app/olds/oldHealthRecords/oldHealthRecords/${params.row.id}`)
+                      }
+                    }
+                  }, '管理健康数据')
+                ])
+              } else {
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`${this.routePrefix}/olds/index/form/${params.row.id}`)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowDel(params.row.id)
+                      }
+                    }
+                  }, '删除')
+                ])
+              }
+            }
+          }
+        ]
+      }
+    },
     async beforeRouteUpdate (to, from, next) {
-      this.list = {}
+      this.topLevelMenu = to.params.topLevelMenu
       this.getList()
 
       next()
     },
     async created () {
-      this.list = {}
+      this.topLevelMenu = this.$route.params.topLevelMenu
       this.getList()
     },
     methods: {

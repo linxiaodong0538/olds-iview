@@ -14,6 +14,12 @@
             @click="handleShowPost">
             新增
           </Button>
+          <Button
+            class="margin-right-sm"
+            type="ghost"
+            @click="handleGoBack">
+            返回
+          </Button>
         </ListOperations>
         <ListSearch>
           <Form
@@ -31,7 +37,7 @@
                   v-for="(item, index) in Object.keys($consts.HEALTH_INDICATORS)"
                   :value="item"
                   :key="index">
-                  {{ $consts.HEALTH_INDICATORS[item].name }}
+                  {{ $consts.HEALTH_INDICATORS[item].name + '（' + $consts.HEALTH_INDICATORS[item].unit + '）' }}
                 </Option>
               </Select>
             </Form-item>
@@ -45,6 +51,9 @@
           </Form>
         </ListSearch>
       </ListHeader>
+      <ListNavigation>
+        <Alert>“{{ oldsDetail.name }}”的健康数据：</Alert>
+      </ListNavigation>
     </List>
     <Modal
       width="280"
@@ -55,7 +64,7 @@
     </Modal>
 
     <Modal
-      width="500"
+      width="350"
       v-model="cForm.modal"
       :title="cForm.id ? '编辑' : '新增'">
       <Form
@@ -76,7 +85,7 @@
                   v-for="(item, index) in Object.keys($consts.HEALTH_INDICATORS)"
                   :value="+item"
                   :key="index">
-                  {{ $consts.HEALTH_INDICATORS[item].name }}
+                  {{ $consts.HEALTH_INDICATORS[item].name + '（' + $consts.HEALTH_INDICATORS[item].unit + '）' }}
                 </Option>
               </Select>
             </Col>
@@ -114,7 +123,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
 
   const module = 'oldHealthRecords'
 
@@ -123,7 +132,8 @@
       List,
       ListHeader,
       ListOperations,
-      ListSearch
+      ListSearch,
+      ListNavigation
     },
     data () {
       return {
@@ -132,15 +142,23 @@
             {
               title: '指标',
               key: 'indicator',
+              width: 130,
               render: (h, params) => {
                 const item = this.$consts.HEALTH_INDICATORS[params.row.indicator]
-                return h('span', null, `${item.name}(${item.unit})`)
+                return h('span', null, `${item.name}（${item.unit}）`)
               }
             },
             {
               title: '值',
-              key: 'value',
-              width: 700
+              key: 'value'
+            },
+            {
+              title: '时间',
+              key: 'created_at',
+              width: 180,
+              render: (h, params) => {
+                return h('span', null, this.$time.getTime(params.row.created_at))
+              }
             },
             {
               title: '操作',
@@ -208,10 +226,13 @@
       }
     },
     computed: mapState({
-      list: state => state[module].list
+      list: state => state[module].list,
+      oldsDetail: state => state.olds.detail
     }),
     created () {
+      this.oldId = this.$route.params.oldId
       this.getList()
+      this.getOldsDetail()
     },
     methods: {
       getList (current = 1) {
@@ -221,9 +242,18 @@
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.cList.cSearch.where
+            where: {
+              ...this.cList.cSearch.where,
+              oldId: this.oldId
+            }
           }
         })
+      },
+      getOldsDetail () {
+        return this.$store.dispatch('olds/getDetail', { id: this.oldId })
+      },
+      handleGoBack () {
+        window.history.go(-1)
       },
       handleShowPost () {
         this.cForm.modal = true
@@ -261,7 +291,10 @@
           if (valid) {
             await this.$store.dispatch(this.cForm.id ? `${module}/put` : `${module}/post`, {
               id: this.cForm.id || '0',
-              body: this.cForm.formValidate
+              body: {
+                ...this.cForm.formValidate,
+                oldId: this.oldId
+              }
             })
 
             this.cForm.modal = false

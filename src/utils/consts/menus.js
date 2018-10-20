@@ -221,7 +221,7 @@ export default [
         children: [
           {
             title: '短视频列表',
-            route: '/xd-app/videos/videos/videos/index'
+            route: '/xd-app/videos/videos/videos/0'
           }
         ]
       },
@@ -233,10 +233,6 @@ export default [
           {
             title: '老人列表',
             route: '/xd-app/olds/olds/olds/index'
-          },
-          {
-            title: '健康数据',
-            route: '/xd-app/olds/oldHealthRecords/oldHealthRecords/index'
           }
         ]
       },
@@ -245,10 +241,6 @@ export default [
         name: 'xd-app/discover',
         title: '发现',
         children: [
-          {
-            title: '家属列表',
-            route: '/xd-app/discover/families/families/index'
-          },
           {
             title: '消息列表',
             route: '/xd-app/discover/messages/messages/index'

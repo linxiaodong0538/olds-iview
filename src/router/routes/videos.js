@@ -3,7 +3,7 @@ export default {
   component: resolve => require(['@/pages/Videos'], resolve),
   children: [
     {
-      path: 'index',
+      path: ':oldId',
       component: resolve => require(['@/pages/Videos/List'], resolve)
     }
   ]
