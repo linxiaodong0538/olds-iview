@@ -1,47 +1,50 @@
 <template>
   <div>
-    <List 
-      :current="cList.cPage.current" 
-      :data="list.items" :columns="cList.columns" 
-      :total="list.total" 
+    <List
+      :current="cList.cPage.current"
+      :data="list.items"
+      :columns="cList.columns"
+      :total="list.total"
       @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button 
-            class="margin-right-sm" 
-            type="primary" 
+          <Button
+            class="margin-right-sm"
+            type="primary"
             @click="handleShowPost">
             新增
           </Button>
         </ListOperations>
         <ListSearch>
-          <Form 
-            inline 
+          <Form
+            inline
             @submit.native.prevent="handleSearch">
             <Form-item prop="name">
-              <Input 
+              <Input
                 type="text"
-                placeholder="请输入标题" 
-                v-model="cList.cSearch.where.title.$like" 
-                style="width: 220px;"/>
+                placeholder="请输入内容"
+                v-model="cList.cSearch.where.content.$like"
+                style="width: 220px;" />
             </Form-item>
             <Form-item>
-              <Button 
-                type="primary" 
-                @click="handleSearch">查询</Button>
+              <Button
+                type="primary"
+                @click="handleSearch">
+                查询
+              </Button>
             </Form-item>
           </Form>
         </ListSearch>
       </ListHeader>
     </List>
-    <Modal 
-      width="280" 
-      v-model="cDel.modal" 
-      title="请确认" 
+    <Modal
+      width="280"
+      v-model="cDel.modal"
+      title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    
+
     <Modal
       width="500"
       v-model="cForm.modal"
@@ -51,17 +54,6 @@
         :model="cForm.formValidate"
         :rules="cForm.ruleValidate"
         :label-width="80">
-        <Form-item
-          label="标题"
-          prop="title">
-          <Row>
-            <Col span="20">
-              <Input
-                v-model="cForm.formValidate.title"
-                placeholder="请输入标题" />
-            </Col>
-          </Row>
-        </Form-item>
         <Form-item
           label="内容"
           prop="content">
@@ -112,64 +104,51 @@
         cList: {
           columns: [
             {
-              title: '标题',
-              key: 'title'
-            },
-            {
               title: '内容',
-              key: 'content',
-              width: 800
+              key: 'content'
             },
             {
-              title: '推送时间',
-              key: 'pushTime',
-              width: 250
+              title: '发布时间',
+              key: 'created_at',
+              width: 160,
+              render: (h, params) => {
+                return h('span', null, this.$time.getTime(params.row.created_at))
+              }
             },
             {
               title: '操作',
               key: 'action',
-              width: 200,
-              align: 'center',
+              width: 150,
               render: (h, params) => {
-                return h(
-                  'ButtonGroup',
-                  [
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            console.log(params)
-                            this.handleShowPut(params.row)
-                          }
-                        }
-                      },
-                      '编辑'
-                    ),
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowDel(params.row.id)
-                          }
-                        }
-                      },
-                      '删除'
-                    )
-                  ])
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        console.log(params)
+                        this.handleShowPut(params.row)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowDel(params.row.id)
+                      }
+                    }
+                  }, '删除')
+                ])
               }
             }
           ],
           cSearch: {
             where: {
-              title: {
+              content: {
                 $like: ''
               }
             }
@@ -187,16 +166,6 @@
           modal: false,
           formValidate: {},
           ruleValidate: {
-            title: [
-              {
-                required: true,
-                message: '标题不能为空'
-              },
-              {
-                max: 100,
-                message: '标题不能多于 100 个字'
-              }
-            ],
             content: [
               {
                 required: true,

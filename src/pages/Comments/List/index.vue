@@ -128,7 +128,7 @@
               render: (h, params) => {
                 return h('span', null, [
                   params.row.fromUserId
-                  ? h(
+                    ? h(
                     PersonLabel,
                     {
                       props: {
@@ -149,7 +149,7 @@
                 return h('span', null, [
                   h('span', null, '@'),
                   params.row.toUserId
-                  ? h(
+                    ? h(
                     PersonLabel,
                     {
                       props: {
@@ -179,42 +179,32 @@
               key: 'action',
               width: 90,
               render: (h, params) => {
-                return h(
-                  'ButtonGroup',
-                  [
-                    params.row.fromUserId
-                      ? h(
-                        'Button',
-                        {
-                          props: {
-                            type: 'ghost'
-                          },
-                          on: {
-                            click: () => {
-                              this.handleShowPost(params.row)
-                            }
-                          }
-                        },
-                      '回复'
-                      )
-                      : null,
-                    !params.row.fromUserId
-                      ? h(
-                      'Button',
-                        {
-                          props: {
-                            type: 'ghost'
-                          },
-                          on: {
-                            click: () => {
-                              this.handleShowDel(params.row.id)
-                            }
-                          }
-                        },
-                      '删除'
-                      )
-                      : null
-                  ])
+                return h('ButtonGroup', [
+                  params.row.fromUserId
+                    ? h('Button', {
+                      props: {
+                        type: 'ghost'
+                      },
+                      on: {
+                        click: () => {
+                          this.handleShowPost(params.row)
+                        }
+                      }
+                    }, '回复')
+                    : null,
+                  !params.row.fromUserId
+                    ? h('Button', {
+                      props: {
+                        type: 'ghost'
+                      },
+                      on: {
+                        click: () => {
+                          this.handleShowDel(params.row.id)
+                        }
+                      }
+                    }, '删除')
+                    : null
+                ])
               }
             }
           ],

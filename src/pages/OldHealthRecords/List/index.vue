@@ -1,23 +1,24 @@
 <template>
   <div>
-    <List 
-      :current="cList.cPage.current" 
-      :data="list.items" :columns="cList.columns" 
-      :total="list.total" 
+    <List
+      :current="cList.cPage.current"
+      :data="list.items"
+      :columns="cList.columns"
+      :total="list.total"
       @on-change="handlePageChange">
       <ListHeader>
         <ListOperations>
-          <Button 
-            class="margin-right-sm" 
-            type="primary" 
+          <Button
+            class="margin-right-sm"
+            type="primary"
             @click="handleShowPost">
             新增
           </Button>
         </ListOperations>
         <ListSearch>
           <Form
-          inline
-          @submit.native.prevent="handleSearch">
+            inline
+            @submit.native.prevent="handleSearch">
             <Form-item>
               <Select
                 ref="select"
@@ -25,12 +26,12 @@
                 filterable
                 style="width: 220px"
                 placeholder="请选择指标"
-                v-model="cList.cSearch.where.indicator.$like">
+                v-model="cList.cSearch.where.indicator.$eq">
                 <Option
-                v-for="(item, index) in $consts.HEALTH_INDICATORS"
-                :value="index"
-                :key="index">
-                {{ item.name }}
+                  v-for="(item, index) in Object.keys($consts.HEALTH_INDICATORS)"
+                  :value="item"
+                  :key="index">
+                  {{ $consts.HEALTH_INDICATORS[item].name }}
                 </Option>
               </Select>
             </Form-item>
@@ -40,19 +41,19 @@
                 @click="handleSearch">
                 查询
               </Button>
-            </Form-item>    
+            </Form-item>
           </Form>
         </ListSearch>
       </ListHeader>
     </List>
-    <Modal 
-      width="280" 
-      v-model="cDel.modal" 
-      title="请确认" 
+    <Modal
+      width="280"
+      v-model="cDel.modal"
+      title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    
+
     <Modal
       width="500"
       v-model="cForm.modal"
@@ -63,18 +64,19 @@
         :rules="cForm.ruleValidate"
         :label-width="80">
         <Form-item
-          label="选择"
+          label="指标"
           prop="indicator">
           <Row>
             <Col span="20">
-              <Select 
-                v-model="cForm.formValidate.indicator" 
-                style="width:200px">
-                <Option 
-                  v-for="(item, index) in $consts.HEALTH_INDICATORS" 
-                  :value="index" 
+              <Select
+                v-model="cForm.formValidate.indicator"
+                style="width:200px"
+                placeholder="请选择指标">
+                <Option
+                  v-for="(item, index) in Object.keys($consts.HEALTH_INDICATORS)"
+                  :value="+item"
                   :key="index">
-                  {{ item.name}}({{item.unit}})
+                  {{ $consts.HEALTH_INDICATORS[item].name }}
                 </Option>
               </Select>
             </Col>
@@ -131,8 +133,8 @@
               title: '指标',
               key: 'indicator',
               render: (h, params) => {
-                return h('span', null, this.$consts.HEALTH_INDICATORS[params.row.indicator].name +
-                `(${this.$consts.HEALTH_INDICATORS[params.row.indicator].unit})`)
+                const item = this.$consts.HEALTH_INDICATORS[params.row.indicator]
+                return h('span', null, `${item.name}(${item.unit})`)
               }
             },
             {
@@ -143,48 +145,38 @@
             {
               title: '操作',
               key: 'action',
-              width: 200,
+              width: 150,
               align: 'center',
               render: (h, params) => {
-                return h(
-                  'ButtonGroup',
-                  [
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowPut(params.row)
-                          }
-                        }
-                      },
-                      '编辑'
-                    ),
-                    h(
-                      'Button',
-                      {
-                        props: {
-                          type: 'ghost'
-                        },
-                        on: {
-                          click: () => {
-                            this.handleShowDel(params.row.id)
-                          }
-                        }
-                      },
-                      '删除'
-                    )
-                  ])
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowPut(params.row)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowDel(params.row.id)
+                      }
+                    }
+                  }, '删除')
+                ])
               }
             }
           ],
           cSearch: {
             where: {
               indicator: {
-                $like: ''
+                $eq: ''
               }
             }
           },
@@ -203,7 +195,7 @@
           ruleValidate: {
             indicator: {
               required: true,
-              message: '选项不能为空'
+              message: '指标不能为空'
             },
             value: [
               {
@@ -223,7 +215,8 @@
     },
     methods: {
       getList (current = 1) {
-        this.current = current
+        this.cList.cPage.current = current
+
         return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
@@ -235,6 +228,7 @@
       handleShowPost () {
         this.cForm.modal = true
         this.cForm.id = 0
+        this.resetFields()
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
@@ -250,16 +244,13 @@
         this.getList(current)
       },
       handleSearch () {
-        console.log(this.cList.cSearch.where)
         this.cList.cPage.current = 1
         this.getList()
       },
       resetFields () {
         this.$refs.formValidate.resetFields()
+        this.$set(this.cForm, 'formValidate', {})
       },
-      // handleIndicatorSelectChange (value) {
-      //   this.getList()
-      // },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
@@ -268,13 +259,10 @@
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            await this.$store.dispatch(
-              this.cForm.id ? `${module}/put` : `${module}/post`,
-              {
-                id: this.cForm.id || '0',
-                body: this.cForm.formValidate
-              }
-            )
+            await this.$store.dispatch(this.cForm.id ? `${module}/put` : `${module}/post`, {
+              id: this.cForm.id || '0',
+              body: this.cForm.formValidate
+            })
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
