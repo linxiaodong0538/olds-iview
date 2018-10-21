@@ -273,16 +273,21 @@
         this.cList.cSearch.cache.where = this.$helpers.deepCopy(initWhere)
         this.handleSearch()
       },
+      handleSearch () {
+        this.cList.cPage.current = 1
+        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
+        this.getList()
+      },
       handleGoBack () {
         window.history.go(-1)
       },
       handleShowPost () {
-        this.cForm.modal = true
         this.cForm.id = 0
+        this.cForm.modal = true
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', Object.assign({}, detail))
+        this.$set(this.cForm, 'formValidate', this.$helpers.deepCopy(detail))
         this.cForm.modal = true
       },
       handleShowDel (id) {
@@ -290,13 +295,7 @@
         this.cDel.modal = true
       },
       handlePageChange (current) {
-        this.cList.cPage.current = current
         this.getList(current)
-      },
-      handleSearch () {
-        this.cList.cPage.current = 1
-        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
-        this.getList()
       },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
@@ -321,7 +320,6 @@
           }
         })
       }
-
     }
   }
 </script>
