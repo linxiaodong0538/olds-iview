@@ -19,7 +19,7 @@
     </List>
     <Modal
       width="280"
-      v-model="cList.cDel.modal"
+      v-model="cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
@@ -151,13 +151,13 @@
               }
             }
           ],
-          cDel: {
-            id: 0,
-            modal: false
-          },
           cPage: {
             current: 1
           }
+        },
+        cDel: {
+          id: 0,
+          modal: false
         },
         cForm: {
           id: 0,
@@ -187,14 +187,21 @@
     computed: mapState({
       list: state => state[module].list
     }),
+    watch: {
+      'cForm.modal': {
+        handler (newVal) {
+          if (!newVal) {
+            this.resetFields()
+          }
+        }
+      }
+    },
     async beforeRouteUpdate (to, from, next) {
-      this.list = {}
       this.getList()
 
       next()
     },
     async created () {
-      this.list = {}
       this.getList()
     },
     methods: {
@@ -217,9 +224,8 @@
         this.getList(current)
       },
       handleShowPost () {
-        this.cForm.modal = true
         this.cForm.id = 0
-        this.resetFields()
+        this.cForm.modal = true
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
@@ -227,11 +233,11 @@
         this.cForm.modal = true
       },
       handleShowDel (id) {
-        this.cList.cDel.id = id
-        this.cList.cDel.modal = true
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
+        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
         this.getList()
       },
@@ -248,7 +254,6 @@
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            !this.cForm.id && this.resetFields()
             this.getList()
           }
         })
