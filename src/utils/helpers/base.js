@@ -4,6 +4,12 @@ import helpers from 'jt-helpers'
 export default {
   ...helpers,
   /**
+   * 深拷贝对象
+   */
+  deepCopy (obj) {
+    return JSON.parse(JSON.stringify(obj))
+  },
+  /**
    * 获取图片地址
    */
   getFileURLById (id) {
