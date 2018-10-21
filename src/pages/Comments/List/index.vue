@@ -236,6 +236,15 @@
       videosDetail: state => state.videos.detail,
       list: state => state[module].list
     }),
+    watch: {
+      'cForm.modal': {
+        handler (newVal) {
+          if (!newVal) {
+            this.resetFields()
+          }
+        }
+      }
+    },
     created () {
       this.videoId = this.$route.params.videoId
       this.getVideosDetail()
@@ -298,7 +307,6 @@
 
             this.cForm.modal = false
             this.$Message.success('回复成功！')
-            this.resetFields()
 
             this.cList.cSearch.where = {
               $or: [
