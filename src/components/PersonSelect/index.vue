@@ -102,23 +102,23 @@
         this.$emit('change', this.selectedIds)
       },
       handleChange (value) {
-        if (!value) return
-
-        const valueString = value.toString()
-
         if (this.hasSelected) {
-          if (this.selectedIds.indexOf(valueString) !== -1) {
-            this.$Message.error('重复添加')
-          } else {
-            if (this.multiple) {
-              this.selectedIds.push(valueString)
-            } else {
-              this.selectedIds = [valueString]
-            }
-          }
+          if (value) {
+            const valueString = value.toString()
 
-          this.$emit('change', this.selectedIds)
-          this.$refs.select.clearSingleSelect()
+            if (this.selectedIds.indexOf(valueString) !== -1) {
+              this.$Message.error('重复添加')
+            } else {
+              if (this.multiple) {
+                this.selectedIds.push(valueString)
+              } else {
+                this.selectedIds = [valueString]
+              }
+            }
+
+            this.$emit('change', this.selectedIds)
+            this.$refs.select.clearSingleSelect()
+          }
         } else {
           this.$emit('change', value)
         }

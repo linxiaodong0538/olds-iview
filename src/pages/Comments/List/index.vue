@@ -42,7 +42,7 @@
 
     <Modal
       width="280"
-      v-model="cList.cDel.modal"
+      v-model="cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
@@ -102,16 +102,18 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListSearch, ListNavigation } from '@/components/List'
+  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
   import PersonSelect from '@/components/PersonSelect'
   import PersonLabel from '@/components/PersonLabel'
 
   const module = 'comments'
+  const initWhere = {}
 
   export default {
     components: {
       List,
       ListHeader,
+      ListOperations,
       ListSearch,
       PersonSelect,
       PersonLabel,
@@ -128,15 +130,12 @@
               render: (h, params) => {
                 return h('span', null, [
                   params.row.fromUserId
-                    ? h(
-                    PersonLabel,
-                    {
+                    ? h(PersonLabel, {
                       props: {
                         type: 'families',
                         id: params.row.fromUserId
                       }
-                    }
-                    )
+                    })
                     : '重阳养老'
                 ])
               }
@@ -149,15 +148,12 @@
                 return h('span', null, [
                   h('span', null, '@'),
                   params.row.toUserId
-                    ? h(
-                    PersonLabel,
-                    {
+                    ? h(PersonLabel, {
                       props: {
                         type: 'families',
                         id: params.row.toUserId
                       }
-                    }
-                    )
+                    })
                     : '重阳养老'
                 ])
               }
@@ -210,17 +206,17 @@
           ],
           cSearch: {
             cache: {
-              where: {}
+              where: this.$helpers.deepCopy(initWhere)
             },
-            where: {}
-          },
-          cDel: {
-            id: 0,
-            modal: false
+            where: this.$helpers.deepCopy(initWhere)
           },
           cPage: {
             current: 1
           }
+        },
+        cDel: {
+          id: 0,
+          modal: false
         },
         cForm: {
           modal: false,
@@ -255,15 +251,16 @@
         return this.$store.dispatch('videos/getDetail', { id: this.videoId })
       },
       getList (current = 1) {
-        const where = Object.assign({}, this.cList.cSearch.where, { resourceId: this.videoId })
-
         this.cList.cPage.current = current
 
         return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where
+            where: {
+              ...this.cList.cSearch.where,
+              resourceId: this.videoId
+            }
           }
         })
       },
@@ -276,7 +273,7 @@
       },
       handleSearch () {
         this.cList.cPage.current = 1
-        this.cList.cSearch.where = Object.assign({}, this.cList.cSearch.cache.where)
+        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
         this.getList()
       },
       handlePageChange (current) {
@@ -287,11 +284,11 @@
         this.cForm.modal = true
       },
       handleShowDel (id) {
-        this.cList.cDel.id = id
-        this.cList.cDel.modal = true
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
+        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
         this.getList()
       },

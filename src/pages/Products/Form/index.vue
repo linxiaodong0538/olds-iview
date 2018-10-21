@@ -122,12 +122,6 @@
               message: '请选择分类'
             }
           ],
-          picture1: [
-            {
-              required: true,
-              message: '请上传图片 1'
-            }
-          ],
           content: [
             {
               required: true,
