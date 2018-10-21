@@ -343,6 +343,15 @@
         return this.oldId !== '0'
       }
     },
+    watch: {
+      'cForm.modal': {
+        handler (newVal) {
+          if (!newVal) {
+            this.resetFields()
+          }
+        }
+      }
+    },
     async beforeRouteUpdate (to, from, next) {
       this.oldId = to.params.oldId
       this.getList()
@@ -377,10 +386,8 @@
         window.history.go(-1)
       },
       resetFields () {
-        const initValue = { praisesNum: 0, commentsNum: 0 }
-
         this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', initValue)
+        this.$set(this.cForm, 'formValidate', { praisesNum: 0, commentsNum: 0 })
       },
       resetSearch () {
         this.cList.cSearch.cache.where = this.$helpers.deepCopy(initWhere)
@@ -400,7 +407,6 @@
       handleShowPost () {
         this.cForm.modal = true
         this.cForm.id = 0
-        this.resetFields()
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
@@ -438,10 +444,7 @@
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            if (!this.cForm.id) {
-              this.resetFields()
-              this.resetSearch()
-            }
+            !this.cForm.id && this.resetSearch()
             this.getList()
           }
         })

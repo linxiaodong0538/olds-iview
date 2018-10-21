@@ -23,7 +23,7 @@
               <Input
                 type="text"
                 placeholder="请输入内容"
-                v-model="cList.cSearch.where.content.$like"
+                v-model="cList.cSearch.cache.where.content.$like"
                 style="width: 220px;" />
             </Form-item>
             <Form-item>
@@ -91,6 +91,11 @@
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
   const module = 'messages'
+  const initWhere = {
+    content: {
+      $like: ''
+    }
+  }
 
   export default {
     components: {
@@ -147,11 +152,10 @@
             }
           ],
           cSearch: {
-            where: {
-              content: {
-                $like: ''
-              }
-            }
+            cache: {
+              where: this.$helpers.deepCopy(initWhere)
+            },
+            where: this.$helpers.deepCopy(initWhere)
           },
           cPage: {
             current: 1
@@ -179,12 +183,22 @@
     computed: mapState({
       list: state => state[module].list
     }),
+    watch: {
+      'cForm.modal': {
+        handler (newVal) {
+          if (!newVal) {
+            this.resetFields()
+          }
+        }
+      }
+    },
     created () {
       this.getList()
     },
     methods: {
       getList (current = 1) {
-        this.current = current
+        this.cList.cPage.current = current
+
         return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
@@ -192,6 +206,10 @@
             where: this.cList.cSearch.where
           }
         })
+      },
+      resetFields () {
+        this.$refs.formValidate.resetFields()
+        this.$set(this.cForm, 'formValidate', {})
       },
       handleShowPost () {
         this.cForm.modal = true
@@ -210,13 +228,10 @@
         this.getList(current)
       },
       handleSearch () {
-        this.current = 1
+        this.cList.cPage.current = 1
+        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
         this.getList()
       },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-      },
-
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
@@ -225,21 +240,16 @@
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            await this.$store.dispatch(
-              this.cForm.id ? `${module}/put` : `${module}/post`,
-              {
-                id: this.cForm.id || '0',
-                body: this.cForm.formValidate
-              }
-            )
+            await this.$store.dispatch(this.cForm.id ? `${module}/put` : `${module}/post`, {
+              id: this.cForm.id || '0',
+              body: this.cForm.formValidate
+            })
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            !this.cForm.id && this.resetFields()
             this.getList()
           }
         })
       }
-
     }
   }
 </script>
