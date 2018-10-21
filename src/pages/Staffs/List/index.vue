@@ -23,7 +23,7 @@
               <Input
                 type="text"
                 placeholder="请输入姓名"
-                v-model="cList.cSearch.where.name.$like"
+                v-model="cList.cSearch.cache.where.name.$like"
                 style="width: 220px;" />
             </Form-item>
             <Form-item>
@@ -39,7 +39,7 @@
     </List>
     <Modal
       width="280"
-      v-model="cList.cDel.modal"
+      v-model="cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
@@ -99,6 +99,11 @@
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
   const module = 'staffs'
+  const initWhere = {
+    name: {
+      $like: ''
+    }
+  }
 
   export default {
     components: {
@@ -112,19 +117,18 @@
       return {
         cList: {
           cSearch: {
-            where: {
-              name: {
-                $like: ''
-              }
-            }
-          },
-          cDel: {
-            id: 0,
-            modal: false
+            cache: {
+              where: this.$helpers.deepCopy(initWhere)
+            },
+            where: this.$helpers.deepCopy(initWhere)
           },
           cPage: {
             current: 1
           }
+        },
+        cDel: {
+          id: 0,
+          modal: false
         },
         cRoleForm: {
           id: 0,
@@ -247,6 +251,15 @@
         return columns
       }
     },
+    watch: {
+      'cRoleForm.modal': {
+        handler (newVal) {
+          if (!newVal) {
+            this.resetFields()
+          }
+        }
+      }
+    },
     async beforeRouteUpdate (to, from, next) {
       await this.getRolesList()
       await this.getList()
@@ -281,19 +294,20 @@
         this.$refs.formValidate.resetFields()
         this.$set(this.cRoleForm, 'formValidate', {})
       },
+      handleSearch () {
+        this.cList.cPage.current = 1
+        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
+        this.getList()
+      },
       handlePageChange (current) {
         this.getList(current)
       },
-      handleSearch () {
-        this.cList.cPage.current = 1
-        this.getList()
-      },
       handleShowDel (id) {
-        this.cList.cDel.id = id
-        this.cList.cDel.modal = true
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
+        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
         this.getList()
       },
@@ -309,7 +323,6 @@
 
             this.cRoleForm.modal = false
             this.$Message.success('设置成功')
-            !this.cRoleForm.id && this.resetFields()
             this.getList()
           }
         })
