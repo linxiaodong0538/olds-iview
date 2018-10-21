@@ -32,7 +32,7 @@
                 filterable
                 style="width: 220px"
                 placeholder="请选择指标"
-                v-model="cList.cSearch.where.indicator.$eq">
+                v-model="cList.cSearch.cache.where.indicator.$eq">
                 <Option
                   v-for="(item, index) in Object.keys($consts.HEALTH_INDICATORS)"
                   :value="item"
@@ -126,6 +126,11 @@
   import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
 
   const module = 'oldHealthRecords'
+  const initWhere = {
+    indicator: {
+      $eq: ''
+    }
+  }
 
   export default {
     components: {
@@ -192,11 +197,10 @@
             }
           ],
           cSearch: {
-            where: {
-              indicator: {
-                $eq: ''
-              }
-            }
+            cache: {
+              where: this.$helpers.deepCopy(initWhere)
+            },
+            where: this.$helpers.deepCopy(initWhere)
           },
           cPage: {
             current: 1
@@ -229,6 +233,15 @@
       list: state => state[module].list,
       oldsDetail: state => state.olds.detail
     }),
+    watch: {
+      'cForm.modal': {
+        handler (newVal) {
+          if (!newVal) {
+            this.resetFields()
+          }
+        }
+      }
+    },
     created () {
       this.oldId = this.$route.params.oldId
       this.getList()
@@ -252,13 +265,20 @@
       getOldsDetail () {
         return this.$store.dispatch('olds/getDetail', { id: this.oldId })
       },
+      resetFields () {
+        this.$refs.formValidate.resetFields()
+        this.$set(this.cForm, 'formValidate', {})
+      },
+      resetSearch () {
+        this.cList.cSearch.cache.where = this.$helpers.deepCopy(initWhere)
+        this.handleSearch()
+      },
       handleGoBack () {
         window.history.go(-1)
       },
       handleShowPost () {
         this.cForm.modal = true
         this.cForm.id = 0
-        this.resetFields()
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
@@ -275,11 +295,8 @@
       },
       handleSearch () {
         this.cList.cPage.current = 1
+        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
         this.getList()
-      },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', {})
       },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
@@ -299,7 +316,7 @@
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            !this.cForm.id && this.resetFields()
+            !this.cForm.id && this.resetSearch()
             this.getList()
           }
         })
