@@ -7,7 +7,7 @@
       :current="cList.cPage.current"
       @on-change="handlePageChange">
       <ListHeader>
-        <ListOperations v-if="topLevelMenu !== 'xd-app'">
+        <ListOperations v-if="routePrefix === '/xhh-app/persons/olds'">
           <Button
             class="margin-right-sm"
             type="primary"
@@ -69,7 +69,6 @@
     mixins: [routeParamsMixin],
     data () {
       return {
-        topLevelMenu: '',
         cList: {
           cSearch: {
             cache: {
@@ -124,9 +123,20 @@
           {
             title: '操作',
             key: 'action',
-            width: this.topLevelMenu === 'xd-app' ? 250 : 150,
+            width: (prefix => {
+              switch (prefix) {
+                case '/xhh-app/persons/olds':
+                  return 150
+                case '/xd-app/olds/olds':
+                  return 250
+                case '/xd-app/discover/olds':
+                  return 145
+                default:
+                  return 250
+              }
+            })(this.routePrefix),
             render: (h, params) => {
-              if (this.topLevelMenu === 'xd-app') {
+              if (this.routePrefix === '/xd-app/olds/olds') {
                 return h('ButtonGroup', [
                   h('Button', {
                     props: {
@@ -149,6 +159,17 @@
                     }
                   }, '管理健康数据')
                 ])
+              } else if (this.routePrefix === '/xd-app/discover/olds') {
+                return h('Button', {
+                  props: {
+                    type: 'ghost'
+                  },
+                  on: {
+                    click: () => {
+                      this.$Message.info('暂未开放')
+                    }
+                  }
+                }, '查看个人仓库')
               } else {
                 return h('ButtonGroup', [
                   h('Button', {
@@ -179,13 +200,10 @@
       }
     },
     async beforeRouteUpdate (to, from, next) {
-      this.topLevelMenu = to.params.topLevelMenu
       this.getList()
-
       next()
     },
     async created () {
-      this.topLevelMenu = this.$route.params.topLevelMenu
       this.getList()
     },
     methods: {

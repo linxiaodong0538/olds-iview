@@ -242,6 +242,10 @@ export default [
         title: '发现',
         children: [
           {
+            title: '老人列表',
+            route: '/xd-app/discover/olds/olds/index'
+          },
+          {
             title: '消息列表',
             route: '/xd-app/discover/messages/messages/index'
           }
