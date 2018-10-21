@@ -211,13 +211,22 @@
         this.$refs.formValidate.resetFields()
         this.$set(this.cForm, 'formValidate', {})
       },
+      resetSearch () {
+        this.cList.cSearch.cache.where = this.$helpers.deepCopy(initWhere)
+        this.handleSearch()
+      },
+      handleSearch () {
+        this.cList.cPage.current = 1
+        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
+        this.getList()
+      },
       handleShowPost () {
-        this.cForm.modal = true
         this.cForm.id = 0
+        this.cForm.modal = true
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', Object.assign({}, detail))
+        this.$set(this.cForm, 'formValidate', this.$helpers.deepCopy(detail))
         this.cForm.modal = true
       },
       handleShowDel (id) {
@@ -226,11 +235,6 @@
       },
       handlePageChange (current) {
         this.getList(current)
-      },
-      handleSearch () {
-        this.cList.cPage.current = 1
-        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
-        this.getList()
       },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
@@ -246,6 +250,7 @@
             })
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
+            !this.cForm.id && this.resetSearch()
             this.getList()
           }
         })

@@ -58,8 +58,7 @@
     <Modal
       width="430"
       v-model="cVideoViewer.modal"
-      title="查看短视频"
-      @on-visible-change="handleVideoViewerVisibleChange">
+      title="查看短视频">
       <video
         v-if="cVideoViewer.id"
         controls
@@ -350,6 +349,13 @@
             this.resetFields()
           }
         }
+      },
+      'cVideoViewer.modal': {
+        handler (newVal) {
+          if (!newVal) {
+            this.cVideoViewer.id = 0
+          }
+        }
       }
     },
     async beforeRouteUpdate (to, from, next) {
@@ -405,8 +411,8 @@
         this.getList(current)
       },
       handleShowPost () {
-        this.cForm.modal = true
         this.cForm.id = 0
+        this.cForm.modal = true
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
@@ -425,11 +431,6 @@
       handleShowVideoViewer (file) {
         this.cVideoViewer.id = file
         this.cVideoViewer.modal = true
-      },
-      handleVideoViewerVisibleChange (visible) {
-        if (!visible) {
-          this.cVideoViewer.id = 0
-        }
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {

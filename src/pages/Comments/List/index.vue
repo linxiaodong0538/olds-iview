@@ -220,9 +220,7 @@
         },
         cForm: {
           modal: false,
-          formValidate: {
-            fromUserId: 25
-          },
+          formValidate: {},
           ruleValidate: {
             content: [
               {
@@ -239,14 +237,11 @@
       list: state => state[module].list
     }),
     created () {
-      this.init()
+      this.videoId = this.$route.params.videoId
       this.getVideosDetail()
       this.getList()
     },
     methods: {
-      init () {
-        this.videoId = this.$route.params.videoId
-      },
       getVideosDetail () {
         return this.$store.dispatch('videos/getDetail', { id: this.videoId })
       },

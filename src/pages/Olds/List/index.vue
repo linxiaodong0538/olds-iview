@@ -39,7 +39,7 @@
     </List>
     <Modal
       width="280"
-      v-model="cList.cDel.modal"
+      v-model="cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
@@ -53,6 +53,11 @@
   import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
 
   const module = 'olds'
+  const initWhere = {
+    name: {
+      $like: ''
+    }
+  }
 
   export default {
     components: {
@@ -66,28 +71,19 @@
       return {
         topLevelMenu: '',
         cList: {
-          columns: [],
           cSearch: {
             cache: {
-              where: {
-                name: {
-                  $like: ''
-                }
-              }
+              where: this.$helpers.deepCopy(initWhere)
             },
-            where: {
-              name: {
-                $like: ''
-              }
-            }
-          },
-          cDel: {
-            id: 0,
-            modal: false
+            where: this.$helpers.deepCopy(initWhere)
           },
           cPage: {
             current: 1
           }
+        },
+        cDel: {
+          id: 0,
+          modal: false
         }
       }
     },
@@ -208,24 +204,24 @@
         })
       },
       resetSearch () {
-        this.cList.cSearch.where.name.$like = ''
+        this.cList.cSearch.cache.where = this.$helpers.deepCopy(initWhere)
+        this.handleSearch()
+      },
+      handleSearch () {
+        this.cList.cPage.current = 1
+        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
+        this.getList()
       },
       handlePageChange (current) {
         this.getList(current)
       },
-      handleSearch () {
-        this.cList.cPage.current = 1
-        this.cList.cSearch.where = Object.assign({}, this.cList.cSearch.cache.where)
-        this.getList()
-      },
       handleShowDel (id) {
-        this.cList.cDel.modal = true
-        this.cList.cDel.id = id
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch(`${module}/del`, { id: this.cList.cDel.id })
+        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        await this.$helpers.sleep(500)
         this.resetSearch()
         this.getList()
       }
