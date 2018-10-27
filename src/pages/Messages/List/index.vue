@@ -9,10 +9,18 @@
       <ListHeader>
         <ListOperations>
           <Button
+            v-if="+oldId === 0"
             class="margin-right-sm"
             type="primary"
             @click="handleShowPost">
             新增
+          </Button>
+          <Button
+            v-if="+oldId !== 0"
+            class="margin-right-sm"
+            type="ghost"
+            @click="handleGoBack">
+            返回
           </Button>
         </ListOperations>
         <ListSearch>
@@ -36,6 +44,9 @@
           </Form>
         </ListSearch>
       </ListHeader>
+      <ListNavigation>
+        <Alert>“{{ oldsDetail.name }}”的消息：</Alert>
+      </ListNavigation>
     </List>
     <Modal
       width="280"
@@ -88,7 +99,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
 
   const module = 'messages'
   const initWhere = {
@@ -102,10 +113,12 @@
       List,
       ListHeader,
       ListOperations,
-      ListSearch
+      ListSearch,
+      ListNavigation
     },
     data () {
       return {
+        oldId: 0,
         cList: {
           columns: [
             {
@@ -181,7 +194,8 @@
       }
     },
     computed: mapState({
-      list: state => state[module].list
+      list: state => state[module].list,
+      oldsDetail: state => state.olds.detail
     }),
     watch: {
       'cForm.modal': {
@@ -192,8 +206,16 @@
         }
       }
     },
-    created () {
+    async beforeRouteUpdate (to, from, next) {
+      this.oldId = to.params.oldId || 0
       this.getList()
+      this.getOldsDetail()
+      next()
+    },
+    created () {
+      this.oldId = this.$route.params.oldId
+      this.getList()
+      this.getOldsDetail()
     },
     methods: {
       getList (current = 1) {
@@ -203,9 +225,15 @@
           query: {
             offset: (current - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: this.cList.cSearch.where
+            where: {
+              ...this.cList.cSearch.where,
+              toId: { $eq: this.oldId }
+            }
           }
         })
+      },
+      getOldsDetail () {
+        return this.$store.dispatch('olds/getDetail', { id: this.oldId })
       },
       resetFields () {
         this.$refs.formValidate.resetFields()
@@ -254,6 +282,9 @@
             this.getList()
           }
         })
+      },
+      handleGoBack () {
+        window.history.go(-1)
       }
     }
   }

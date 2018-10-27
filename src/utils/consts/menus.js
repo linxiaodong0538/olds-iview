@@ -247,7 +247,7 @@ export default [
           },
           {
             title: '消息列表',
-            route: '/xd-app/discover/messages/messages/index'
+            route: '/xd-app/discover/messages/messages/0'
           }
         ]
       }

@@ -3,7 +3,7 @@ export default {
   component: resolve => require(['@/pages/Messages'], resolve),
   children: [
     {
-      path: 'index',
+      path: ':oldId',
       component: resolve => require(['@/pages/Messages/List'], resolve)
     }
   ]

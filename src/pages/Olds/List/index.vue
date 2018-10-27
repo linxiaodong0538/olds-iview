@@ -130,7 +130,7 @@
                 case '/xd-app/olds/olds':
                   return 250
                 case '/xd-app/discover/olds':
-                  return 145
+                  return 225
                 default:
                   return 250
               }
@@ -160,16 +160,28 @@
                   }, '管理健康数据')
                 ])
               } else if (this.routePrefix === '/xd-app/discover/olds') {
-                return h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.$Message.info('暂未开放')
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$Message.info('暂未开放')
+                      }
                     }
-                  }
-                }, '查看个人仓库')
+                  }, '查看个人仓库'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`/xd-app/discover/messages/messages/${params.row.id}`)
+                      }
+                    }
+                  }, '查看消息')
+                ])
               } else {
                 return h('ButtonGroup', [
                   h('Button', {
