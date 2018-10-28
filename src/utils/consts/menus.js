@@ -246,7 +246,7 @@ export default [
             route: '/xd-app/discover/olds/olds/index'
           },
           {
-            title: '消息列表',
+            title: '机构消息',
             route: '/xd-app/discover/messages/messages/0'
           }
         ]

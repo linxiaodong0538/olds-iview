@@ -44,7 +44,7 @@
           </Form>
         </ListSearch>
       </ListHeader>
-      <ListNavigation>
+      <ListNavigation v-if="+oldId !== 0">
         <Alert>“{{ oldsDetail.name }}”的消息：</Alert>
       </ListNavigation>
     </List>
@@ -209,13 +209,13 @@
     async beforeRouteUpdate (to, from, next) {
       this.oldId = to.params.oldId || 0
       this.getList()
-      this.getOldsDetail()
+      this.oldId && this.getOldsDetail()
       next()
     },
     created () {
       this.oldId = this.$route.params.oldId
       this.getList()
-      this.getOldsDetail()
+      this.oldId && this.getOldsDetail()
     },
     methods: {
       getList (current = 1) {

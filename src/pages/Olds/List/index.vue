@@ -130,7 +130,7 @@
                 case '/xd-app/olds/olds':
                   return 250
                 case '/xd-app/discover/olds':
-                  return 225
+                  return 250
                 default:
                   return 250
               }
@@ -180,7 +180,7 @@
                         this.$router.push(`/xd-app/discover/messages/messages/${params.row.id}`)
                       }
                     }
-                  }, '查看消息')
+                  }, '查看个人消息')
                 ])
               } else {
                 return h('ButtonGroup', [
