@@ -113,6 +113,7 @@
             </Col>
           </Row>
         </Form-item>
+        <!--
         <Form-item
           label="描述"
           prop="description">
@@ -126,14 +127,15 @@
             </Col>
           </Row>
         </Form-item>
+        -->
         <Form-item
-          label="拍摄地点"
+          label="地点"
           prop="address">
           <Row>
             <Col span="20">
               <Input
                 v-model="cForm.formValidate.address"
-                placeholder="请输入拍摄地点" />
+                placeholder="请输入地点" />
             </Col>
           </Row>
         </Form-item>
@@ -212,13 +214,15 @@
               title: '标题',
               key: 'title'
             },
+            /*
             {
               title: '描述',
               key: 'description',
               width: 250
             },
+            */
             {
-              title: '拍摄地点',
+              title: '地点',
               key: 'address',
               width: 250
             },
