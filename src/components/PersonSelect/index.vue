@@ -1,8 +1,8 @@
 <template>
   <span class="c-person-select">
     <p
-      v-if="hasSelected && !!items.length"
       v-for="(item, index) in selectedIds"
+      v-if="hasSelected && !!items.length && +item !== 0"
       :key="index"
       class="c-person-select__selected-item">
       <ButtonGroup>

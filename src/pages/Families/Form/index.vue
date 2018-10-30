@@ -192,9 +192,13 @@
               message: '身份证不能为空'
             },
             {
-              min: 18,
-              max: 18,
-              message: '身份证格式错误'
+              validator (rule, value, callback) {
+                if (value.length !== 15 && value.length !== 18) {
+                  callback('身份证格式错误')
+                } else {
+                  callback()
+                }
+              }
             }
           ]
         }
