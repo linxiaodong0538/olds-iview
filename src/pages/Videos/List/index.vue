@@ -99,17 +99,29 @@
           </Row>
         </Form-item>
         <Form-item
+          label="封面"
+          prop="poster">
+          <Row>
+            <Col span="20">
+              <Uploader
+                :has-default-file="!!cForm.formValidate.poster"
+                v-model="cForm.formValidate.poster"
+                @change="file => { handleUploaderChange('poster')(file) }" />
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item
           label="短视频"
-          prop="file">
+          prop="src">
           <Row>
             <Col span="20">
               <Uploader
                 :max-size="1024 * 50"
                 :preview-icon="`${$consts.BASE_URL}/images/video.png`"
                 :format="['mp4','wmv']"
-                :has-default-file="!!cForm.formValidate.file"
-                v-model="cForm.formValidate.file"
-                @change="handleUploaderChange" />
+                :has-default-file="!!cForm.formValidate.src"
+                v-model="cForm.formValidate.src"
+                @change="file => { handleUploaderChange('src')(file) }" />
             </Col>
           </Row>
         </Form-item>
@@ -256,7 +268,7 @@
                     },
                     on: {
                       click: () => {
-                        this.handleShowVideoViewer(params.row.file)
+                        this.handleShowVideoViewer(params.row.src)
                       }
                     }
                   }, '查看短视频'),
@@ -327,7 +339,13 @@
                 message: '标题不能多于 100 个字'
               }
             ],
-            file: [
+            poster: [
+              {
+                required: true,
+                message: '封面不能为空'
+              }
+            ],
+            src: [
               {
                 required: true,
                 message: '短视频不能为空'
@@ -408,8 +426,10 @@
         this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
         this.getList()
       },
-      handleUploaderChange (file) {
-        this.$set(this.cForm.formValidate, 'file', file ? file.id : '')
+      handleUploaderChange (field) {
+        return file => {
+          this.$set(this.cForm.formValidate, field, file ? file.id : '')
+        }
       },
       handlePageChange (current) {
         this.getList(current)
@@ -432,8 +452,8 @@
         this.$Message.success('删除成功！')
         this.getList()
       },
-      handleShowVideoViewer (file) {
-        this.cVideoViewer.id = file
+      handleShowVideoViewer (src) {
+        this.cVideoViewer.id = src
         this.cVideoViewer.modal = true
       },
       handleFormOk () {
