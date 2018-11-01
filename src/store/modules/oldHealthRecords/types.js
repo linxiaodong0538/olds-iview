@@ -1,4 +1,4 @@
 export default {
-  GET_LIST: 'messages/GET_LIST',
-  GET_DETAIL: 'messages/GET_DETAIL'
+  GET_LIST: 'oldHealthRecords/GET_LIST',
+  GET_DETAIL: 'oldHealthRecords/GET_DETAIL'
 }
