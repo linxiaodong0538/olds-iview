@@ -216,6 +216,16 @@
         }
       }
     },
+    async beforeRouteUpdate (to, from, next) {
+      if (this.id) {
+        this.getDetail(this.id)
+        this.$set(this.formData, 'olds', await this.getRelationsList('olds,families', this.id))
+      } else {
+        this.$set(this.formData, 'olds', [])
+      }
+
+      this.getOldsList()
+    },
     async created () {
       if (this.id) {
         this.getDetail(this.id)
