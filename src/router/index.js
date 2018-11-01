@@ -13,6 +13,7 @@ import olds from './routes/olds'
 import families from './routes/families'
 import messages from './routes/messages'
 import oldHealthRecords from './routes/oldHealthRecords'
+import productStocks from './routes/productStocks'
 import notices from './routes/notices'
 import roles from './routes/roles'
 import permissions from './routes/permissions'
@@ -49,7 +50,8 @@ const router = new Router({
             videos,
             comments,
             messages,
-            oldHealthRecords
+            oldHealthRecords,
+            productStocks
           ],
           meta: {
             requiresAuth: true

@@ -295,7 +295,7 @@
             {
               validator (rule, value, callback) {
                 if (value.length !== 15 && value.length !== 18) {
-                  callback('身份证格式错误')
+                  // callback('身份证格式错误')
                 } else {
                   callback()
                 }

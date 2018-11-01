@@ -167,7 +167,7 @@
                     },
                     on: {
                       click: () => {
-                        this.$Message.info('暂未开放')
+                        this.$router.push(`/xd-app/discover/productStocks/productStocks/${params.row.id}`)
                       }
                     }
                   }, '查看个人仓库'),
