@@ -23,29 +23,9 @@
             返回
           </Button>
         </ListOperations>
-        <ListSearch>
-          <Form
-            inline
-            @submit.native.prevent="handleSearch">
-            <Form-item prop="name">
-              <Input
-                type="text"
-                placeholder="请输入内容"
-                v-model="cList.cSearch.cache.where"
-                style="width: 220px;" />
-            </Form-item>
-            <Form-item>
-              <Button
-                type="primary"
-                @click="handleSearch">
-                查询
-              </Button>
-            </Form-item>
-          </Form>
-        </ListSearch>
       </ListHeader>
       <ListNavigation v-if="+oldId !== 0">
-        <!-- <Alert>“{{ oldsDetail.name }}”的消息：</Alert> -->
+        <Alert>“{{ oldsDetail.name }}” 老人的个人仓库：</Alert>
       </ListNavigation>
     </List>
     </div>
@@ -54,9 +34,16 @@
 <script>
   import { mapState } from 'vuex'
   import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
+  import helpers from '@/utils/helpers/base'
 
   const module = 'productStocks'
+  const initWhere = {
+    title: {
+      $like: ''
+    }
+  }
   export default {
+    name: 'list',
     components: {
       List,
       ListHeader,
@@ -64,12 +51,9 @@
       ListSearch,
       ListNavigation
     },
-    created () {
-      this.oldId = this.$route.params.oldId
-      this.getList()
-    },
     data () {
       return {
+        alias: '',
         oldId: 0,
         cList: {
           columns: [
@@ -81,13 +65,16 @@
               title: '价格',
               key: 'productPrice',
               width: 160,
-              render: (h, params) => {
-                return h('span', null, this.$time.getTime(params.row.created_at))
+              render (h, params) {
+                return h('span', null, `${params.row.productPrice} 元`)
               }
             },
             {
               title: '分类',
-              key: 'type'
+              key: 'type',
+              render: (h, params) => {
+                return h('span', null, this.getCategoryTitle(params.row.productCategoryId))
+              }
             },
             {
               title: '数量',
@@ -95,14 +82,17 @@
             },
             {
               title: '时间',
-              key: 'created_at'
+              key: 'created_at',
+              render: (h, params) => {
+                return h('span', null, this.$time.getTime(params.row.created_at))
+              }
             }
           ],
           cSearch: {
             cache: {
-              where: ''
+              where: this.$helpers.deepCopy(initWhere)
             },
-            where: ''
+            where: this.$helpers.deepCopy(initWhere)
           },
           cPage: {
             current: 1
@@ -127,9 +117,19 @@
         }
       }
     },
-    computed: mapState({
-      list: state => state[module].list
-    }),
+    async created () {
+      this.oldId = this.$route.params.oldId
+      this.getList()
+      this.oldId && this.getOldsDetail()
+      await this.getCategoryItems()
+    },
+    computed: {
+      ...mapState({
+        list: state => state[module].list,
+        oldsDetail: state => state.olds.detail,
+        categories: 'categories'
+      })
+    },
     methods: {
       getList (current = 1) {
         this.cList.cPage.current = current
@@ -144,10 +144,34 @@
           }
         })
       },
-      handlePageChange () {},
-      handleShowPost () {},
-      handleGoBack () {},
-      handleSearch () {}
+      getOldsDetail () {
+        return this.$store.dispatch('olds/getDetail', { id: this.oldId })
+      },
+      handlePageChange (current) {
+        this.getList(current)
+      },
+      handleShowPost () {
+        this.cForm.id = 0
+        this.cForm.modal = true
+      },
+      handleGoBack () {
+        window.history.go(-1)
+      },
+      getCategoryItems () {
+        return this.$store.dispatch('getCategories', {
+          query: {
+            limit: 1000
+          }
+        })
+      },
+      getCategoryTitle (id) {
+        const items = this.categories.categories.items
+        const item = helpers.getItemById(items, id)
+        const parentItem = item.parent_id
+          ? helpers.getItemById(items, item.parent_id) || {}
+          : {}
+        return `${parentItem.title || ''} - ${item.title || ''}`
+      }
     }
   }
 </script>
