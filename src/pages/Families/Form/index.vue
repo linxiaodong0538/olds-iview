@@ -87,7 +87,7 @@
         prop="olds">
         <p
           class="person-item"
-          v-for="(item, index) in formData.olds" :key="index">
+          v-for="(item, index) in formData.olds">
           <Button
             type="ghost"
             :key="index"
@@ -194,7 +194,7 @@
             {
               validator (rule, value, callback) {
                 if (value.length !== 15 && value.length !== 18) {
-                  // callback('身份证格式错误')
+                  callback('身份证格式错误')
                 } else {
                   callback()
                 }
@@ -225,6 +225,7 @@
       }
 
       this.getOldsList()
+      next()
     },
     async created () {
       if (this.id) {
