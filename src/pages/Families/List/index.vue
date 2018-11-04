@@ -179,10 +179,7 @@
           query: {
             offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: {
-              ...this.listSearchWhere,
-              alias: this.alias
-            }
+            where: { ...this.listSearchWhere, alias: this.alias }
           }
         })
       },
