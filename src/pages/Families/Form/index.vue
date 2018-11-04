@@ -149,7 +149,7 @@
         </Button>
         <Button
           type="ghost"
-          @click="$router.push(`${routePrefix}/families/index`)">
+          @click="$helpers.goBack()">
           返回
         </Button>
       </Form-item>
@@ -190,7 +190,7 @@
             {
               required: true,
               message: '身份证不能为空'
-            },
+            }/*,
             {
               validator (rule, value, callback) {
                 if (value.length !== 15 && value.length !== 18) {
@@ -199,7 +199,7 @@
                   callback()
                 }
               }
-            }
+            }*/
           ]
         }
       }
