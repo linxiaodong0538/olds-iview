@@ -3,6 +3,9 @@ import helpers from 'jt-helpers'
 
 export default {
   ...helpers,
+  goBack () {
+    window.history.go(-1)
+  },
   /**
    * 深拷贝对象
    */
