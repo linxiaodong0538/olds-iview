@@ -1,21 +1,21 @@
 <template>
   <div>
-    <List
+    <CList
       :columns="listColumns"
       :data="list.items"
       :total="list.total"
-      :current="cList.cPage.current"
-      @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations v-if="routePrefix === '/xhh-app/persons/olds'">
+      :pageCurrent="listPageCurrent"
+      :searchWhere="listSearchWhere">
+      <CListHeader>
+        <CListOperations v-if="routePrefix === '/xhh-app/persons/olds'">
           <Button
             class="margin-right-sm"
             type="primary"
             @click="$router.push(`${routePrefix}/olds/index/form`)">
             新增
           </Button>
-        </ListOperations>
-        <ListSearch>
+        </CListOperations>
+        <CListSearch>
           <Form
             inline
             @submit.native.prevent="handleSearch">
@@ -23,7 +23,7 @@
               <Input
                 type="text"
                 placeholder="请输入姓名"
-                v-model="cList.cSearch.cache.where.name.$like"
+                v-model="cList.cSearch.where.name.$like"
                 style="width: 220px;" />
             </Form-item>
             <Form-item>
@@ -34,9 +34,9 @@
               </Button>
             </Form-item>
           </Form>
-        </ListSearch>
-      </ListHeader>
-    </List>
+        </CListSearch>
+      </CListHeader>
+    </CList>
     <Modal
       width="280"
       v-model="cDel.modal"
@@ -50,31 +50,31 @@
 <script>
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
-  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import listMixin from '@/mixins/list'
+  import CList, { CListHeader, CListOperations, CListSearch } from '@/components1/List'
 
   const module = 'olds'
-  const initWhere = {
-    name: {
-      $like: ''
-    }
-  }
 
   export default {
     components: {
-      List,
-      ListHeader,
-      ListOperations,
-      ListSearch
+      CList,
+      CListHeader,
+      CListOperations,
+      CListSearch
     },
-    mixins: [routeParamsMixin],
+    mixins: [
+      routeParamsMixin,
+      listMixin
+    ],
     data () {
       return {
         cList: {
           cSearch: {
-            cache: {
-              where: this.$helpers.deepCopy(initWhere)
-            },
-            where: this.$helpers.deepCopy(initWhere)
+            where: {
+              name: {
+                $like: ''
+              }
+            }
           },
           cPage: {
             current: 1
@@ -216,34 +216,28 @@
       next()
     },
     async created () {
+      if (this.listSearchWhere) {
+        this.cList.cSearch.where = this.listSearchWhere
+      }
       this.getList()
     },
     methods: {
       getList (current = 1) {
-        this.cList.cPage.current = current
-
         return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: {
-              ...this.cList.cSearch.where,
-              alias: this.alias
-            }
+            where: { ...this.listSearchWhere, alias: this.alias }
           }
         })
       },
-      resetSearch () {
-        this.cList.cSearch.cache.where = this.$helpers.deepCopy(initWhere)
-        this.handleSearch()
-      },
       handleSearch () {
-        this.cList.cPage.current = 1
-        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
-        this.getList()
-      },
-      handlePageChange (current) {
-        this.getList(current)
+        this.$router.push({
+          query: {
+            listPageCurrent: 1,
+            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
+          }
+        })
       },
       handleShowDel (id) {
         this.cDel.id = id
@@ -252,8 +246,17 @@
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        this.resetSearch()
-        this.getList()
+
+        const getListRes = await this.getList()
+
+        if (!getListRes.items.length) {
+          this.$router.push({
+            query: {
+              listPageCurrent: this.listPageCurrent - 1 || 1,
+              listSearchWhere: JSON.stringify(this.listSearchWhere)
+            }
+          })
+        }
       }
     }
   }
