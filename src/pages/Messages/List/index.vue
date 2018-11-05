@@ -145,7 +145,6 @@
                     },
                     on: {
                       click: () => {
-                        console.log(params)
                         this.handleShowPut(params.row)
                       }
                     }

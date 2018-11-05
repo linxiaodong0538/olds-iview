@@ -1,8 +1,12 @@
 <template>
   <div>
     <slot></slot>
-    <Table :context="$parent" class="margin-bottom" border :columns="columns" :data="data" :selection="[1]"
-           @on-selection-change="handleSectionChange"></Table>
+    <Table :context="$parent" 
+      class="margin-bottom" border :columns="columns" 
+      :data="data" 
+      :selection="[1]"
+      @on-selection-change="handleSectionChange">
+    </Table>
     <Page :total="total" :current="current" :page-size="$consts.PAGE_SIZE" show-total show-elevator
           @on-change="handlePageChange"></Page>
   </div>
