@@ -1,11 +1,11 @@
 <template>
   <div>
     <CList
-      :columns="cList.columns"
       :data="list.items"
+      :columns="cList.columns"
       :total="list.total"
-      :current="cList.cPage.current"
-      @on-change="handlePageChange">
+      :pageCurrent="listPageCurrent"
+      :searchWhere="listSearchWhere">
       <CListHeader>
         <CListOperations>
           <Button
@@ -18,14 +18,14 @@
             v-if="belongsToOld"
             class="margin-right-sm"
             type="ghost"
-            @click="handleGoBack">
+            @click="$router.push('/xd-app/olds/olds/olds/index')">
             返回
           </Button>
         </CListOperations>
         <CListSearch>
           <Form
             inline
-            @submit.native.prevent="handleSearch">
+            @submit.native.prevent="search">
             <Form-item prop="name">
               <Input
                 placeholder="请输入标题"
@@ -35,7 +35,7 @@
             <Form-item>
               <Button
                 type="primary"
-                @click="handleSearch">
+                @click="search">
                 查询
               </Button>
             </Form-item>
@@ -125,21 +125,6 @@
             </Col>
           </Row>
         </Form-item>
-        <!--
-        <Form-item
-          label="描述"
-          prop="description">
-          <Row>
-            <Col span="20">
-              <Input
-                v-model="cForm.formValidate.description"
-                type="textarea"
-                :rows="3"
-                placeholder="请输入描述" />
-            </Col>
-          </Row>
-        </Form-item>
-        -->
         <Form-item
           label="地点"
           prop="address">
@@ -200,10 +185,17 @@
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
   import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
   import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
   import Uploader from '@/components/Uploader'
 
   const module = 'videos'
+  const initWhere = {
+    title: {
+      $like: ''
+    }
+  }
+  const initForm = { praisesNum: 0, commentsNum: 0 }
 
   export default {
     components: {
@@ -216,7 +208,8 @@
     },
     mixins: [
       routeParamsMixin,
-      listMixin
+      listMixin,
+      formMixin
     ],
     data () {
       return {
@@ -227,13 +220,6 @@
               title: '标题',
               key: 'title'
             },
-            /*
-            {
-              title: '描述',
-              key: 'description',
-              width: 250
-            },
-            */
             {
               title: '地点',
               key: 'address',
@@ -308,11 +294,7 @@
             }
           ],
           cSearch: {
-            where: {
-              title: {
-                $like: ''
-              }
-            }
+            where: this.$helpers.deepCopy(initWhere)
           },
           cPage: {
             current: 1
@@ -329,16 +311,18 @@
         cForm: {
           id: 0,
           modal: false,
-          formValidate: {},
+          formValidate: { ...initForm },
           ruleValidate: {
             title: [
               {
                 required: true,
                 message: '标题不能为空'
-              },
+              }
+            ],
+            address: [
               {
-                max: 100,
-                message: '标题不能多于 100 个字'
+                required: true,
+                message: '地点不能为空'
               }
             ],
             poster: [
@@ -370,7 +354,7 @@
       'cForm.modal': {
         handler (newVal) {
           if (!newVal) {
-            this.resetFields()
+            this.resetFields(initForm)
           }
         }
       },
@@ -383,19 +367,16 @@
       }
     },
     async beforeRouteUpdate (to, from, next) {
+      this.initSearchWhere(initWhere)
       this.oldId = to.params.oldId
       this.getList()
       next()
     },
     created () {
       this.oldId = this.$route.params.oldId
-      if (this.listSearchWhere) {
-        this.cList.cSearch.where = this.listSearchWhere
-      }
+      this.oldId !== '0' && this.getOldsDetail()
+      this.initSearchWhere(initWhere)
       this.getList()
-      if (this.oldId !== '0') {
-        this.getOldsDetail()
-      }
     },
     methods: {
       getList () {
@@ -410,38 +391,10 @@
       getOldsDetail () {
         return this.$store.dispatch('olds/getDetail', { id: this.oldId })
       },
-      handleGoBack () {
-        window.history.go(-1)
-      },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', { praisesNum: 0, commentsNum: 0 })
-      },
-      async resetSearch () {
-        const getListRes = await this.getList()
-        if (!getListRes.items.length) {
-          this.$router.push({
-            query: {
-              listPageCurrent: this.listPageCurrent - 1 || 1
-            }
-          })
-        }
-      },
-      handleSearch () {
-        this.$router.push({
-          query: {
-            listPageCurrent: 1,
-            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
-          }
-        })
-      },
       handleUploaderChange (field) {
         return file => {
           this.$set(this.cForm.formValidate, field, file ? file.id : '')
         }
-      },
-      handlePageChange (current) {
-        this.getList(current)
       },
       handleShowPost () {
         this.cForm.id = 0
@@ -449,8 +402,8 @@
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', Object.assign({}, detail))
         this.cForm.modal = true
+        this.initFields(detail)
       },
       handleShowDel (id) {
         this.cDel.id = id
@@ -459,7 +412,9 @@
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        this.getList()
+
+        const getListRes = await this.getList()
+        !getListRes.items.length && this.goPrevPage()
       },
       handleShowVideoViewer (src) {
         this.cVideoViewer.id = src
@@ -478,7 +433,7 @@
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            !this.cForm.id && this.resetSearch()
+            !this.cForm.id && this.resetSearch(initWhere)
             this.getList()
           }
         })
