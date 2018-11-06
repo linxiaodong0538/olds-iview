@@ -1,13 +1,13 @@
 <template>
   <div>
-    <List
+    <CList
       :columns="cList.columns"
       :data="list.items"
       :total="list.total"
       :current="cList.cPage.current"
       @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations>
+      <CListHeader>
+        <CListOperations>
           <Button
             class="margin-right-sm"
             type="primary"
@@ -21,8 +21,8 @@
             @click="handleGoBack">
             返回
           </Button>
-        </ListOperations>
-        <ListSearch>
+        </CListOperations>
+        <CListSearch>
           <Form
             inline
             @submit.native.prevent="handleSearch">
@@ -30,7 +30,7 @@
               <Input
                 placeholder="请输入标题"
                 style="width: 220px;"
-                v-model="cList.cSearch.cache.where.title.$like" />
+                v-model="cList.cSearch.where.title.$like" />
             </Form-item>
             <Form-item>
               <Button
@@ -40,12 +40,12 @@
               </Button>
             </Form-item>
           </Form>
-        </ListSearch>
-      </ListHeader>
-      <ListNavigation>
+        </CListSearch>
+      </CListHeader>
+      <CListNavigation>
         <Alert v-if="belongsToOld">“{{ oldsDetail.name }}”的健康动态：</Alert>
-      </ListNavigation>
-    </List>
+      </CListNavigation>
+    </CList>
 
     <Modal
       width="280"
@@ -198,25 +198,26 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
+  import routeParamsMixin from '@/mixins/routeParams'
+  import listMixin from '@/mixins/list'
+  import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
   import Uploader from '@/components/Uploader'
 
   const module = 'videos'
-  const initWhere = {
-    title: {
-      $like: ''
-    }
-  }
 
   export default {
     components: {
-      List,
-      ListHeader,
-      ListOperations,
-      ListSearch,
-      ListNavigation,
+      CList,
+      CListHeader,
+      CListOperations,
+      CListSearch,
+      CListNavigation,
       Uploader
     },
+    mixins: [
+      routeParamsMixin,
+      listMixin
+    ],
     data () {
       return {
         oldId: '0',
@@ -307,10 +308,11 @@
             }
           ],
           cSearch: {
-            cache: {
-              where: this.$helpers.deepCopy(initWhere)
-            },
-            where: this.$helpers.deepCopy(initWhere)
+            where: {
+              title: {
+                $like: ''
+              }
+            }
           },
           cPage: {
             current: 1
@@ -387,23 +389,21 @@
     },
     created () {
       this.oldId = this.$route.params.oldId
+      if (this.listSearchWhere) {
+        this.cList.cSearch.where = this.listSearchWhere
+      }
       this.getList()
       if (this.oldId !== '0') {
         this.getOldsDetail()
       }
     },
     methods: {
-      getList (current = 1) {
-        this.cList.cPage.current = current
-
+      getList () {
         return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: {
-              ...this.cList.cSearch.where,
-              oldId: this.oldId
-            }
+            where: { ...this.listSearchWhere, oldId: this.oldId }
           }
         })
       },
@@ -417,14 +417,23 @@
         this.$refs.formValidate.resetFields()
         this.$set(this.cForm, 'formValidate', { praisesNum: 0, commentsNum: 0 })
       },
-      resetSearch () {
-        this.cList.cSearch.cache.where = this.$helpers.deepCopy(initWhere)
-        this.handleSearch()
+      async resetSearch () {
+        const getListRes = await this.getList()
+        if (!getListRes.items.length) {
+          this.$router.push({
+            query: {
+              listPageCurrent: this.listPageCurrent - 1 || 1
+            }
+          })
+        }
       },
       handleSearch () {
-        this.cList.cPage.current = 1
-        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
-        this.getList()
+        this.$router.push({
+          query: {
+            listPageCurrent: 1,
+            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
+          }
+        })
       },
       handleUploaderChange (field) {
         return file => {

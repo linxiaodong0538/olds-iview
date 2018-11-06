@@ -1,21 +1,21 @@
 <template>
   <div>
-    <List
+    <CList
       :columns="cList.columns"
       :data="list.items"
       :total="list.total"
-      :current="cList.cPage.current"
-      @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations>
+      :pageCurrent="listPageCurrent"
+      :searchWhere="listSearchWhere">
+      <CListHeader>
+        <CListOperations>
           <Button
             class="margin-right-sm"
             type="ghost"
             @click="handleGoBack">
             返回
           </Button>
-        </ListOperations>
-        <ListSearch>
+        </CListOperations>
+        <CListSearch>
           <Form
             inline
             @submit.native.prevent="handleSearch">
@@ -23,7 +23,7 @@
               <PersonSelect
                 type="families"
                 placeholder="请选择评论人"
-                @change="handlePersonSelectChange" />
+                v-model="cList.cSearch.where.$or.fromUserId" />
             </Form-item>
             <Form-item>
               <Button
@@ -33,12 +33,12 @@
               </Button>
             </Form-item>
           </Form>
-        </ListSearch>
-      </ListHeader>
-      <ListNavigation>
+        </CListSearch>
+      </CListHeader>
+      <CListNavigation>
         <Alert>“{{ videosDetail.title }}”的评论：</Alert>
-      </ListNavigation>
-    </List>
+      </CListNavigation>
+    </CList>
 
     <Modal
       width="280"
@@ -102,23 +102,28 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
+  import routeParamsMixin from '@/mixins/routeParams'
+  import listMixin from '@/mixins/list'
+  import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
   import PersonSelect from '@/components/PersonSelect'
   import PersonLabel from '@/components/PersonLabel'
 
   const module = 'comments'
-  const initWhere = {}
 
   export default {
     components: {
-      List,
-      ListHeader,
-      ListOperations,
-      ListSearch,
+      CList,
+      CListHeader,
+      CListOperations,
+      CListSearch,
       PersonSelect,
       PersonLabel,
-      ListNavigation
+      CListNavigation
     },
+    mixins: [
+      routeParamsMixin,
+      listMixin
+    ],
     data () {
       return {
         cList: {
@@ -205,13 +210,18 @@
             }
           ],
           cSearch: {
-            cache: {
-              where: this.$helpers.deepCopy(initWhere)
-            },
-            where: this.$helpers.deepCopy(initWhere)
-          },
-          cPage: {
-            current: 1
+            where: {
+              $or: [
+                {
+                  fromUserId: 1,
+                  toUserId: null
+                },
+                {
+                  fromUserId: null,
+                  toUserId: 1
+                }
+              ]
+            }
           }
         },
         cDel: {
@@ -254,17 +264,12 @@
       getVideosDetail () {
         return this.$store.dispatch('videos/getDetail', { id: this.videoId })
       },
-      getList (current = 1) {
-        this.cList.cPage.current = current
-
+      getList () {
         return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: {
-              ...this.cList.cSearch.where,
-              resourceId: this.videoId
-            }
+            where: { ...this.listSearchWhere, resourceId: this.videoId }
           }
         })
       },
@@ -276,9 +281,12 @@
         window.history.go(-1)
       },
       handleSearch () {
-        this.cList.cPage.current = 1
-        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
-        this.getList()
+        this.$router.push({
+          query: {
+            listPageCurrent: 1,
+            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
+          }
+        })
       },
       handlePageChange (current) {
         this.getList(current)
