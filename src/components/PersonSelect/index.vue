@@ -24,8 +24,7 @@
       filterable
       :placeholder="placeholder"
       style="width: 220px"
-      @on-change="handleChange"
-      >
+      @on-change="handleChange">
       <Option
         v-for="(item, index) in items"
         :value="item.id"
