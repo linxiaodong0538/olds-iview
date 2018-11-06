@@ -124,6 +124,7 @@
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
   import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
   import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
 
   const module = 'oldHealthRecords'
@@ -143,7 +144,8 @@
     },
     mixins: [
       routeParamsMixin,
-      listMixin
+      listMixin,
+      formMixin
     ],
     data () {
       return {
@@ -265,10 +267,6 @@
       getOldsDetail () {
         return this.$store.dispatch('olds/getDetail', { id: this.oldId })
       },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', {})
-      },
       handleShowPost () {
         this.cForm.id = 0
         this.cForm.modal = true
@@ -287,15 +285,7 @@
         this.$Message.success('删除成功！')
 
         const getListRes = await this.getList()
-
-        if (!getListRes.items.length && this.listPageCurrent !== 1) {
-          this.$router.push({
-            query: {
-              listPageCurrent: this.listPageCurrent - 1 || 1,
-              listSearchWhere: JSON.stringify(this.listSearchWhere)
-            }
-          })
-        }
+        !getListRes.items.length && this.goPrevPage()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
