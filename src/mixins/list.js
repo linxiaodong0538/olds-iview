@@ -42,6 +42,16 @@ export default {
           listSearchWhere: JSON.stringify(this.cList.cSearch.where)
         }
       })
+    },
+    goPrevPage () {
+      if (this.listPageCurrent !== 1) {
+        this.$router.push({
+          query: {
+            listPageCurrent: this.listPageCurrent - 1 || 1,
+            listSearchWhere: JSON.stringify(this.listSearchWhere)
+          }
+        })
+      }
     }
   }
 }
