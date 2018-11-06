@@ -18,7 +18,7 @@
         <CListSearch>
           <Form
             inline
-            @submit.native.prevent="handleSearch">
+            @submit.native.prevent="search">
             <Form-item prop="name">
               <Input
                 type="text"
@@ -29,7 +29,7 @@
             <Form-item>
               <Button
                 type="primary"
-                @click="handleSearch">
+                @click="search">
                 查询
               </Button>
             </Form-item>
@@ -51,9 +51,15 @@
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
   import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
   import CList, { CListHeader, CListOperations, CListSearch } from '@/components1/List'
 
   const module = 'olds'
+  const initWhere = {
+    name: {
+      $like: ''
+    }
+  }
 
   export default {
     components: {
@@ -64,17 +70,14 @@
     },
     mixins: [
       routeParamsMixin,
-      listMixin
+      listMixin,
+      formMixin
     ],
     data () {
       return {
         cList: {
           cSearch: {
-            where: {
-              name: {
-                $like: ''
-              }
-            }
+            where: this.$helpers.deepCopy(initWhere)
           },
           cPage: {
             current: 1
@@ -212,13 +215,12 @@
       }
     },
     async beforeRouteUpdate (to, from, next) {
+      this.initSearchWhere(initWhere)
       this.getList()
       next()
     },
     async created () {
-      if (this.listSearchWhere) {
-        this.cList.cSearch.where = this.listSearchWhere
-      }
+      this.initSearchWhere(initWhere)
       this.getList()
     },
     methods: {
@@ -231,14 +233,6 @@
           }
         })
       },
-      handleSearch () {
-        this.$router.push({
-          query: {
-            listPageCurrent: 1,
-            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
-          }
-        })
-      },
       handleShowDel (id) {
         this.cDel.id = id
         this.cDel.modal = true
@@ -248,15 +242,7 @@
         this.$Message.success('删除成功！')
 
         const getListRes = await this.getList()
-
-        if (!getListRes.items.length) {
-          this.$router.push({
-            query: {
-              listPageCurrent: this.listPageCurrent - 1 || 1,
-              listSearchWhere: JSON.stringify(this.listSearchWhere)
-            }
-          })
-        }
+        !getListRes.items.length && this.goPrevPage()
       }
     }
   }
