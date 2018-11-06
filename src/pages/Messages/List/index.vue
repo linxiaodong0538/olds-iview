@@ -1,13 +1,13 @@
 <template>
   <div>
-    <List
-      :current="cList.cPage.current"
+    <CList
+      :pageCurrent="listPageCurrent"
       :data="list.items"
       :columns="cList.columns"
       :total="list.total"
-      @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations>
+      :searchWhere="listSearchWhere">
+      <CListHeader>
+        <CListOperations>
           <Button
             v-if="+oldId === 0"
             class="margin-right-sm"
@@ -22,8 +22,8 @@
             @click="handleGoBack">
             返回
           </Button>
-        </ListOperations>
-        <ListSearch>
+        </CListOperations>
+        <CListSearch>
           <Form
             inline
             @submit.native.prevent="handleSearch">
@@ -31,7 +31,7 @@
               <Input
                 type="text"
                 placeholder="请输入内容"
-                v-model="cList.cSearch.cache.where.content.$like"
+                v-model="cList.cSearch.where.content.$like"
                 style="width: 220px;" />
             </Form-item>
             <Form-item>
@@ -42,16 +42,16 @@
               </Button>
             </Form-item>
           </Form>
-        </ListSearch>
-      </ListHeader>
-      <ListNavigation v-if="+oldId !== 0">
+        </CListSearch>
+      </CListHeader>
+      <CListNavigation v-if="+oldId !== 0">
         <Alert>“{{ oldsDetail.name }}”的消息：</Alert>
-      </ListNavigation>
-    </List>
+      </CListNavigation>
+    </CList>
     <Modal
       width="280"
       v-model="cDel.modal"
-      title="请确认"
+      title="请确认" 
       @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
@@ -99,23 +99,24 @@
 
 <script>
   import { mapState } from 'vuex'
-  import List, { ListHeader, ListOperations, ListSearch, ListNavigation } from '@/components/List'
+  import routeParamsMixin from '@/mixins/routeParams'
+  import listMixin from '@/mixins/list'
+  import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
 
   const module = 'messages'
-  const initWhere = {
-    content: {
-      $like: ''
-    }
-  }
 
   export default {
     components: {
-      List,
-      ListHeader,
-      ListOperations,
-      ListSearch,
-      ListNavigation
+      CList,
+      CListHeader,
+      CListOperations,
+      CListSearch,
+      CListNavigation
     },
+    mixins: [
+      routeParamsMixin,
+      listMixin
+    ],
     data () {
       return {
         oldId: 0,
@@ -164,13 +165,11 @@
             }
           ],
           cSearch: {
-            cache: {
-              where: this.$helpers.deepCopy(initWhere)
-            },
-            where: this.$helpers.deepCopy(initWhere)
-          },
-          cPage: {
-            current: 1
+            where: {
+              content: {
+                $like: ''
+              }
+            }
           }
         },
         cDel: {
@@ -213,21 +212,19 @@
     },
     created () {
       this.oldId = this.$route.params.oldId
+      if (this.listSearchWhere) {
+        this.cList.cSearch.where = this.listSearchWhere
+      }
       this.getList()
       this.oldId && this.getOldsDetail()
     },
     methods: {
-      getList (current = 1) {
-        this.cList.cPage.current = current
-
+      getList () {
         return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: {
-              ...this.cList.cSearch.where,
-              toId: { $eq: this.oldId }
-            }
+            where: { ...this.listSearchWhere, toId: {$eq: this.oldId} }
           }
         })
       },
@@ -238,14 +235,23 @@
         this.$refs.formValidate.resetFields()
         this.$set(this.cForm, 'formValidate', {})
       },
-      resetSearch () {
-        this.cList.cSearch.cache.where = this.$helpers.deepCopy(initWhere)
-        this.handleSearch()
+      async resetSearch () {
+        const getListRes = await this.getList()
+        if (!getListRes.items.length) {
+          this.$router.push({
+            query: {
+              listPageCurrent: this.listPageCurrent - 1 || 1
+            }
+          })
+        }
       },
       handleSearch () {
-        this.cList.cPage.current = 1
-        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
-        this.getList()
+        this.$router.push({
+          query: {
+            listPageCurrent: 1,
+            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
+          }
+        })
       },
       handleShowPost () {
         this.cForm.id = 0
@@ -259,9 +265,6 @@
       handleShowDel (id) {
         this.cDel.id = id
         this.cDel.modal = true
-      },
-      handlePageChange (current) {
-        this.getList(current)
       },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })

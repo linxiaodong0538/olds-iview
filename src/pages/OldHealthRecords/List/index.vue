@@ -247,6 +247,9 @@
     },
     created () {
       this.oldId = this.$route.params.oldId
+      if (this.listSearchWhere) {
+        this.cList.cSearch.where = this.listSearchWhere
+      }
       this.getList()
       this.getOldsDetail()
     },
@@ -256,10 +259,7 @@
           query: {
             offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: {
-              ...this.cList.cSearch.where,
-              oldId: this.oldId
-            }
+            where: { ...this.listSearchWhere, oldId: this.oldId }
           }
         })
       },
