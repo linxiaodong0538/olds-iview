@@ -273,8 +273,8 @@
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', this.$helpers.deepCopy(detail))
         this.cForm.modal = true
+        this.initFields(detail)
       },
       handleShowDel (id) {
         this.cDel.id = id
