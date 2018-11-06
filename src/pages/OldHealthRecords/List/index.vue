@@ -17,19 +17,17 @@
           <Button
             class="margin-right-sm"
             type="ghost"
-            @click="handleGoBack">
+            @click="$router.push('/xd-app/olds/olds/olds/index')">
             返回
           </Button>
         </CListOperations>
         <CListSearch>
           <Form
             inline
-            @submit.native.prevent="handleSearch">
+            @submit.native.prevent="search">
             <Form-item>
               <Select
-                ref="select"
                 clearable
-                filterable
                 style="width: 220px"
                 placeholder="请选择指标"
                 v-model="cList.cSearch.where.indicator.$eq">
@@ -44,7 +42,7 @@
             <Form-item>
               <Button
                 type="primary"
-                @click="handleSearch">
+                @click="search">
                 查询
               </Button>
             </Form-item>
@@ -78,8 +76,9 @@
           <Row>
             <Col span="20">
               <Select
-                v-model="cForm.formValidate.indicator"
+                clearable
                 style="width:200px"
+                v-model="cForm.formValidate.indicator"
                 placeholder="请选择指标">
                 <Option
                   v-for="(item, index) in Object.keys($consts.HEALTH_INDICATORS)"
@@ -128,6 +127,11 @@
   import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
 
   const module = 'oldHealthRecords'
+  const initWhere = {
+    indicator: {
+      $eq: ''
+    }
+  }
 
   export default {
     components: {
@@ -198,11 +202,7 @@
             }
           ],
           cSearch: {
-            where: {
-              indicator: {
-                $eq: ''
-              }
-            }
+            where: this.$helpers.deepCopy(initWhere)
           }
         },
         cDel: {
@@ -232,10 +232,6 @@
       list: state => state[module].list,
       oldsDetail: state => state.olds.detail
     }),
-    async beforeRouteUpdate (to, from, next) {
-      this.getList()
-      next()
-    },
     watch: {
       'cForm.modal': {
         handler (newVal) {
@@ -245,13 +241,16 @@
         }
       }
     },
+    async beforeRouteUpdate (to, from, next) {
+      this.initSearchWhere(initWhere)
+      this.getList()
+      next()
+    },
     created () {
       this.oldId = this.$route.params.oldId
-      if (this.listSearchWhere) {
-        this.cList.cSearch.where = this.listSearchWhere
-      }
-      this.getList()
       this.getOldsDetail()
+      this.initSearchWhere(initWhere)
+      this.getList()
     },
     methods: {
       getList () {
@@ -270,27 +269,6 @@
         this.$refs.formValidate.resetFields()
         this.$set(this.cForm, 'formValidate', {})
       },
-      async resetSearch () {
-        const getListRes = await this.getList()
-        if (!getListRes.items.length) {
-          this.$router.push({
-            query: {
-              listPageCurrent: this.listPageCurrent - 1 || 1
-            }
-          })
-        }
-      },
-      handleSearch () {
-        this.$router.push({
-          query: {
-            listPageCurrent: 1,
-            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
-          }
-        })
-      },
-      handleGoBack () {
-        window.history.go(-1)
-      },
       handleShowPost () {
         this.cForm.id = 0
         this.cForm.modal = true
@@ -304,11 +282,20 @@
         this.cDel.id = id
         this.cDel.modal = true
       },
-
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        this.getList()
+
+        const getListRes = await this.getList()
+
+        if (!getListRes.items.length && this.listPageCurrent !== 1) {
+          this.$router.push({
+            query: {
+              listPageCurrent: this.listPageCurrent - 1 || 1,
+              listSearchWhere: JSON.stringify(this.listSearchWhere)
+            }
+          })
+        }
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
@@ -323,7 +310,7 @@
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            !this.cForm.id && this.resetSearch()
+            !this.cForm.id && this.resetSearch(initWhere)
             this.getList()
           }
         })
