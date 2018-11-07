@@ -257,7 +257,8 @@
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        this.getList()
+        const getListRes = await this.getList()
+        !getListRes.items.length && this.goPrevPage()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
