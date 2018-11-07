@@ -311,7 +311,7 @@
         cForm: {
           id: 0,
           modal: false,
-          formValidate: { ...initForm },
+          formValidate: this.$helpers.deepCopy(initForm),
           ruleValidate: {
             title: [
               {
