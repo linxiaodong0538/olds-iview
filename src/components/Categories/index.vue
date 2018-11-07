@@ -1,13 +1,26 @@
 <template>
   <div>
-    <Select style="width: 220px" placeholder="请选择分类" clearable :value.sync="value" @on-change="change">
+    <Select
+      style="width: 220px"
+      placeholder="请选择分类"
+      clearable
+      :value.sync="value"
+      @on-change="change">
       <template v-for="item1 in items">
-        <OptionGroup v-if="!!item1.children" :label="item1.title">
-          <Option v-for="item2 in item1.children" :value="item2.id" :key="item2.id">
+        <OptionGroup
+          v-if="!!item1.children"
+          :label="item1.title">
+          <Option
+            v-for="item2 in item1.children"
+            :value="item2.id"
+            :key="item2.id">
             {{ item2.title }}
           </Option>
         </OptionGroup>
-        <Option v-else :value="item1.id" :key="item1.id">
+        <Option
+          v-else
+          :value="item1.id"
+          :key="item1.id">
           {{ item1.title }}
         </Option>
       </template>
@@ -20,7 +33,7 @@
   import arrayToTree from 'array-to-tree'
 
   export default {
-    name: 'categories',
+    name: 'CCategories',
     props: {
       alias: {
         type: String,
