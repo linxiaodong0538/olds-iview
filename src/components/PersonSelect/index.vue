@@ -44,7 +44,7 @@
     name: 'PersonSelect',
     props: {
       value: {
-        type: Number,
+        type: [Number, String],
         default: ''
       },
       type: {
