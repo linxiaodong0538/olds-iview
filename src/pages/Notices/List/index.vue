@@ -1,11 +1,11 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="notices.notices.items" :total="notices.notices.total"
-          @on-change="handlePageChange">
-    </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
-      <p>确认删除？</p>
-    </Modal>
+    <CList 
+      :columns="columns" 
+      :data="list.items" 
+      :total="list.total"
+      :pageCurrent="listPageCurrent">
+    </CList>
   </div>
 </template>
 
@@ -14,37 +14,39 @@
   import time from '@/utils/time'
   import consts from '@/utils/consts'
   import helpers from '@/utils/helpers/base'
-  import List, { ListHeader, ListOperations } from '@/components/List'
+  import routeParamsMixin from '@/mixins/routeParams'
+  import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
+  import CList, { CListHeader, CListOperations } from '@/components1/List'
+
+  const module = 'notices'
 
   export default {
     name: 'list',
     async beforeRouteUpdate (to, from, next) {
-      this.notices.notices = {}
-
       this.routePrefix = helpers.getRoutePrefix(to.params)
       this.where.alias = to.params.alias
-
-      this.getItems()
-
+      this.getList()
       next()
     },
     async created () {
-      this.notices.notices = {}
-
       this.routePrefix = helpers.getRoutePrefix(this.$route.params)
       this.where.alias = this.$route.params.alias
-
-      this.getItems()
+      this.getList()
     },
     components: {
-      List,
-      ListHeader,
-      ListOperations
+      CList,
+      CListHeader,
+      CListOperations
     },
+    mixins: [
+      routeParamsMixin,
+      listMixin,
+      formMixin
+    ],
     data () {
       return {
         consts,
-        routePrefix: '',
         where: {
           alias: ''
         },
@@ -96,36 +98,18 @@
         ]
       }
     },
-    computed: mapState([
-      'notices'
-    ]),
+    computed: mapState({
+      list: state => state[module].list
+    }),
     methods: {
-      getItems (current = 1) {
-        this.current = current
-
-        return this.$store.dispatch('getNotices', {
+      getList () {
+        return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * consts.PAGE_SIZE,
-            limit: consts.PAGE_SIZE,
+            offset: (this.listPageCurrent - 1) * consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE,
             where: this.where
           }
         })
-      },
-      handlePageChange (current) {
-        this.getItems(current)
-      },
-      handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
-      },
-      async handleDelOk () {
-        await this.$store.dispatch('delNotice', {
-          id: this.del.id
-        })
-        this.$Message.success('删除成功！')
-        // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
-        await helpers.sleep(500)
-        this.getItems()
       }
     }
   }
