@@ -265,7 +265,8 @@
                     },
                     on: {
                       click: () => {
-                        this.$router.push(`/xd-app/${this.belongsToOld ? 'olds' : 'videos'}/videos/comments/${params.row.id}/${this.oldsDetail.id}`)
+                        const oldId = this.oldsDetail && this.oldsDetail.id ? this.oldsDetail.id : 0
+                        this.$router.push(`/xd-app/${this.belongsToOld ? 'olds' : 'videos'}/videos/comments/${params.row.id}/${oldId}`)
                       }
                     }
                   }, '查看评论'),

@@ -103,7 +103,7 @@
     computed: mapState({
       list: state => state[module].list,
       oldsDetail: state => state.olds.detail,
-      categories: 'categories'
+      categories: state => state.categories
     }),
     async beforeRouteUpdate (to, from, next) {
       this.getList()
@@ -112,6 +112,7 @@
     async created () {
       this.oldId = this.$route.params.oldId
       this.oldId && this.getOldsDetail()
+      await this.getCategoryItems()
       this.getList()
     },
     methods: {
@@ -128,6 +129,15 @@
       },
       getOldsDetail () {
         return this.$store.dispatch('olds/getDetail', { id: this.oldId })
+      },
+      getCategoryItems () {
+        console.log(22)
+        return this.$store.dispatch('getCategories', {
+          query: {
+            where: { alias: this.alias },
+            limit: 1000
+          }
+        })
       },
       getCategoryTitle (id) {
         const items = this.categories.categories.items
