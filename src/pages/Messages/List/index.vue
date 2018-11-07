@@ -19,14 +19,14 @@
             v-if="+oldId !== 0"
             class="margin-right-sm"
             type="ghost"
-            @click="handleGoBack">
+            @click="$router.push('/xd-app/discover/olds/olds/index')">
             返回
           </Button>
         </CListOperations>
         <CListSearch>
           <Form
             inline
-            @submit.native.prevent="handleSearch">
+            @submit.native.prevent="search">
             <Form-item prop="name">
               <Input
                 type="text"
@@ -37,7 +37,7 @@
             <Form-item>
               <Button
                 type="primary"
-                @click="handleSearch">
+                @click="search">
                 查询
               </Button>
             </Form-item>
@@ -51,7 +51,7 @@
     <Modal
       width="280"
       v-model="cDel.modal"
-      title="请确认" 
+      title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
@@ -101,9 +101,15 @@
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
   import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
   import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
 
   const module = 'messages'
+  const initWhere = {
+    content: {
+      $like: ''
+    }
+  }
 
   export default {
     components: {
@@ -115,7 +121,8 @@
     },
     mixins: [
       routeParamsMixin,
-      listMixin
+      listMixin,
+      formMixin
     ],
     data () {
       return {
@@ -165,11 +172,7 @@
             }
           ],
           cSearch: {
-            where: {
-              content: {
-                $like: ''
-              }
-            }
+            where: this.$helpers.deepCopy(initWhere)
           }
         },
         cDel: {
@@ -206,17 +209,16 @@
     },
     async beforeRouteUpdate (to, from, next) {
       this.oldId = to.params.oldId || 0
-      this.getList()
       this.oldId && this.getOldsDetail()
+      this.initSearchWhere(initWhere)
+      this.getList()
       next()
     },
     created () {
-      this.oldId = this.$route.params.oldId
-      if (this.listSearchWhere) {
-        this.cList.cSearch.where = this.listSearchWhere
-      }
-      this.getList()
+      this.oldId = this.$route.params.oldId || 0
       this.oldId && this.getOldsDetail()
+      this.initSearchWhere(initWhere)
+      this.getList()
     },
     methods: {
       getList () {
@@ -224,34 +226,12 @@
           query: {
             offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: { ...this.listSearchWhere, toId: {$eq: this.oldId} }
+            where: { ...this.listSearchWhere, toId: { $eq: this.oldId } }
           }
         })
       },
       getOldsDetail () {
         return this.$store.dispatch('olds/getDetail', { id: this.oldId })
-      },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', {})
-      },
-      async resetSearch () {
-        const getListRes = await this.getList()
-        if (!getListRes.items.length) {
-          this.$router.push({
-            query: {
-              listPageCurrent: this.listPageCurrent - 1 || 1
-            }
-          })
-        }
-      },
-      handleSearch () {
-        this.$router.push({
-          query: {
-            listPageCurrent: 1,
-            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
-          }
-        })
       },
       handleShowPost () {
         this.cForm.id = 0
@@ -259,8 +239,8 @@
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', this.$helpers.deepCopy(detail))
         this.cForm.modal = true
+        this.initFields(detail)
       },
       handleShowDel (id) {
         this.cDel.id = id
@@ -269,7 +249,9 @@
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        this.getList()
+
+        const getListRes = await this.getList()
+        !getListRes.items.length && this.goPrevPage()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
@@ -278,15 +260,13 @@
               id: this.cForm.id || '0',
               body: this.cForm.formValidate
             })
+
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            !this.cForm.id && this.resetSearch()
+            !this.cForm.id && this.resetSearch(initWhere)
             this.getList()
           }
         })
-      },
-      handleGoBack () {
-        window.history.go(-1)
       }
     }
   }

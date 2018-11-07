@@ -265,7 +265,7 @@
                     },
                     on: {
                       click: () => {
-                        this.$router.push(`/xd-app/${this.belongsToOld ? 'olds' : 'videos'}/videos/comments/${params.row.id}`)
+                        this.$router.push(`/xd-app/${this.belongsToOld ? 'olds' : 'videos'}/videos/comments/${params.row.id}/${this.oldsDetail.id}`)
                       }
                     }
                   }, '查看评论'),
@@ -311,7 +311,7 @@
         cForm: {
           id: 0,
           modal: false,
-          formValidate: { ...initForm },
+          formValidate: this.$helpers.deepCopy(initForm),
           ruleValidate: {
             title: [
               {

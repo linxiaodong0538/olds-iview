@@ -24,7 +24,9 @@ export default {
   },
   methods: {
     initSearchWhere (initWhere) {
-      this.cList.cSearch.where = this.listSearchWhere || this.$helpers.deepCopy(initWhere)
+      this.cList.cSearch.where = this.listSearchWhere
+        ? this.$helpers.deepCopy(this.listSearchWhere)
+        : this.$helpers.deepCopy(initWhere)
     },
     async resetSearch (initWhere) {
       this.$router.push({
