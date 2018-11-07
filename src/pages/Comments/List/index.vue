@@ -11,24 +11,25 @@
           <Button
             class="margin-right-sm"
             type="ghost"
-            @click="handleGoBack">
+            @click="$router.push('')">
             返回
           </Button>
         </CListOperations>
         <CListSearch>
           <Form
             inline
-            @submit.native.prevent="handleSearch">
+            @submit.native.prevent="search">
             <Form-item prop="name">
               <PersonSelect
                 type="families"
                 placeholder="请选择评论人"
-                v-model="cList.cSearch.where.$or.fromUserId" />
+                v-model="cList.cSearch.where.userId.$eq"
+                @change="value => { cList.cSearch.where.userId.$eq = value }" />
             </Form-item>
             <Form-item>
               <Button
                 type="primary"
-                @click="handleSearch">
+                @click="search">
                 查询
               </Button>
             </Form-item>
@@ -104,11 +105,17 @@
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
   import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
   import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
   import PersonSelect from '@/components/PersonSelect'
   import PersonLabel from '@/components/PersonLabel'
 
   const module = 'comments'
+  const initWhere = {
+    userId: {
+      $eq: 0
+    }
+  }
 
   export default {
     components: {
@@ -122,7 +129,8 @@
     },
     mixins: [
       routeParamsMixin,
-      listMixin
+      listMixin,
+      formMixin
     ],
     data () {
       return {
@@ -210,18 +218,7 @@
             }
           ],
           cSearch: {
-            where: {
-              $or: [
-                {
-                  fromUserId: 1,
-                  toUserId: null
-                },
-                {
-                  fromUserId: null,
-                  toUserId: 1
-                }
-              ]
-            }
+            where: this.$helpers.deepCopy(initWhere)
           }
         },
         cDel: {
@@ -255,9 +252,15 @@
         }
       }
     },
+    async beforeRouteUpdate (to, from, next) {
+      this.initSearchWhere(initWhere)
+      this.getList()
+      next()
+    },
     created () {
       this.videoId = this.$route.params.videoId
       this.getVideosDetail()
+      this.initSearchWhere(initWhere)
       this.getList()
     },
     methods: {
@@ -265,31 +268,32 @@
         return this.$store.dispatch('videos/getDetail', { id: this.videoId })
       },
       getList () {
+        console.log(this.listSearchWhere, 1111)
         return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
-            where: { ...this.listSearchWhere, resourceId: this.videoId }
+            where: Object.assign(
+              { resourceId: this.videoId },
+              this.listSearchWhere && this.listSearchWhere.userId.$eq
+                ? {
+                  $or: [
+                    {
+                      fromUserId: {
+                        $eq: this.listSearchWhere.userId.$eq,
+                      }
+                    },
+                    {
+                      toUserId: {
+                        $eq: this.listSearchWhere.userId.$eq,
+                      }
+                    }
+                  ]
+                }
+                : null
+            )
           }
         })
-      },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', {})
-      },
-      handleGoBack () {
-        window.history.go(-1)
-      },
-      handleSearch () {
-        this.$router.push({
-          query: {
-            listPageCurrent: 1,
-            listSearchWhere: JSON.stringify(this.cList.cSearch.where)
-          }
-        })
-      },
-      handlePageChange (current) {
-        this.getList(current)
       },
       handleShowPost ({ fromUserId }) {
         this.$set(this.cForm, 'formValidate', { toUserId: fromUserId })
@@ -302,7 +306,9 @@
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        this.getList()
+
+        const getListRes = await this.getList()
+        !getListRes.items.length && this.goPrevPage()
       },
       handleFormOk () {
         this.$refs.formValidate.validate(async valid => {
@@ -316,36 +322,11 @@
             this.cForm.modal = false
             this.$Message.success('回复成功！')
 
-            this.cList.cSearch.where = {
-              $or: [
-                {
-                  fromUserId: toUserId,
-                  toUserId: null
-                },
-                {
-                  fromUserId: null,
-                  toUserId: toUserId
-                }
-              ]
-            }
-
+            this.cList.cSearch.where.userId.$eq = toUserId
+            this.search()
             this.getList()
           }
         })
-      },
-      handlePersonSelectChange (value) {
-        this.cList.cSearch.cache.where = {
-          $or: [
-            {
-              fromUserId: value,
-              toUserId: null
-            },
-            {
-              fromUserId: null,
-              toUserId: value
-            }
-          ]
-        }
       }
     }
   }

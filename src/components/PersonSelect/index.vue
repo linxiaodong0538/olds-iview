@@ -19,11 +19,11 @@
       </ButtonGroup>
     </p>
     <Select
-      ref="select"
       clearable
       filterable
       :placeholder="placeholder"
       style="width: 220px"
+      :value="value"
       @on-change="handleChange">
       <Option
         v-for="(item, index) in items"
@@ -43,6 +43,10 @@
   export default {
     name: 'PersonSelect',
     props: {
+      value: {
+        type: Number,
+        default: ''
+      },
       type: {
         type: String,
         default: 'olds'
