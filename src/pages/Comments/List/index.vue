@@ -11,7 +11,7 @@
           <Button
             class="margin-right-sm"
             type="ghost"
-            @click="$router.push('')">
+            @click="$router.push(routePrefix === '/xd-app/videos/videos' ? '/xd-app/videos/videos/videos/0' : `/xd-app/olds/videos/videos/${oldId}`)">
             返回
           </Button>
         </CListOperations>
@@ -134,6 +134,7 @@
     ],
     data () {
       return {
+        oldId: 0,
         cList: {
           columns: [
             {
@@ -253,11 +254,13 @@
       }
     },
     async beforeRouteUpdate (to, from, next) {
+      this.oldId = to.params.oldId
       this.initSearchWhere(initWhere)
       this.getList()
       next()
     },
     created () {
+      this.oldId = this.$route.params.oldId
       this.videoId = this.$route.params.videoId
       this.getVideosDetail()
       this.initSearchWhere(initWhere)
@@ -268,7 +271,6 @@
         return this.$store.dispatch('videos/getDetail', { id: this.videoId })
       },
       getList () {
-        console.log(this.listSearchWhere, 1111)
         return this.$store.dispatch(`${module}/getList`, {
           query: {
             offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
