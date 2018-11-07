@@ -150,7 +150,7 @@
         </Button>
         <Button
           type="ghost"
-          @click="$helpers.goBack()">
+          @click="id ? $helpers.goBack() : $router.push('/xhh-app/persons/families/families/index')">
           返回
         </Button>
       </Form-item>
