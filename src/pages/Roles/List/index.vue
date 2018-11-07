@@ -1,22 +1,21 @@
 <template>
   <div>
-    <List
+    <CList
       :columns="cList.columns"
       :data="list.items"
       :total="list.total"
-      :current="cList.cPage.current"
-      @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations>
+      :pageCurrent="listPageCurrent">
+      <CListHeader>
+        <CListOperations>
           <Button
             class="margin-right-sm"
             type="primary"
             @click="handleShowPost">
             新增
           </Button>
-        </ListOperations>
-      </ListHeader>
-    </List>
+        </CListOperations>
+      </CListHeader>
+    </CList>
     <Modal
       width="280"
       v-model="cDel.modal"
@@ -99,17 +98,23 @@
 <script>
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
-  import List, { ListHeader, ListOperations } from '@/components/List'
+  import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
+  import CList, { CListHeader, CListOperations } from '@/components1/List'
 
   const module = 'roles'
 
   export default {
     components: {
-      List,
-      ListHeader,
-      ListOperations
+      CList,
+      CListHeader,
+      CListOperations
     },
-    mixins: [routeParamsMixin],
+    mixins: [
+      routeParamsMixin,
+      listMixin,
+      formMixin
+    ],
     data () {
       return {
         cList: {
@@ -167,10 +172,7 @@
                 ])
               }
             }
-          ],
-          cPage: {
-            current: 1
-          }
+          ]
         },
         cDel: {
           id: 0,
@@ -225,12 +227,10 @@
       await this.getList()
     },
     methods: {
-      getList (current = 1) {
-        this.cList.cPage.current = current
-
+      getList () {
         return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
             where: { alias: this.alias }
           }
@@ -241,20 +241,13 @@
           query: { offset: 0, limit: 1000 }
         })
       },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cForm, 'formValidate', {})
-      },
-      handlePageChange (current) {
-        this.getList(current)
-      },
       handleShowPost () {
         this.cForm.id = 0
         this.cForm.modal = true
       },
       handleShowPut (detail) {
         this.cForm.id = detail.id
-        this.$set(this.cForm, 'formValidate', this.$helpers.deepCopy(detail))
+        this.initFields(detail)
         this.cForm.modal = true
       },
       handleShowDel (id) {
@@ -279,6 +272,7 @@
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
+            !this.cForm.id && this.resetSearch()
             this.getList()
           }
         })
@@ -286,7 +280,6 @@
       handlePermissionsChange (item) {
         return checked => {
           const { permissions } = this.cForm.formValidate
-
           let items = permissions ? permissions.split(',') : []
 
           const index = items.indexOf(item)
