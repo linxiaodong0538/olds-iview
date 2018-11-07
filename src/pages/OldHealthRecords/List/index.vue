@@ -115,7 +115,7 @@
           @click="handleFormOk">
           确定
         </Button>
-      </div>  
+      </div>
     </Modal>
   </div>
 </template>
@@ -185,7 +185,6 @@
                     },
                     on: {
                       click: () => {
-                        console.log(params.row)
                         this.handleShowPut(params.row)
                       }
                     }

@@ -1,20 +1,13 @@
 <template>
-    <div>
-      <CList
-        :pageCurrent="listPageCurrent"
-        :data="list.items"
-        :columns="cList.columns"
-        :total="list.total"
-        :searchWhere="listSearchWhere">
-        <CListHeader>
+  <div>
+    <CList
+      :pageCurrent="listPageCurrent"
+      :data="list.items"
+      :columns="cList.columns"
+      :total="list.total"
+      :searchWhere="listSearchWhere">
+      <CListHeader>
         <CListOperations>
-          <Button
-            v-if="+oldId === 0"
-            class="margin-right-sm"
-            type="primary"
-            @click="handleShowPost">
-            新增
-          </Button>
           <Button
             v-if="+oldId !== 0"
             class="margin-right-sm"
@@ -28,13 +21,13 @@
         <Alert>“{{ oldsDetail.name }}” 老人的个人仓库：</Alert>
       </CListNavigation>
     </CList>
-    </div>
+  </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
   import listMixin from '@/mixins/list'
-  import helpers from '@/utils/helpers/base'
+  import formMixin from '@/mixins/form'
   import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
 
   const module = 'productStocks'
@@ -49,11 +42,11 @@
       CListNavigation
     },
     mixins: [
-      listMixin
+      listMixin,
+      formMixin
     ],
     data () {
       return {
-        alias: '',
         oldId: 0,
         cList: {
           columns: [
@@ -88,13 +81,6 @@
               }
             }
           ],
-          cSearch: {
-            where: {
-              title: {
-                $like: ''
-              }
-            }
-          },
           cDel: {
             id: 0,
             modal: false
@@ -115,14 +101,6 @@
         }
       }
     },
-    async created () {
-      if (this.listSearchWhere) {
-        this.cList.cSearch.where = this.listSearchWhere
-      }
-      this.oldId = this.$route.params.oldId
-      this.getList()
-      this.oldId && this.getOldsDetail()
-    },
     computed: {
       ...mapState({
         list: state => state[module].list,
@@ -134,6 +112,11 @@
       this.getList()
       next()
     },
+    async created () {
+      this.oldId = this.$route.params.oldId
+      this.getList()
+      this.oldId && this.getOldsDetail()
+    },
     methods: {
       getList () {
         return this.$store.dispatch(`${module}/getList`, {
@@ -141,8 +124,7 @@
             offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
             where: {
-              ...this.listSearchWhere,
-              oldId: {$eq: this.oldId}
+              oldId: { $eq: this.oldId }
             }
           }
         })
@@ -155,9 +137,9 @@
       },
       getCategoryTitle (id) {
         const items = this.categories.categories.items
-        const item = helpers.getItemById(items, id)
+        const item = this.$helpers.getItemById(items, id)
         const parentItem = item.parent_id
-          ? helpers.getItemById(items, item.parent_id) || {}
+          ? this.$helpers.getItemById(items, item.parent_id) || {}
           : {}
 
         return `${parentItem.title || ''} - ${item.title || ''}`

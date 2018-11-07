@@ -7,6 +7,7 @@ export default {
   },
   async beforeRouteUpdate (to, from, next) {
     const { query } = to
+
     this.listPageCurrent = +query.listPageCurrent || 1
     this.listSearchWhere = query.listSearchWhere
       ? JSON.parse(query.listSearchWhere)
