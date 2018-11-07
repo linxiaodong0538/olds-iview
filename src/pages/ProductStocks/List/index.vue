@@ -4,15 +4,14 @@
       :pageCurrent="listPageCurrent"
       :data="list.items"
       :columns="cList.columns"
-      :total="list.total"
-      :searchWhere="listSearchWhere">
+      :total="list.total">
       <CListHeader>
         <CListOperations>
           <Button
             v-if="+oldId !== 0"
             class="margin-right-sm"
             type="ghost"
-            @click="handleGoBack">
+            @click="$router.push('/xd-app/discover/olds/olds/index')">
             返回
           </Button>
         </CListOperations>
@@ -101,21 +100,19 @@
         }
       }
     },
-    computed: {
-      ...mapState({
-        list: state => state[module].list,
-        oldsDetail: state => state.olds.detail,
-        categories: 'categories'
-      })
-    },
+    computed: mapState({
+      list: state => state[module].list,
+      oldsDetail: state => state.olds.detail,
+      categories: 'categories'
+    }),
     async beforeRouteUpdate (to, from, next) {
       this.getList()
       next()
     },
     async created () {
       this.oldId = this.$route.params.oldId
-      this.getList()
       this.oldId && this.getOldsDetail()
+      this.getList()
     },
     methods: {
       getList () {
@@ -131,9 +128,6 @@
       },
       getOldsDetail () {
         return this.$store.dispatch('olds/getDetail', { id: this.oldId })
-      },
-      handleGoBack () {
-        window.history.go(-1)
       },
       getCategoryTitle (id) {
         const items = this.categories.categories.items
