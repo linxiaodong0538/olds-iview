@@ -2,50 +2,35 @@ import types from './types'
 import Model from '../../../models/categories'
 
 export default {
-  /**
-   * 获取列表
-   */
-  getCategories ({ commit }, { query }) {
-    return new Model().GET({ query }).then((res) => {
-      commit(types.GET_CATEGORIES, {
-        data: res.data
-      })
+  async getList ({ commit }, { query }) {
+    const res = await new Model().GET({ query })
+
+    commit(types.GET_LIST, {
+      data: res.data
     })
+
+    return res.data
   },
 
-  /**
-   * 获取详情
-   */
-  getCategory ({ commit }, { id }) {
-    return new Model().GET({ id }).then((res) => {
-      commit(types.GET_CATEGORY, {
-        data: res.data
-      })
+  async getDetail ({ commit }, { id }) {
+    const res = await new Model().GET({ id })
+
+    commit(types.GET_DETAIL, {
+      data: res.data
     })
+
+    return res.data
   },
 
-  /**
-   * 新增
-   */
-  postCategory ({ commit }, { body }) {
+  async post ({ commit }, { body }) {
     return new Model().POST({ body })
   },
 
-  /**
-   * 编辑
-   */
-  putCategory ({ commit }, { id, body }) {
+  async put ({ commit }, { id, body }) {
     return new Model().PUT({ id, body })
   },
 
-  /**
-   * 删除
-   */
-  delCategory ({ commit }, { id }) {
+  async del ({ commit }, { id }) {
     return new Model().DELETE({ id })
-  },
-
-  postCategoryAction ({ commit }, { id, query, body }) {
-    return new Model().addPath('actions').POST({ id, query, body })
   }
 }
