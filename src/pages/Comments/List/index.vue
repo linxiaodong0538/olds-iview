@@ -282,12 +282,12 @@
                   $or: [
                     {
                       fromUserId: {
-                        $eq: this.listSearchWhere.userId.$eq,
+                        $eq: this.listSearchWhere.userId.$eq
                       }
                     },
                     {
                       toUserId: {
-                        $eq: this.listSearchWhere.userId.$eq,
+                        $eq: this.listSearchWhere.userId.$eq
                       }
                     }
                   ]
