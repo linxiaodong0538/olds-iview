@@ -32,5 +32,9 @@ export default {
 
   async del ({ commit }, { id }) {
     return new Model().DELETE({ id })
+  },
+
+  postAction ({ commit }, { body }) {
+    return new Model().addPath('actions').POST({ body })
   }
 }

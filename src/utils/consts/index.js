@@ -7,6 +7,7 @@ import EDUCATION_DEGREES from './educationDegrees'
 import NURSING_GRADES from './nursingGrades'
 import NOTICE_COLUMNS from './noticeColumns'
 import HEALTH_INDICATORS from './healthIndicators'
+import ARTICLE_ATTRS from './articleAttrs'
 
 // 基础地址
 const BASE_URL = 'https://www.rjwb.cn' // env.isDev() ? 'http://localhost:3002' : 'https://www.chongyangyanglao.com'
@@ -29,6 +30,7 @@ export default {
   NURSING_GRADES,
   NOTICE_COLUMNS,
   HEALTH_INDICATORS,
+  ARTICLE_ATTRS,
   BASE_URL,
   API_URL,
   PAGE_SIZE,
