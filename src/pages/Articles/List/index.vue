@@ -1,264 +1,288 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="articles.articles.items" :total="articles.articles.total"
-          @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations>
-          <Button class="margin-right-sm" type="primary"
-                  @click="$router.push(`${routePrefix}/articles/index/form`)">新增
+    <CList
+      :data="list.items"
+      :columns="cList.columns"
+      :total="list.total"
+      :pageCurrent="listPageCurrent"
+      :searchWhere="listSearchWhere">
+      <CListHeader>
+        <CListOperations>
+          <Button
+            class="margin-right-sm"
+            type="primary"
+            @click="$router.push(`${routePrefix}/articles/index/form`)">
+            新增
           </Button>
-        </ListOperations>
-        <ListSearch>
-          <Form inline @submit.native.prevent="handleSearch">
+        </CListOperations>
+        <CListSearch>
+          <Form
+            inline
+            @submit.native.prevent="search">
             <Form-item prop="attr">
-              <Select v-model="attr.search.which" placeholder="请选择属性" clearable style="width: 220px;">
-                <Option v-for="item in attr.options" :value="item.id" :key="item.id">
-                  {{ item.title }}
+              <Select
+                v-model="cList.cSearch.where.attr.$eq"
+                placeholder="请选择属性"
+                clearable
+                style="width: 220px;">
+                <Option
+                  v-for="(item, index) in Object.keys($consts.ARTICLE_ATTRS)"
+                  :value="item"
+                  :key="index">
+                  {{ $consts.ARTICLE_ATTRS[item] }}
                 </Option>
               </Select>
             </Form-item>
             <Form-item prop="category_id">
-              <Categories :alias="where.alias" v-model="where.category_id.$eq" @on-change="handleCategoryChange"></Categories>
+              <Categories
+                :alias="alias"
+                v-model="cList.cSearch.where.category_id.$eq"
+                @on-change="handleCategoryChange" />
             </Form-item>
             <Form-item prop="title">
-              <Input type="text" placeholder="请输入标题" v-model="where.title.$like" style="width: 220px;"></Input>
+              <Input
+                type="text"
+                placeholder="请输入标题"
+                v-model="cList.cSearch.where.title.$like"
+                style="width: 220px;" />
             </Form-item>
             <Form-item>
-              <Button type="primary" @click="handleSearch">查询</Button>
+              <Button
+                type="primary"
+                @click="search">
+                查询
+              </Button>
             </Form-item>
           </Form>
-        </ListSearch>
-      </ListHeader>
-    </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+        </CListSearch>
+      </CListHeader>
+    </CList>
+    <Modal
+      width="280"
+      v-model="cDel.modal"
+      title="请确认"
+      @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    <Modal width="280" v-model="attr.setting.modal" title="请确认" @on-ok="handleSetAttr">
-      <p>{{setAttrTip}}</p>
+    <Modal
+      width="280"
+      v-model="cAttr.modal"
+      title="请确认"
+      @on-ok="handlePutAttr">
+      <p>{{
+        cAttr.which==='is_home_ad'
+        ? cAttr.value === 1
+        ? '确认设为首页广告？'
+        : '确认取消设为首页广告？'
+        : cAttr.value === 1
+        ? '确认设为分类头条？'
+        : '确认取消设为分类头条？'
+        }}</p>
     </Modal>
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
-  import consts from '@/utils/consts'
-  import helpers from '@/utils/helpers/base'
-  import time from 'apples/libs/time'
-  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
   import Categories from '@/components/Categories'
+  import routeParamsMixin from '@/mixins/routeParams'
+  import categoriesListMixin from '@/mixins/categoriesList'
+  import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
+  import CList, { CListHeader, CListOperations, CListSearch, CListNavigation } from '@/components1/List'
+
+  const module = 'articles'
+  const initWhere = {
+    attr: {
+      $eq: ''
+    },
+    category_id: {
+      $eq: ''
+    },
+    title: {
+      $like: ''
+    }
+  }
 
   export default {
-    name: 'list',
     async beforeRouteUpdate (to, from, next) {
-      this.categories.categories = {}
-      this.articles.articles = {}
-
-      this.routePrefix = helpers.getRoutePrefix(to.params)
-      this.where.alias = to.params.alias
-
-      await this.getCategoryItems()
-      this.getItems()
-
+      this.initSearchWhere(initWhere)
+      this.getList()
       next()
     },
     async created () {
-      this.categories.categories = {}
-      this.articles.articles = {}
-
-      this.routePrefix = helpers.getRoutePrefix(this.$route.params)
-      this.where.alias = this.$route.params.alias
-
-      await this.getCategoryItems()
-      this.getItems()
+      this.initSearchWhere(initWhere)
+      this.getList()
     },
     components: {
-      List,
-      ListHeader,
-      ListOperations,
-      ListSearch,
+      CList,
+      CListHeader,
+      CListOperations,
+      CListSearch,
+      CListNavigation,
       Categories
     },
+    mixins: [
+      routeParamsMixin,
+      categoriesListMixin,
+      listMixin,
+      formMixin
+    ],
     data () {
       return {
-        consts,
-        routePrefix: '',
-        attr: {
-          search: {
-            which: ''
-          },
-          setting: {
-            id: 0,
-            which: '',
-            modal: false,
-            value: ''
-          },
-          options: [
+        cList: {
+          columns: [
             {
-              id: 'is_category_top',
-              title: '是否分类头条'
+              title: '标题',
+              key: 'title'
             },
             {
-              id: 'is_home_ad',
-              title: '是否首页广告'
+              title: '分类',
+              key: 'category_id',
+              width: 180,
+              render: (h, params) => {
+                const item = this.$helpers.getItemById(this.categoriesList.items, params.row.category_id)
+                return h('span', null, item.title || '')
+              }
+            },
+            {
+              title: '发布时间',
+              key: 'created_at',
+              width: 180,
+              render: (h, params) => {
+                return h('span', null, this.$time.getTime(params.row.created_at))
+              }
+            },
+            {
+              title: '操作',
+              key: 'action',
+              width: 520,
+              render: (h, params) => {
+                const isHomeAd = params.row.is_home_ad === 1
+                const isCategoryTop = params.row.is_category_top === 1
+
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`${this.routePrefix}/articles/index/form/${params.row.id}`)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowDel(params.row.id)
+                      }
+                    }
+                  }, '删除'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: async () => {
+                        await this.$store.dispatch(`${module}/postAction`, {
+                          query: { where: this.searchWhere },
+                          body: { type: 'TO_PREV', id: params.row.id }
+                        })
+
+                        this.getList()
+                      }
+                    }
+                  }, '上移'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: async () => {
+                        await this.$store.dispatch(`${module}/postAction`, {
+                          query: { where: this.searchWhere },
+                          body: { type: 'TO_NEXT', id: params.row.id }
+                        })
+
+                        this.getList()
+                      }
+                    }
+                  }, '下移'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$set(this, 'cAttr', {
+                          id: params.row.id,
+                          which: 'is_home_ad',
+                          modal: true,
+                          value: isHomeAd ? 0 : 1
+                        })
+                      }
+                    }
+                  }, isHomeAd ? '取消设为首页广告' : '设为首页广告'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$set(this, 'cAttr', {
+                          id: params.row.id,
+                          which: 'is_category_top',
+                          modal: true,
+                          value: isCategoryTop ? 0 : 1
+                        })
+                      }
+                    }
+                  }, isCategoryTop ? '取消设为分类头条' : '设为分类头条')
+                ])
+              }
             }
-          ]
-        },
-        del: {
-          modal: false,
-          id: 0
-        },
-        where: {
-          alias: '',
-          category_id: {
-            $eq: ''
-          },
-          title: {
-            $like: ''
+          ],
+          cSearch: {
+            where: this.$helpers.deepCopy(initWhere)
           }
         },
-        current: 1,
-        columns: [
-          {
-            title: '标题',
-            key: 'title'
-          },
-          {
-            title: '分类',
-            key: 'category_id',
-            width: 180,
-            render: (h, params) => {
-              const item = helpers.getItemById(this.categories.categories.items, params.row.category_id)
-              return h('span', null, item.title || '')
-            }
-          },
-          {
-            title: '发布时间',
-            key: 'created_at',
-            width: 180,
-            render (h, params) {
-              return h('span', null, time.getDateTime(params.row.created_at + '000'))
-            }
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 520,
-            render: (h, params) => {
-              const isHomeAd = params.row.is_home_ad === 1
-              const isCategoryTop = params.row.is_category_top === 1
-
-              return h('ButtonGroup', [
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.$router.push(`${this.routePrefix}/articles/index/form/${params.row.id}`)
-                    }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.handleDel(params.row.id)
-                    }
-                  }
-                }, '删除'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: async () => {
-                      await this.$store.dispatch('postArticleAction', {
-                        query: {
-                          where: this.where
-                        },
-                        body: {
-                          type: 'TO_PREV',
-                          id: params.row.id,
-                          where: this.where
-                        }
-                      })
-
-                      this.getItems()
-                    }
-                  }
-                }, '上移'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: async () => {
-                      await this.$store.dispatch('postArticleAction', {
-                        query: {
-                          where: this.where
-                        },
-                        body: {
-                          type: 'TO_NEXT',
-                          id: params.row.id,
-                          where: this.where
-                        }
-                      })
-
-                      this.getItems()
-                    }
-                  }
-                }, '下移'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.attr.setting.id = params.row.id
-                      this.attr.setting.which = 'is_home_ad'
-                      this.attr.setting.modal = true
-                      this.attr.setting.value = isHomeAd ? 0 : 1
-                    }
-                  }
-                }, isHomeAd ? '取消设为首页广告' : '设为首页广告'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.attr.setting.id = params.row.id
-                      this.attr.setting.which = 'is_category_top'
-                      this.attr.setting.modal = true
-                      this.attr.setting.value = isCategoryTop ? 0 : 1
-                    }
-                  }
-                }, isCategoryTop ? '取消设为分类头条' : '设为分类头条')
-              ])
-            }
-          }
-        ]
+        cDel: {
+          id: 0,
+          modal: false
+        },
+        cAttr: {
+          id: 0,
+          which: '',
+          value: 0,
+          modal: false
+        }
       }
     },
     computed: {
-      ...mapState([
-        'articles',
-        'categories'
-      ]),
-      setAttrTip () {
-        const { which, value } = this.attr.setting
+      ...mapState({
+        list: state => state[module].list
+      }),
+      searchWhere () {
+        const attrWhere = {}
+        const { attr, ...otherWheres } = this.listSearchWhere || {}
 
-        if (which === 'is_home_ad') {
-          return value === 1 ? '确认设为首页广告？' : '确认取消设为首页广告？'
-        } else {
-          return value === 1 ? '确认设为分类头条？' : '确认取消设为分类头条？'
+        if (attr && attr.$eq) {
+          attrWhere[attr.$eq] = { $eq: 1 }
+        }
+
+        return {
+          ...attrWhere,
+          ...otherWheres,
+          alias: this.alias
         }
       }
     },
     methods: {
-      async handleSetAttr () {
+      async handlePutAttr () {
         const { which, value } = this.attr.setting
         const actionType = which === 'is_category_top'
           ? value === 1
@@ -268,67 +292,35 @@
             ? 'SET_HOME_AD'
             : 'CANCEL_HOME_AD'
 
-        await this.$store.dispatch('postArticleAction', {
-          body: {
-            type: actionType,
-            id: this.attr.setting.id
-          }
+        await this.$store.dispatch(`${module}/postAction`, {
+          body: { type: actionType, id: this.attr.setting.id }
         })
 
         this.$Message.success('设置成功！')
         this.resetSearch()
-        this.getItems()
       },
-      getItems (current = 1) {
-        const attrWhere = this.attr.search.which
-          ? { [this.attr.search.which]: { $eq: 1 } }
-          : null
-
-        this.current = current
-
-        return this.$store.dispatch('getArticles', {
+      getList () {
+        return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * consts.PAGE_SIZE,
-            limit: consts.PAGE_SIZE,
-            where: { ...this.where, ...attrWhere }
+            offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE,
+            where: this.searchWhere
           }
         })
       },
-      resetSearch () {
-        this.where.category_id.$eq = ''
-        this.where.title.$like = ''
-        this.attr.search.which = ''
-      },
-      getCategoryItems () {
-        return this.$store.dispatch('getCategories', {
-          query: {
-            where: { alias: this.where.alias }
-          }
-        })
-      },
-      handlePageChange (current) {
-        this.getItems(current)
-      },
-      handleSearch () {
-        this.current = 1
-        this.getItems()
-      },
-      handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
+      handleShowDel (id) {
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch('delArticle', {
-          id: this.del.id
-        })
+        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
-        await helpers.sleep(500)
-        this.resetSearch()
-        this.getItems()
+
+        const getListRes = await this.getList()
+        !getListRes.items.length && this.goPrevPage()
       },
-      handleCategoryChange (val) {
-        this.where.category_id.$eq = val
+      handleCategoryChange (value) {
+        this.cList.cSearch.where.category_id.$eq = value
       }
     }
   }
