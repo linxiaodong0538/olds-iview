@@ -1,7 +1,7 @@
 <template>
   <div>
     <CList 
-      :columns="columns" 
+      :columns="cList.columns" 
       :data="list.items" 
       :total="list.total"
       :pageCurrent="listPageCurrent">
@@ -50,52 +50,50 @@
         where: {
           alias: ''
         },
-        del: {
-          modal: false,
-          id: 0
-        },
-        columns: [
-          {
-            title: '告警内容',
-            key: 'content',
-            render (h, params) {
-              return h('span', null, params.row.content)
-            }
-          },
-          {
-            title: '告警时间',
-            key: 'created_at',
-            width: 180,
-            render (h, params) {
-              return h('span', null, time.getDate(params.created_at))
-            }
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 120,
-            render: (h, params) => {
-              return h('ButtonGroup', [
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      switch (this.where.alias) {
-                        case 'cars':
-                          window.open(`/#/company-app/cars/cars/cars/index/form/${params.row.resource_id}`)
-                          break
-                        default:
-                          window.open(`/#/company-app/medicines/${this.where.alias}/products/index/form/${params.row.resource_id}`)
+        cList: {
+          columns: [
+            {
+              title: '告警内容',
+              key: 'content',
+              render (h, params) {
+                return h('span', null, params.row.content)
+              }
+            },
+            {
+              title: '告警时间',
+              key: 'created_at',
+              width: 180,
+              render (h, params) {
+                return h('span', null, time.getDate(params.created_at))
+              }
+            },
+            {
+              title: '操作',
+              key: 'action',
+              width: 120,
+              render: (h, params) => {
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        switch (this.where.alias) {
+                          case 'cars':
+                            window.open(`/#/company-app/cars/cars/cars/index/form/${params.row.resource_id}`)
+                            break
+                          default:
+                            window.open(`/#/company-app/medicines/${this.where.alias}/products/index/form/${params.row.resource_id}`)
+                        }
                       }
                     }
-                  }
-                }, '查看对象')
-              ])
+                  }, '查看对象')
+                ])
+              }
             }
-          }
-        ]
+          ]
+        }
       }
     },
     computed: mapState({
