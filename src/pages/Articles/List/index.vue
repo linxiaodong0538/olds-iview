@@ -283,7 +283,7 @@
     },
     methods: {
       async handlePutAttr () {
-        const { which, value } = this.attr.setting
+        const { which, value, id } = this.cAttr
         const actionType = which === 'is_category_top'
           ? value === 1
             ? 'SET_CATEGORY_TOP'
@@ -293,11 +293,11 @@
             : 'CANCEL_HOME_AD'
 
         await this.$store.dispatch(`${module}/postAction`, {
-          body: { type: actionType, id: this.attr.setting.id }
+          body: { type: actionType, id }
         })
 
         this.$Message.success('设置成功！')
-        this.resetSearch()
+        this.getList()
       },
       getList () {
         return this.$store.dispatch(`${module}/getList`, {
