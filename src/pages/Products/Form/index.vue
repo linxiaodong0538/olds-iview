@@ -70,6 +70,7 @@
   import Editor from '@/components/Editor'
   import Uploader from '@/components/Uploader'
   import Categories from '@/components/Categories'
+  const module = 'products'
 
   export default {
     name: 'form',
@@ -137,10 +138,10 @@
     },
     methods: {
       getDetails (id) {
-        return this.$store.dispatch('getProduct', { id })
+        return this.$store.dispatch(`${module}/getDetail`, { id })
       },
       getCategoryItems () {
-        return this.$store.dispatch('getCategories', {
+        return this.$store.dispatch('categories/getList', {
           query: {
             where: { alias: this.alias }
           }
@@ -159,9 +160,9 @@
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
             const { id, formValidate, alias } = this
-            const action = id ? 'putProduct' : 'postProduct'
+            const action = id ? 'put' : 'post'
 
-            await this.$store.dispatch(action, {
+            await this.$store.dispatch(`${module}/${action}`, {
               id,
               body: { ...formValidate, alias }
             })
@@ -181,12 +182,12 @@
         this.formValidate.category_id = val
       }
     },
-    computed: mapState([
-      'products',
-      'categories'
-    ]),
+    computed: mapState({
+      list: state => state[module].list,
+      categories: state => state['categories'].list
+    }),
     watch: {
-      'products.product': {
+      'list': {
         handler (newVal) {
           const { id, ...others } = newVal
 
