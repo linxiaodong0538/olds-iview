@@ -1,21 +1,21 @@
 <template>
   <div>
-    <List
+    <CList
       :columns="listColumns"
       :data="list.items"
       :total="list.total"
-      :current="cList.cPage.current"
-      @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations>
+      :searchWhere="listSearchWhere"
+      :pageCurrent="listPageCurrent">
+      <CListHeader>
+        <CListOperations>
           <Button
             class="margin-right-sm"
             type="primary"
             @click="$router.push(`${routePrefix}/staffs/index/form`)">
             新增
           </Button>
-        </ListOperations>
-        <ListSearch>
+        </CListOperations>
+        <CListSearch>
           <Form
             inline
             @submit.native.prevent="handleSearch">
@@ -23,20 +23,20 @@
               <Input
                 type="text"
                 placeholder="请输入姓名"
-                v-model="cList.cSearch.cache.where.name.$like"
+                v-model="cList.cSearch.where.name.$like"
                 style="width: 220px;" />
             </Form-item>
             <Form-item>
               <Button
                 type="primary"
-                @click="handleSearch">
+                @click="search">
                 查询
               </Button>
             </Form-item>
           </Form>
-        </ListSearch>
-      </ListHeader>
-    </List>
+        </CListSearch>
+      </CListHeader>
+    </CList>
     <Modal
       width="280"
       v-model="cDel.modal"
@@ -46,12 +46,12 @@
     </Modal>
     <Modal
       width="400"
-      v-model="cRoleForm.modal"
+      v-model="cForm.modal"
       title="设置角色">
       <Form
         ref="formValidate"
-        :model="cRoleForm.formValidate"
-        :rules="cRoleForm.ruleValidate"
+        :model="cForm.formValidate"
+        :rules="cForm.ruleValidate"
         :label-width="80">
         <Form-item
           label="角色"
@@ -61,7 +61,7 @@
               <Select
                 placeholder="请选择角色"
                 clearable
-                v-model="cRoleForm.formValidate.role"
+                v-model="cForm.formValidate.role"
                 style="width:200px">
                 <Option
                   v-for="(item, index) in rolesList.items"
@@ -78,7 +78,7 @@
         <Button
           type="text"
           size="large"
-          @click="cRoleForm.modal = false">
+          @click="cForm.modal = false">
           取消
         </Button>
         <Button
@@ -96,7 +96,9 @@
 <script>
   import { mapState } from 'vuex'
   import routeParamsMixin from '@/mixins/routeParams'
-  import List, { ListHeader, ListOperations, ListSearch } from '@/components/List'
+  import listMixin from '@/mixins/list'
+  import formMixin from '@/mixins/form'
+  import CList, { CListHeader, CListOperations, CListSearch } from '@/components1/List'
 
   const module = 'staffs'
   const initWhere = {
@@ -107,30 +109,28 @@
 
   export default {
     components: {
-      List,
-      ListHeader,
-      ListOperations,
-      ListSearch
+      CList,
+      CListHeader,
+      CListOperations,
+      CListSearch
     },
-    mixins: [routeParamsMixin],
+    mixins: [
+      routeParamsMixin,
+      listMixin,
+      formMixin
+    ],
     data () {
       return {
         cList: {
           cSearch: {
-            cache: {
-              where: this.$helpers.deepCopy(initWhere)
-            },
             where: this.$helpers.deepCopy(initWhere)
-          },
-          cPage: {
-            current: 1
           }
         },
         cDel: {
           id: 0,
           modal: false
         },
-        cRoleForm: {
+        cForm: {
           id: 0,
           modal: false,
           formValidate: {},
@@ -224,9 +224,9 @@
                   },
                   on: {
                     click: () => {
-                      this.cRoleForm.modal = true
-                      this.cRoleForm.id = params.row.id
-                      this.$set(this.cRoleForm.formValidate, 'role', params.row.role)
+                      this.cForm.modal = true
+                      this.cForm.id = params.row.id
+                      this.$set(this.cForm.formValidate, 'role', params.row.role)
                     }
                   }
                 }, '设置角色')
@@ -247,12 +247,11 @@
             return h('span', null, item.name || '')
           }
         })
-
         return columns
       }
     },
     watch: {
-      'cRoleForm.modal': {
+      'cForm.modal': {
         handler (newVal) {
           if (!newVal) {
             this.resetFields()
@@ -262,24 +261,23 @@
     },
     async beforeRouteUpdate (to, from, next) {
       await this.getRolesList()
+      this.initSearchWhere(initWhere)
       await this.getList()
-
       next()
     },
     async created () {
       await this.getRolesList()
+      this.initSearchWhere(initWhere)
       await this.getList()
     },
     methods: {
-      getList (current = 1) {
-        this.cList.cPage.current = current
-
+      getList () {
         return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * this.$consts.PAGE_SIZE,
+            offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
             limit: this.$consts.PAGE_SIZE,
             where: {
-              ...this.cList.cSearch.where,
+              ...this.listSearchWhere,
               alias: this.alias
             }
           }
@@ -290,18 +288,6 @@
           query: { offset: 0, limit: 1000 }
         })
       },
-      resetFields () {
-        this.$refs.formValidate.resetFields()
-        this.$set(this.cRoleForm, 'formValidate', {})
-      },
-      handleSearch () {
-        this.cList.cPage.current = 1
-        this.cList.cSearch.where = this.$helpers.deepCopy(this.cList.cSearch.cache.where)
-        this.getList()
-      },
-      handlePageChange (current) {
-        this.getList(current)
-      },
       handleShowDel (id) {
         this.cDel.id = id
         this.cDel.modal = true
@@ -309,19 +295,20 @@
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        this.getList()
+        const getListRes = await this.getList()
+        !getListRes.items.length && this.goPrevPage()
       },
       handleRoleFormOk () {
         this.$refs.formValidate.validate(async valid => {
           if (valid) {
-            const { id, formValidate } = this.cRoleForm
+            const { id, formValidate } = this.cForm
 
             await this.$store.dispatch(`${module}/put`, {
               id,
               body: { role: formValidate.role || 0 }
             })
 
-            this.cRoleForm.modal = false
+            this.cForm.modal = false
             this.$Message.success('设置成功')
             this.getList()
           }
