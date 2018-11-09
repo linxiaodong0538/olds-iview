@@ -11,11 +11,11 @@ export default {
       component: resolve => require(['@/pages/Cars/Form'], resolve)
     },
     {
-      path: 'index/breakdowns/:car_id',
+      path: 'index/breakdowns/:carId',
       component: resolve => require(['@/pages/Cars/Breakdowns'], resolve)
     },
     {
-      path: 'index/trips/:car_id',
+      path: 'index/trips/:carId',
       component: resolve => require(['@/pages/Cars/Trips'], resolve)
     }
   ]
