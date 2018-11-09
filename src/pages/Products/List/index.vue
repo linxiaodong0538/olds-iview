@@ -30,7 +30,7 @@
         </CListSearch>
       </CListHeader>
     </CList>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+    <Modal width="280" v-model="cDel.modal" title="请确认" @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
     <Modal width="400" v-model="qrcode.modal" title="获取二维码">
@@ -240,7 +240,7 @@
       },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, {
-          id: this.del.id
+          id: this.cDel.id
         })
         this.$Message.success('删除成功！')
         // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
