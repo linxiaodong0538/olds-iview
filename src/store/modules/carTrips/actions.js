@@ -2,46 +2,35 @@ import types from './types'
 import Model from '../../../models/carTrips'
 
 export default {
-  /**
-   * 获取列表
-   */
-  getCarTrips ({ commit }, { query }) {
-    return new Model().GET({ query }).then((res) => {
-      commit(types.GET_CAR_TRIPS, {
-        data: res.data
-      })
+  async getList ({ commit }, { query }) {
+    const res = await new Model().GET({ query })
+
+    commit(types.GET_LIST, {
+      data: res.data
     })
+
+    return res.data
   },
 
-  /**
-   * 获取详情
-   */
-  getCarTrip ({ commit }, { id }) {
-    return new Model().GET({ id }).then((res) => {
-      commit(types.GET_CAR_TRIP, {
-        data: res.data
-      })
+  async getDetail ({ commit }, { id }) {
+    const res = await new Model().GET({ id })
+
+    commit(types.GET_DETAIL, {
+      data: res.data
     })
+
+    return res.data
   },
 
-  /**
-   * 新增
-   */
-  postCarTrip ({ commit }, { body }) {
+  async post ({ commit }, { body }) {
     return new Model().POST({ body })
   },
 
-  /**
-   * 编辑
-   */
-  putCarTrip ({ commit }, { id, body }) {
+  async put ({ commit }, { id, body }) {
     return new Model().PUT({ id, body })
   },
 
-  /**
-   * 删除
-   */
-  delCarTrip ({ commit }, { id }) {
+  async del ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }
