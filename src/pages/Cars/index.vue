@@ -3,9 +3,5 @@
 </template>
 
 <script>
-  import './i18n'
-
-  export default {
-    name: 'cars'
-  }
+  export default {}
 </script>

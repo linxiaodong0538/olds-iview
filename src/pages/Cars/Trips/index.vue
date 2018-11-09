@@ -1,103 +1,186 @@
 <template>
   <div>
-    <List :current="current" :columns="columns" :data="carTrips.carTrips.items"
-          :total="carTrips.carTrips.total"
-          @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations>
-          <Button class="margin-right-sm" type="ghost" @click="$router.push(`${routePrefix}/cars/index`)">返回</Button>
-        </ListOperations>
-      </ListHeader>
-    </List>
-    <Modal width="280" v-model="del.modal" title="请确认" @on-ok="handleDelOk">
+    <CList
+      :data="list.items"
+      :columns="cList.columns"
+      :total="list.total"
+      :pageCurrent="listPageCurrent"
+      :searchWhere="listSearchWhere">
+      <CListHeader>
+        <CListOperations>
+          <Button
+            class="margin-right-sm"
+            type="ghost"
+            @click="$router.push(`${routePrefix}/cars/index`)">
+            返回
+          </Button>
+        </CListOperations>
+      </CListHeader>
+    </CList>
+    <Modal
+      width="280"
+      v-model="cDel.modal"
+      title="请确认"
+      @on-ok="handleDelOk">
       <p>确认删除？</p>
     </Modal>
-    <Modal width="500" v-model="formModal" :title="put.id ? '编辑' : '新增'">
+    <Modal
+      width="500"
+      v-model="formModal"
+      :title="put.id ? '编辑' : '新增'">
       <div style="height: 500px; overflow-y: auto;">
-        <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-          <Form-item label="司机" prop="driver">
+        <Form
+          ref="formValidate"
+          :model="formValidate"
+          :rules="ruleValidate"
+          :label-width="80">
+          <Form-item
+            label="司机"
+            prop="driver">
             <Row>
               <Col span="20">
-                <Input v-model="formValidate.driver" placeholder="请输入司机"></Input>
+                <Input
+                  v-model="formValidate.driver"
+                  placeholder="请输入司机" />
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="开始时间" prop="start_time">
+          <Form-item
+            label="开始时间"
+            prop="start_time">
             <Row>
               <Col span="20">
-                <DatePicker v-model="formValidate.start_date" type="date" placeholder="请选择开始日期"
-                            style="width: 220px"></DatePicker>
-                <TimePicker v-model="formValidate.start_time" format="HH:mm:ss" placeholder="请选择开始时间点"
-                            style="width: 220px"></TimePicker>
+                <DatePicker
+                  v-model="formValidate.start_date"
+                  type="date"
+                  placeholder="请选择开始日期"
+                  style="width: 220px" />
+                <TimePicker
+                  v-model="formValidate.start_time"
+                  format="HH:mm:ss"
+                  placeholder="请选择开始时间点"
+                  style="width: 220px" />
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="开始公里数" prop="start_km">
+          <Form-item
+            label="开始公里数"
+            prop="start_km">
             <Row>
               <Col span="20">
-                <InputNumber :min="0" :max="100000" v-model="formValidate.start_km" style="width: 220px;"></InputNumber>
+                <InputNumber
+                  :min="0"
+                  :max="100000"
+                  v-model="formValidate.start_km"
+                  style="width: 220px;" />
                 公里
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="结束时间" prop="end_time">
+          <Form-item
+            label="结束时间"
+            prop="end_time">
             <Row>
               <Col span="20">
-                <DatePicker v-model="formValidate.end_date" type="date" placeholder="请选择结束日期"
-                            style="width: 220px"></DatePicker>
-                <TimePicker v-model="formValidate.end_time" format="HH:mm:ss" placeholder="请选择结束时间点"
-                            style="width: 220px"></TimePicker>
+                <DatePicker
+                  v-model="formValidate.end_date"
+                  type="date"
+                  placeholder="请选择结束日期"
+                  style="width: 220px" />
+                <TimePicker
+                  v-model="formValidate.end_time"
+                  format="HH:mm:ss"
+                  placeholder="请选择结束时间点"
+                  style="width: 220px" />
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="结束公里数" prop="end_km">
+          <Form-item
+            label="结束公里数"
+            prop="end_km">
             <Row>
               <Col span="20">
-                <InputNumber :min="0" :max="100000" v-model="formValidate.end_km" style="width: 220px;"></InputNumber>
+                <InputNumber
+                  :min="0"
+                  :max="100000"
+                  v-model="formValidate.end_km"
+                  style="width: 220px;" />
                 公里
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="停靠点" prop="stop1">
+          <Form-item
+            label="停靠点"
+            prop="stop1">
             <Row>
               <Col span="20">
-                <Input v-model="formValidate.stop1" placeholder="请输入停靠点"></Input>
+                <Input
+                  v-model="formValidate.stop1"
+                  placeholder="请输入停靠点" />
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="停靠点" prop="stop2">
+          <Form-item
+            label="停靠点"
+            prop="stop2">
             <Row>
               <Col span="20">
-                <Input v-model="formValidate.stop2" placeholder="请输入停靠点"></Input>
+                <Input
+                  v-model="formValidate.stop2"
+                  placeholder="请输入停靠点" />
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="停靠点" prop="stop3">
+          <Form-item
+            label="停靠点"
+            prop="stop3">
             <Row>
               <Col span="20">
-                <Input v-model="formValidate.stop3" placeholder="请输入停靠点"></Input>
+                <Input
+                  v-model="formValidate.stop3"
+                  placeholder="请输入停靠点" />
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="目的地" prop="destination">
+          <Form-item
+            label="目的地"
+            prop="destination">
             <Row>
               <Col span="20">
-                <Input v-model="formValidate.destination" placeholder="请输入目的地"></Input>
+                <Input
+                  v-model="formValidate.destination"
+                  placeholder="请输入目的地" />
               </Col>
             </Row>
           </Form-item>
-          <Form-item label="行程目的" prop="aim">
+          <Form-item
+            label="行程目的"
+            prop="aim">
             <Row>
               <Col span="20">
-                <Input type="textarea" :rows="3" v-model="formValidate.aim" placeholder="请输入行程目的"></Input>
+                <Input
+                  type="textarea"
+                  :rows="3"
+                  v-model="formValidate.aim"
+                  placeholder="请输入行程目的" />
               </Col>
             </Row>
           </Form-item>
         </Form>
       </div>
       <div slot="footer">
-        <Button type="text" size="large" @click="formModal = false">取消</Button>
-        <Button type="primary" size="large" @click="handleFormOk">确定</Button>
+        <Button
+          type="text"
+          size="large"
+          @click="formModal = false">
+          取消
+        </Button>
+        <Button
+          type="primary"
+          size="large"
+          @click="handleFormOk">
+          确定
+        </Button>
       </div>
     </Modal>
   </div>
