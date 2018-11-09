@@ -1,6 +1,4 @@
-import helpers from 'jt-helpers'
-
-export default helpers.keyMirror({
-  GET_CAR_BREAKDOWNS: null,
-  GET_CAR_BREAKDOWN: null
-})
+export default {
+  GET_LIST: 'cars/GET_LIST',
+  GET_DETAIL: 'cars/GET_DETAIL'
+}

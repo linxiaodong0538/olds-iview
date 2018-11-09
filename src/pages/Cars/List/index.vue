@@ -1,25 +1,24 @@
 <template>
   <div>
-    <List
-      :current="current"
-      :columns="columns"
-      :data="cars.cars.items"
-      :total="cars.cars.total"
-      @on-change="handlePageChange">
-      <ListHeader>
-        <ListOperations>
+    <CList
+      :data="list.items"
+      :columns="cList.columns"
+      :total="list.total"
+      :pageCurrent="listPageCurrent">
+      <CListHeader>
+        <CListOperations>
           <Button
             class="margin-right-sm"
             type="primary"
             @click="$router.push(`${routePrefix}/cars/index/form`)">
             新增
           </Button>
-        </ListOperations>
-      </ListHeader>
-    </List>
+        </CListOperations>
+      </CListHeader>
+    </CList>
     <Modal
       width="280"
-      v-model="del.modal"
+      v-model="cDel.modal"
       title="请确认"
       @on-ok="handleDelOk">
       <p>确认删除？</p>
@@ -29,155 +28,135 @@
 
 <script>
   import { mapState } from 'vuex'
-  // import time from '@/utils/time'
-  import consts from '@/utils/consts'
-  import helpers from '@/utils/helpers/base'
-  import List, { ListHeader, ListOperations } from '@/components/List'
+  import routeParamsMixin from '@/mixins/routeParams'
+  import listMixin from '@/mixins/list'
+  import CList, { CListHeader, CListOperations } from '@/components1/List'
+
+  const module = 'cars'
 
   export default {
-    name: 'list',
-    async beforeRouteUpdate (to, from, next) {
-      this.cars.cars = {}
-
-      this.routePrefix = helpers.getRoutePrefix(to.params)
-      this.alias = to.params.alias
-
-      this.getItems()
-
-      next()
-    },
-    async created () {
-      this.cars.cars = {}
-
-      this.routePrefix = helpers.getRoutePrefix(this.$route.params)
-      this.alias = this.$route.params.alias
-
-      this.getItems()
-    },
     components: {
-      List,
-      ListHeader,
-      ListOperations
+      CList,
+      CListHeader,
+      CListOperations
     },
+    mixins: [
+      routeParamsMixin,
+      listMixin
+    ],
     data () {
       return {
-        consts,
-        routePrefix: '',
-        alias: '',
-        del: {
-          modal: false,
-          id: 0
+        cList: {
+          columns: [
+            {
+              title: '车牌号',
+              key: 'num'
+            },
+            {
+              title: '车主',
+              key: 'owner',
+              width: 80,
+              render (h, params) {
+                return h('span', null, params.row.owner)
+              }
+            },
+            {
+              title: '年检时间',
+              key: 'mot_time',
+              width: 120
+            },
+            {
+              title: '保险到期时间',
+              key: 'insurance_time',
+              width: 120
+            },
+            {
+              title: '购买日期',
+              key: 'buy_time',
+              width: 120
+            },
+            {
+              title: '操作',
+              key: 'action',
+              width: 360,
+              render: (h, params) => {
+                return h('ButtonGroup', [
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`${this.routePrefix}/cars/index/form/${params.row.id}`)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleShowDel(params.row.id)
+                      }
+                    }
+                  }, '删除'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`${this.routePrefix}/cars/index/breakdowns/${params.row.id}`)
+                      }
+                    }
+                  }, '查看维修保养记录'),
+                  h('Button', {
+                    props: {
+                      type: 'ghost'
+                    },
+                    on: {
+                      click: () => {
+                        this.$router.push(`${this.routePrefix}/cars/index/trips/${params.row.id}`)
+                      }
+                    }
+                  }, '查看行程')
+                ])
+              }
+            }
+          ]
         },
-        columns: [
-          {
-            title: '车牌号',
-            key: 'num'
-          },
-          {
-            title: '车主',
-            key: 'owner',
-            width: 80,
-            render (h, params) {
-              return h('span', null, params.row.owner)
-            }
-          },
-          {
-            title: '年检时间',
-            key: 'mot_time',
-            width: 120
-          },
-          {
-            title: '保险到期时间',
-            key: 'insurance_time',
-            width: 120
-          },
-          {
-            title: '购买日期',
-            key: 'buy_time',
-            width: 120
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 360,
-            render: (h, params) => {
-              return h('ButtonGroup', [
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.$router.push(`${this.routePrefix}/cars/index/form/${params.row.id}`)
-                    }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.handleDel(params.row.id)
-                    }
-                  }
-                }, '删除'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.$router.push(`${this.routePrefix}/cars/index/breakdowns/${params.row.id}`)
-                    }
-                  }
-                }, '查看维修保养记录'),
-                h('Button', {
-                  props: {
-                    type: 'ghost'
-                  },
-                  on: {
-                    click: () => {
-                      this.$router.push(`${this.routePrefix}/cars/index/trips/${params.row.id}`)
-                    }
-                  }
-                }, '查看行程')
-              ])
-            }
-          }
-        ]
+        cDel: {
+          id: 0,
+          modal: false
+        }
       }
     },
-    computed: mapState([
-      'cars'
-    ]),
+    computed: mapState({
+      list: state => state[module].list
+    }),
+    async created () {
+      this.getList()
+    },
     methods: {
-      getItems (current = 1) {
-        this.current = current
-
-        return this.$store.dispatch('getCars', {
+      getList () {
+        return this.$store.dispatch(`${module}/getList`, {
           query: {
-            offset: (current - 1) * consts.PAGE_SIZE,
-            limit: consts.PAGE_SIZE,
-            where: { ...this.where, alias: this.alias }
+            offset: (this.listPageCurrent - 1) * this.$consts.PAGE_SIZE,
+            limit: this.$consts.PAGE_SIZE
           }
         })
       },
-      handlePageChange (current) {
-        this.getItems(current)
-      },
-      handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
+      handleShowDel (id) {
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       async handleDelOk () {
-        await this.$store.dispatch('delCar', {
-          id: this.del.id
-        })
+        await this.$store.dispatch(`${module}/del`, { id: this.cDel.id })
         this.$Message.success('删除成功！')
-        // iView.Spin 的坑，调用 iView.Spin.hide()，500ms 后实例才被销毁
-        await helpers.sleep(500)
-        this.getItems()
+
+        const getListRes = await this.getList()
+        !getListRes.items.length && this.goPrevPage()
       }
     }
   }

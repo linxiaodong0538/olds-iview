@@ -2,46 +2,35 @@ import types from './types'
 import Model from '../../../models/carBreakdowns'
 
 export default {
-  /**
-   * 获取列表
-   */
-  getCarBreakdowns ({ commit }, { query }) {
-    return new Model().GET({ query }).then((res) => {
-      commit(types.GET_CAR_BREAKDOWNS, {
-        data: res.data
-      })
+  async getList ({ commit }, { query }) {
+    const res = await new Model().GET({ query })
+
+    commit(types.GET_LIST, {
+      data: res.data
     })
+
+    return res.data
   },
 
-  /**
-   * 获取详情
-   */
-  getCarBreakdown ({ commit }, { id }) {
-    return new Model().GET({ id }).then((res) => {
-      commit(types.GET_CAR_BREAKDOWN, {
-        data: res.data
-      })
+  async getDetail ({ commit }, { id }) {
+    const res = await new Model().GET({ id })
+
+    commit(types.GET_DETAIL, {
+      data: res.data
     })
+
+    return res.data
   },
 
-  /**
-   * 新增
-   */
-  postCarBreakdown ({ commit }, { body }) {
+  async post ({ commit }, { body }) {
     return new Model().POST({ body })
   },
 
-  /**
-   * 编辑
-   */
-  putCarBreakdown ({ commit }, { id, body }) {
+  async put ({ commit }, { id, body }) {
     return new Model().PUT({ id, body })
   },
 
-  /**
-   * 删除
-   */
-  delCarBreakdown ({ commit }, { id }) {
+  async del ({ commit }, { id }) {
     return new Model().DELETE({ id })
   }
 }
