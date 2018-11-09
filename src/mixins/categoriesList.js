@@ -13,7 +13,7 @@ export default {
       return this.$store.dispatch('categories/getList', {
         query: {
           offset: 0,
-          limit: 2000,
+          limit: 2000
           // where: { alias: this.alias }
         }
       })

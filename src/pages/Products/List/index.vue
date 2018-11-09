@@ -100,7 +100,7 @@
           title: '',
           download: ''
         },
-        del: {
+        cDel: {
           id: 0,
           modal: false,
           imgSrc: ''
@@ -160,7 +160,7 @@
                     },
                     on: {
                       click: () => {
-                        this.handleDel(params.row.id)
+                        this.handleShowDel(params.row.id)
                       }
                     }
                   }, '删除'),
@@ -234,9 +234,9 @@
           }
         })
       },
-      handleDel (id) {
-        this.del.modal = true
-        this.del.id = id
+      handleShowDel (id) {
+        this.cDel.id = id
+        this.cDel.modal = true
       },
       async handleDelOk () {
         await this.$store.dispatch(`${module}/del`, {
