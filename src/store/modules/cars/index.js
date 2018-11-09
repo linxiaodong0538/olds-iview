@@ -3,9 +3,10 @@ import actions from './actions'
 import mutations from './mutations'
 
 export default {
+  namespaced: true,
   state: {
-    cars: {},
-    car: {}
+    list: {},
+    detail: {}
   },
   getters,
   actions,
