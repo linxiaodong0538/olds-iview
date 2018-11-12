@@ -144,6 +144,9 @@
   import formMixin from '@/mixins/form'
   import CList, { CListHeader, CListOperations } from '@/components1/List'
   import Uploader from '@/components/Uploader'
+  import helpers from '@/utils/helpers/base'
+
+  const initWhere = {}
 
   export default {
     components: {
@@ -180,7 +183,7 @@
               key: 'time',
               width: 150,
               render (h, params) {
-                return h('span', null, time.getDate(params.row.time))
+                return h('span', null, this.time.getDate(params.row.time))
               }
             },
             {

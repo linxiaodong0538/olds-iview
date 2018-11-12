@@ -368,7 +368,7 @@
 
             this.cForm.modal = false
             this.$Message.success((this.cForm.id ? '编辑' : '新增') + '成功！')
-            !this.cForm.id && this.resetSearch(initWhere)
+            !this.cForm.id && this.resetSearch()
             this.getList()
           }
         })
