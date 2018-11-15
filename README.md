@@ -1,4 +1,4 @@
-项目名：基于 vue-cli + iView 的后台管理系统，仓库地址：[https://github.com/zhaotoday/iview](https://github.com/zhaotoday/iview)。负责人：[赵金添@zhaotoday](https://github.com/zhaotoday)。
+项目名：基于 vue-cli + iView 的后台管理系统，仓库地址：[https://github.com/zhaotoday/iview](https://github.com/zhaotoday/iview)
 
 ## 1. 关于
 
